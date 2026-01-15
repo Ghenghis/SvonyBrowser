@@ -719,16 +719,14 @@ async function sendChatMessage() {
         } else if (response && response.error) {
             addChatMessage('assistant', `Error: ${response.error}`);
         } else {
-            // Fallback to local response if LM Studio not available
-            const localResponse = generateChatResponse(message);
-            addChatMessage('assistant', localResponse);
+            // No response from LM Studio - show connection error
+            addChatMessage('assistant', '⚠️ Unable to get response. Please ensure LM Studio is running and connected.\n\nGo to Settings → LLM to configure your LM Studio URL and test the connection.');
         }
     } catch (error) {
         typingDiv.remove();
         console.error('Chatbot error:', error);
-        // Fallback to local response
-        const localResponse = generateChatResponse(message);
-        addChatMessage('assistant', localResponse + '\n\n(Note: LM Studio not connected - using local responses)');
+        // Show connection error
+        addChatMessage('assistant', `⚠️ Connection Error: ${error.message}\n\nPlease ensure LM Studio is running at the configured URL. Go to Settings → LLM to configure and test your connection.`);
     }
 }
 
@@ -743,21 +741,8 @@ function addChatMessage(role, content) {
     elements.chatbotMessages.scrollTop = elements.chatbotMessages.scrollHeight;
 }
 
-function generateChatResponse(message) {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('protocol') || lowerMessage.includes('command')) {
-        return 'You can find all available protocols in the Protocol tab. Each protocol includes its command ID, parameters, and example requests.';
-    }
-    if (lowerMessage.includes('training') || lowerMessage.includes('troops')) {
-        return 'Use the Training Calculator in the Tools tab to calculate resource costs and time for training troops.';
-    }
-    if (lowerMessage.includes('amf') || lowerMessage.includes('decode')) {
-        return 'The AMF3 Decoder in the Tools tab can decode AMF data from traffic captures. Paste the hex data and click Decode.';
-    }
-    
-    return 'I can help you with Evony protocols, traffic analysis, and game strategies. Try asking about specific commands or use the quick action buttons below.';
-}
+// generateChatResponse removed - all responses now come from LM Studio
+// No mock/fallback responses - users must connect LM Studio for AI features
 
 function handleQuickAction(action) {
     switch (action) {
@@ -1731,13 +1716,12 @@ async function sendChatMessageEnhanced() {
         } else if (response && response.error) {
             addChatMessage('assistant', `Error: ${response.error}`);
         } else {
-            // Fallback to local response
-            const localResponse = generateChatResponse(message);
-            addChatMessage('assistant', localResponse);
+            // No response from LM Studio
+            addChatMessage('assistant', '⚠️ Unable to get response. Please ensure LM Studio is running and connected.');
         }
     } catch (error) {
         typingDiv.remove();
-        addChatMessage('assistant', `Error: ${error.message}`);
+        addChatMessage('assistant', `⚠️ Connection Error: ${error.message}\n\nPlease configure LM Studio in Settings → LLM.`);
     }
 }
 
@@ -2148,12 +2132,11 @@ async function sendChatMessageWithAttachments() {
         } else if (response && response.error) {
             addChatMessage('assistant', `Error: ${response.error}`);
         } else {
-            const localResponse = generateChatResponse(message);
-            addChatMessage('assistant', localResponse);
+            addChatMessage('assistant', '⚠️ Unable to get response. Please ensure LM Studio is running and connected.');
         }
     } catch (error) {
         typingDiv.remove();
-        addChatMessage('assistant', `Error: ${error.message}`);
+        addChatMessage('assistant', `⚠️ Connection Error: ${error.message}\n\nPlease configure LM Studio in Settings → LLM.`);
     }
 }
 
