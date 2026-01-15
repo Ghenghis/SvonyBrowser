@@ -6,6 +6,28 @@
 const { ipcRenderer, remote } = require('electron');
 const path = require('path');
 const fs = require('fs');
+// Find SWF file in multiple locations (packaged vs development)
+function findSWFPath(swfName) {
+    const possibleDirs = [
+        path.join(__dirname, 'swf'),
+        path.join(process.resourcesPath || __dirname, 'swf'),
+        path.join(path.dirname(process.execPath), 'resources', 'swf')
+    ];
+    
+    for (const dir of possibleDirs) {
+        try {
+            const swfPath = path.join(dir, swfName);
+            if (fs.existsSync(swfPath)) {
+                console.log('[Renderer] Found SWF:', swfPath);
+                return swfPath;
+            }
+        } catch (e) { /* ignore */ }
+    }
+    
+    console.warn('[Renderer] SWF not found:', swfName);
+    return null;
+}
+
 const Store = require('./store');
 
 // Initialize store
@@ -450,9 +472,9 @@ function togglePanelMode(panel, mode) {
         
         if (mode === 'swf') {
             // SWF files are in the swf/ directory
-            const swfPath = store.get('autoevonySwfPath') || path.join(__dirname, 'swf', 'AutoEvony.swf');
+            const swfPath = store.get('autoevonySwfPath') || findSWFPath('AutoEvony.swf');
             // If file doesn't exist, show message
-            if (!fs.existsSync(swfPath)) {
+            if (!swfPath || !fs.existsSync(swfPath)) {
                 elements.leftWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>AutoEvony.swf not found in swf/ directory</p></div></body></html>';
                 return;
             }
@@ -485,9 +507,9 @@ function togglePanelMode(panel, mode) {
         
         if (mode === 'swf') {
             // SWF files are in the swf/ directory
-            const swfPath = store.get('evonySwfPath') || path.join(__dirname, 'swf', 'EvonyClient.swf');
+            const swfPath = store.get('evonySwfPath') || findSWFPath('AutoEvony.swf');
             // If file doesn't exist, show message
-            if (!fs.existsSync(swfPath)) {
+            if (!swfPath || !fs.existsSync(swfPath)) {
                 elements.rightWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>EvonyClient.swf not found in swf/ directory</p></div></body></html>';
                 return;
             }
@@ -4535,3 +4557,6 @@ if (document.readyState === 'loading') {
 window.ErrorNotification = ErrorNotification;
 window.safeIpcCall = safeIpcCall;
 window.withRetry = withRetry;
+
+
+

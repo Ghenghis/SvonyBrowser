@@ -2,6 +2,28 @@
 
 All notable changes to Svony Browser will be documented in this file.
 
+## [2.2.7] - 2026-01-15 - SWF Asset Fix & Playwright Commands
+
+### Fixed
+- **SWF Asset Loading**: Added indSWFFile() function to properly locate SWF files in both packaged and development modes
+- **Panel Manager**: SWF paths now fallback to auto-detected paths when not configured
+- **get-swf-path Handler**: Returns auto-detected SWF path when store value is empty
+
+### New Features
+
+#### Playwright Chatbot Commands
+- /navigate <url> - Navigate to URL via Playwright
+- /screenshot - Take screenshot of current page
+- /login <email> <password> - Auto-login to Evony
+- /click <selector> - Click element on page
+- /type <selector> <text> - Type text into input field
+
+### Technical Details
+- Added indSWFFile() function similar to indFlashPlugin() for consistent asset resolution
+- Chatbot now has 6 new Playwright-powered commands
+- All Playwright commands lazy-load the service for performance
+
+---
 ## [2.2.1] - 2026-01-15 - Full CLI Access & Evony Knowledge Base
 
 ### New Features
@@ -162,3 +184,4 @@ This release focuses on enterprise-grade stability, comprehensive error handling
 ## [2.0.x] - Previous Releases
 
 See GitHub releases for detailed history of earlier versions.
+

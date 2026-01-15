@@ -635,7 +635,103 @@ class ChatbotService extends EventEmitter {
         }
     }
     
+    
     /**
+     * Handle navigate command - Navigate to URL via Playwright
+     */
+    async handleNavigate(args) {
+        if (!args) {
+            return { content: 'Usage: /navigate <url>', type: 'error' };
+        }
+        try {
+            const { getPlaywrightService } = require('./playwright-service');
+            this.playwrightService = getPlaywrightService();
+            if (!this.playwrightService.isInitialized) {
+                await this.playwrightService.initialize({ headless: false });
+            }
+            await this.playwrightService.navigate(args);
+            return { content: '**Navigated to:** ' + args, type: 'success' };
+        } catch (error) {
+            return { content: 'Navigation failed: ' + error.message, type: 'error' };
+        }
+    }
+
+    /**
+     * Handle screenshot command
+     */
+    async handleScreenshot(args) {
+        try {
+            const { getPlaywrightService } = require('./playwright-service');
+            this.playwrightService = getPlaywrightService();
+            if (!this.playwrightService.isInitialized) {
+                return { content: 'Playwright not initialized. Use /navigate first.', type: 'error' };
+            }
+            const screenshot = await this.playwrightService.screenshot(args);
+            return { content: '**Screenshot captured**', type: 'success', data: screenshot };
+        } catch (error) {
+            return { content: 'Screenshot failed: ' + error.message, type: 'error' };
+        }
+    }
+
+    /**
+     * Handle auto-login command
+     */
+    async handleAutoLogin(args) {
+        const parts = args ? args.split(' ') : [];
+        if (parts.length < 2) {
+            return { content: 'Usage: /login <email> <password>', type: 'error' };
+        }
+        try {
+            const { getPlaywrightService } = require('./playwright-service');
+            this.playwrightService = getPlaywrightService();
+            if (!this.playwrightService.isInitialized) {
+                await this.playwrightService.initialize({ headless: false });
+            }
+            await this.playwrightService.navigate('https://www.evony.com');
+            const result = await this.playwrightService.autoLogin(parts[0], parts[1]);
+            return { content: '**Auto-login initiated for:** ' + parts[0], type: 'success', data: result };
+        } catch (error) {
+            return { content: 'Auto-login failed: ' + error.message, type: 'error' };
+        }
+    }
+
+    /**
+     * Handle click command
+     */
+    async handleClick(args) {
+        if (!args) { return { content: 'Usage: /click <selector>', type: 'error' }; }
+        try {
+            const { getPlaywrightService } = require('./playwright-service');
+            this.playwrightService = getPlaywrightService();
+            if (!this.playwrightService.isInitialized) {
+                return { content: 'Playwright not initialized.', type: 'error' };
+            }
+            await this.playwrightService.click(args);
+            return { content: '**Clicked:** ' + args, type: 'success' };
+        } catch (error) {
+            return { content: 'Click failed: ' + error.message, type: 'error' };
+        }
+    }
+
+    /**
+     * Handle type command
+     */
+    async handleType(args) {
+        const parts = args ? args.split(' ') : [];
+        if (parts.length < 2) { return { content: 'Usage: /type <selector> <text>', type: 'error' }; }
+        try {
+            const { getPlaywrightService } = require('./playwright-service');
+            this.playwrightService = getPlaywrightService();
+            if (!this.playwrightService.isInitialized) {
+                return { content: 'Playwright not initialized.', type: 'error' };
+            }
+            await this.playwrightService.type(parts[0], parts.slice(1).join(' '));
+            return { content: '**Typed into ' + parts[0] + '**', type: 'success' };
+        } catch (error) {
+            return { content: 'Type failed: ' + error.message, type: 'error' };
+        }
+    }
+/**
      * Handle help command
      */
     async handleHelp() {
@@ -976,3 +1072,6 @@ module.exports = {
     set conversationMemory(memory) { chatbotSingleton.conversationMemory = memory; },
     get isInitialized() { return chatbotSingleton.isInitialized; }
 };
+
+
+

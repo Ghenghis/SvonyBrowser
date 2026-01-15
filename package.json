@@ -4,7 +4,7 @@
   "description": "Evony Analysis Suite - Flash Browser with Dual Panels, Traffic Viewer, Protocol Explorer, Combat Simulator, Session Recorder, and AI Co-Pilot",
   "homepage": "https://github.com/Ghenghis/Svony-Browser",
   "author": "Ghenghis",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "main": "index.js",
   "scripts": {
     "start": "electron .",
@@ -207,3 +207,4 @@
     "node": ">=14.0.0"
   }
 }
+

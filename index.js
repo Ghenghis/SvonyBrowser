@@ -182,6 +182,28 @@ function findFlashPlugin() {
     return null;
 }
 
+// Function to find SWF file in various locations (packaged vs development)
+function findSWFFile(swfName) {
+    const possibleDirs = [
+        path.join(__dirname, 'swf'),
+        path.join(process.resourcesPath || __dirname, 'swf'),
+        path.join(app.getAppPath(), 'swf'),
+        path.join(path.dirname(process.execPath), 'resources', 'swf')
+    ];
+
+    for (const dir of possibleDirs) {
+        try {
+            const swfPath = path.join(dir, swfName);
+            if (fs.existsSync(swfPath)) {
+                console.log('[SWF] Found SWF file: ' + swfPath);
+                return swfPath;
+            }
+        } catch (e) { /* ignore */ }
+    }
+    
+    console.warn('[SWF] SWF file not found: ' + swfName);
+    return null;
+}
 // Find Flash plugin
 pluginName = findFlashPlugin();
 flashFound = pluginName !== null;
@@ -206,7 +228,7 @@ app.commandLine.appendSwitch("--enable-npapi");
 app.commandLine.appendSwitch("--enable-logging");
 app.commandLine.appendSwitch("--log-level", 4);
 if (pluginName) {
-    app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, pluginName));
+    app.commandLine.appendSwitch('ppapi-flash-path', pluginName);
 }
 app.commandLine.appendSwitch('disable-site-isolation-trials');
 app.commandLine.appendSwitch('no-sandbox');
@@ -3196,3 +3218,7 @@ process.on('unhandledRejection', (reason, promise) => {
         });
     }
 });
+
+
+
+
