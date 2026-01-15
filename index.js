@@ -67,24 +67,84 @@ const store = new Store({
 
 // Flash plugin configuration
 let pluginName = null;
-switch (process.platform) {
-    case 'win32':
-        switch (process.arch) {
-            case 'ia32':
-            case 'x32':
-                pluginName = 'flashver/pepflashplayer32.dll';
-                break;
-            case 'x64':
-                pluginName = 'flashver/pepflashplayer64.dll';
-                break;
+let flashFound = false;
+
+// Function to find Flash plugin
+function findFlashPlugin() {
+    const flashDir = path.join(__dirname, 'flashver');
+    
+    // Define possible Flash plugin names for each platform
+    const flashNames = {
+        win32: {
+            x64: [
+                'pepflashplayer64_32_0_0_465.dll',
+                'pepflashplayer64.dll',
+                'pepflashplayer.dll'
+            ],
+            ia32: [
+                'pepflashplayer32_32_0_0_465.dll',
+                'pepflashplayer32.dll',
+                'pepflashplayer.dll'
+            ],
+            x32: [
+                'pepflashplayer32_32_0_0_465.dll',
+                'pepflashplayer32.dll',
+                'pepflashplayer.dll'
+            ]
+        },
+        linux: {
+            x64: ['libpepflashplayer.so'],
+            ia32: ['libpepflashplayer.so']
+        },
+        darwin: {
+            x64: ['PepperFlashPlayer.plugin'],
+            arm64: ['PepperFlashPlayer.plugin']
         }
-        break;
+    };
+    
+    const platform = process.platform;
+    const arch = process.arch;
+    
+    if (flashNames[platform] && flashNames[platform][arch]) {
+        for (const name of flashNames[platform][arch]) {
+            const fullPath = path.join(flashDir, name);
+            if (fs.existsSync(fullPath)) {
+                console.log(`[Flash] Found Flash plugin: ${name}`);
+                return `flashver/${name}`;
+            }
+        }
+    }
+    
+    // Also check for any pepflashplayer*.dll file
+    if (platform === 'win32' && fs.existsSync(flashDir)) {
+        try {
+            const files = fs.readdirSync(flashDir);
+            for (const file of files) {
+                if (file.startsWith('pepflashplayer') && file.endsWith('.dll')) {
+                    console.log(`[Flash] Found Flash plugin: ${file}`);
+                    return `flashver/${file}`;
+                }
+            }
+        } catch (e) {
+            console.warn('[Flash] Error scanning flashver directory:', e.message);
+        }
+    }
+    
+    return null;
+}
+
+// Find Flash plugin
+pluginName = findFlashPlugin();
+flashFound = pluginName !== null;
+
+if (!flashFound) {
+    console.warn('[Flash] Flash plugin NOT found in flashver/ directory!');
+    console.warn('[Flash] Please see flashver/README.md for instructions on obtaining Flash Player files.');
+}
+
+switch (process.platform) {
     case 'linux':
-        pluginName = 'flashver/libpepflashplayer.so';
         app.commandLine.appendSwitch('no-sandbox');
-        break;
-    case 'darwin':
-        pluginName = 'flashver/PepperFlashPlayer.plugin';
         break;
 }
 
@@ -1168,6 +1228,33 @@ app.on('ready', async () => {
     createMenu();
     setupIPC();
     setupShortcuts();
+    
+    // Check for Flash plugin and show warning if not found
+    if (!flashFound) {
+        dialog.showMessageBox(mainWindow, {
+            type: 'warning',
+            title: 'Flash Player Not Found',
+            message: 'Flash Player plugin was not found!',
+            detail: 'Flash content (including Evony) will not work without the Flash Player plugin.\n\n' +
+                    'To fix this:\n' +
+                    '1. Download FlashBrowser from:\n' +
+                    '   https://github.com/radubirsan/FlashBrowser/releases\n\n' +
+                    '2. Install it, then copy pepflashplayer64_32_0_0_465.dll\n' +
+                    '   from the FlashBrowser folder to the flashver/ folder\n' +
+                    '   in your Svony Browser installation.\n\n' +
+                    '3. Restart Svony Browser.\n\n' +
+                    'See flashver/README.md for detailed instructions.',
+            buttons: ['Open FlashBrowser Releases', 'Open flashver Folder', 'Continue Anyway'],
+            defaultId: 0,
+            cancelId: 2
+        }).then(result => {
+            if (result.response === 0) {
+                shell.openExternal('https://github.com/radubirsan/FlashBrowser/releases');
+            } else if (result.response === 1) {
+                shell.openPath(path.join(__dirname, 'flashver'));
+            }
+        });
+    }
     
     // Initialize services in background (non-blocking)
     try {
