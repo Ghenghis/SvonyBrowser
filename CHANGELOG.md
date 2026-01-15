@@ -2,6 +2,50 @@
 
 All notable changes to Svony Browser will be documented in this file.
 
+## [2.2.1] - 2026-01-15 - Full CLI Access & Evony Knowledge Base
+
+### New Features
+
+#### CLI Access Service
+- **Full command-line access** from chatbot when LM Studio unavailable
+- **Execute shell commands** with streaming output support
+- **Run scripts** (.js, .py, .ps1, .bat, .sh)
+- **File operations** - read, write, list directories
+- **System info** - platform, memory, CPU details
+- **Process management** - kill running commands
+- **Security controls** - blocked command patterns
+
+#### Evony Knowledge Base
+- **Comprehensive game knowledge** in JSON format
+- **Troop data** - all types, tiers, stats
+- **Resource info** - buildings, production
+- **Protocol actions** - categorized command reference
+- **Combat formulas** - attack, defense, march speed
+- **Automation templates** - gathering, training, attacking
+- **Fine-tuning prompts** - system prompt and examples
+- **Server list** - Americas, Europe, Asia regions
+
+### Technical Details
+
+#### New Files
+- `services/cli-access.js` - Full CLI access service (400+ lines)
+- `knowledge-base/evony-knowledge.json` - Evony fine-tuning data
+
+#### New IPC Handlers (11 handlers)
+- `cli-execute` - Execute command
+- `cli-execute-streaming` - Execute with streaming output
+- `cli-run-script` - Run script file
+- `cli-list-dir` - List directory contents
+- `cli-read-file` - Read file contents
+- `cli-write-file` - Write file contents
+- `cli-get-system-info` - Get system information
+- `cli-get-history` - Get command history
+- `cli-get-status` - Get CLI service status
+- `cli-kill-process` - Kill running process
+- `cli-set-working-dir` - Set working directory
+
+---
+
 ## [2.2.0] - 2026-01-15 - Enterprise Grade Release
 
 ### Highlights
@@ -63,12 +107,12 @@ This release focuses on enterprise-grade stability, comprehensive error handling
 
 ### Downloads
 
-| Platform | Type | File |
-|----------|------|------|
-| Windows x64 | Portable | SvonyBrowser-Portable-2.2.0-x64.exe |
-| Windows x64 | Installer | SvonyBrowser-Setup-2.2.0-x64.exe |
-| Windows x86 | Portable | SvonyBrowser-Portable-2.2.0-ia32.exe |
-| Windows x86 | Installer | SvonyBrowser-Setup-2.2.0-ia32.exe |
+| Platform    | Type      | File                                 |
+| ----------- | --------- | ------------------------------------ |
+| Windows x64 | Portable  | SvonyBrowser-Portable-2.2.0-x64.exe  |
+| Windows x64 | Installer | SvonyBrowser-Setup-2.2.0-x64.exe     |
+| Windows x86 | Portable  | SvonyBrowser-Portable-2.2.0-ia32.exe |
+| Windows x86 | Installer | SvonyBrowser-Setup-2.2.0-ia32.exe    |
 
 ### Requirements
 - Windows 7/10/11 (32-bit or 64-bit)

@@ -3043,6 +3043,76 @@ ipcMain.handle('healer-set-enabled', async (event, enabled) => {
     }
 });
 
+// ============================================================================
+// CLI Access IPC Handlers (v2.2.1)
+// ============================================================================
+
+let cliAccessService = null;
+
+try {
+    const { getCLIAccessService } = require('./services/cli-access');
+    cliAccessService = getCLIAccessService();
+    cliAccessService.initialize();
+    console.log('[Main] CLI Access Service initialized');
+} catch (e) {
+    console.warn('[Main] CLI Access Service not available:', e.message);
+}
+
+ipcMain.handle('cli-execute', async (event, command, options) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.executeCommand(command, options);
+});
+
+ipcMain.handle('cli-execute-streaming', async (event, command, options) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.executeCommandStreaming(command, options);
+});
+
+ipcMain.handle('cli-run-script', async (event, scriptPath, args, options) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.runScript(scriptPath, args, options);
+});
+
+ipcMain.handle('cli-list-dir', async (event, dirPath, options) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.listDirectory(dirPath, options);
+});
+
+ipcMain.handle('cli-read-file', async (event, filePath, options) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.readFile(filePath, options);
+});
+
+ipcMain.handle('cli-write-file', async (event, filePath, content, options) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.writeFile(filePath, content, options);
+});
+
+ipcMain.handle('cli-get-system-info', async () => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.getSystemInfo();
+});
+
+ipcMain.handle('cli-get-history', async (event, limit) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.getHistory(limit);
+});
+
+ipcMain.handle('cli-get-status', async () => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.getStatus();
+});
+
+ipcMain.handle('cli-kill-process', async (event, id) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.killProcess(id);
+});
+
+ipcMain.handle('cli-set-working-dir', async (event, dir) => {
+    if (!cliAccessService) return { error: 'CLI service not available' };
+    return cliAccessService.setWorkingDirectory(dir);
+});
+
 // Window lifecycle
 app.on('window-all-closed', () => {
     // Stop services

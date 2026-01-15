@@ -1,0 +1,379 @@
+{
+  "version": "2.2.1",
+  "description": "Evony-specific knowledge base for AI fine-tuning and chatbot responses",
+  "lastUpdated": "2026-01-15",
+  "gameBasics": {
+    "name": "Evony: The King's Return",
+    "type": "Real-time strategy MMO",
+    "platforms": [
+      "Web (Flash)",
+      "Mobile"
+    ],
+    "servers": {
+      "pattern": "cc{N}.evony.com",
+      "examples": [
+        "cc1.evony.com",
+        "cc2.evony.com",
+        "cc3.evony.com",
+        "cc4.evony.com"
+      ],
+      "format": "Server number corresponds to age/region"
+    }
+  },
+  "troopTypes": {
+    "ground": {
+      "warrior": {
+        "tier": 1,
+        "attack": "melee",
+        "food": 1,
+        "training_time": "10s"
+      },
+      "swordsman": {
+        "tier": 2,
+        "attack": "melee",
+        "food": 2,
+        "training_time": "30s"
+      },
+      "pikeman": {
+        "tier": 3,
+        "attack": "melee",
+        "food": 3,
+        "training_time": "60s"
+      },
+      "halberdier": {
+        "tier": 4,
+        "attack": "melee",
+        "food": 4,
+        "training_time": "120s"
+      },
+      "knight": {
+        "tier": 5,
+        "attack": "melee",
+        "food": 5,
+        "training_time": "180s"
+      }
+    },
+    "ranged": {
+      "scout": {
+        "tier": 1,
+        "attack": "ranged",
+        "food": 1,
+        "training_time": "10s"
+      },
+      "archer": {
+        "tier": 2,
+        "attack": "ranged",
+        "food": 2,
+        "training_time": "30s"
+      },
+      "crossbowman": {
+        "tier": 3,
+        "attack": "ranged",
+        "food": 3,
+        "training_time": "60s"
+      },
+      "longbowman": {
+        "tier": 4,
+        "attack": "ranged",
+        "food": 4,
+        "training_time": "120s"
+      },
+      "sharpshooter": {
+        "tier": 5,
+        "attack": "ranged",
+        "food": 5,
+        "training_time": "180s"
+      }
+    },
+    "mounted": {
+      "cavalry": {
+        "tier": 3,
+        "attack": "mounted",
+        "food": 4,
+        "training_time": "90s"
+      },
+      "cataphract": {
+        "tier": 4,
+        "attack": "mounted",
+        "food": 5,
+        "training_time": "150s"
+      },
+      "hussar": {
+        "tier": 5,
+        "attack": "mounted",
+        "food": 6,
+        "training_time": "240s"
+      }
+    },
+    "siege": {
+      "ram": {
+        "tier": 3,
+        "attack": "siege",
+        "food": 6,
+        "training_time": "180s"
+      },
+      "catapult": {
+        "tier": 4,
+        "attack": "siege",
+        "food": 8,
+        "training_time": "300s"
+      },
+      "trebuchet": {
+        "tier": 5,
+        "attack": "siege",
+        "food": 10,
+        "training_time": "420s"
+      }
+    }
+  },
+  "resources": {
+    "food": {
+      "icon": "🌾",
+      "building": "Farm",
+      "description": "Required for troops"
+    },
+    "wood": {
+      "icon": "🪵",
+      "building": "Sawmill",
+      "description": "Required for buildings"
+    },
+    "stone": {
+      "icon": "🪨",
+      "building": "Quarry",
+      "description": "Required for walls/defenses"
+    },
+    "iron": {
+      "icon": "⚙️",
+      "building": "Iron Mine",
+      "description": "Required for advanced troops"
+    },
+    "gold": {
+      "icon": "💰",
+      "building": "Tax collection",
+      "description": "Required for research/heroes"
+    }
+  },
+  "buildings": {
+    "military": [
+      "Barracks",
+      "Archery Range",
+      "Stable",
+      "Workshop",
+      "Rally Spot",
+      "Beacon Tower"
+    ],
+    "resource": [
+      "Farm",
+      "Sawmill",
+      "Quarry",
+      "Iron Mine",
+      "Warehouse"
+    ],
+    "defense": [
+      "Wall",
+      "Trap Factory",
+      "Archer Tower",
+      "Catapult Tower"
+    ],
+    "support": [
+      "Academy",
+      "Forge",
+      "Relief Station",
+      "Embassy",
+      "Feasting Hall",
+      "Inn"
+    ]
+  },
+  "heroes": {
+    "types": [
+      "Ground",
+      "Ranged",
+      "Mounted",
+      "Siege",
+      "Wall Defense",
+      "Gathering"
+    ],
+    "rarities": [
+      "Green",
+      "Blue",
+      "Purple",
+      "Orange",
+      "Gold"
+    ],
+    "skills": {
+      "active": "Triggered during battle",
+      "passive": "Always active bonuses",
+      "specialty": "Specific troop type buffs"
+    },
+    "attributes": [
+      "Leadership",
+      "Attack",
+      "Defense",
+      "Politics",
+      "Speed"
+    ]
+  },
+  "protocolActions": {
+    "categories": [
+      "Alliance",
+      "Army",
+      "Building",
+      "Castle",
+      "Chat",
+      "City",
+      "Common",
+      "Field",
+      "Friend",
+      "Gamble",
+      "Hero",
+      "Item",
+      "Mail",
+      "Map",
+      "March",
+      "Quest",
+      "Research",
+      "Resource",
+      "Shop",
+      "Tech",
+      "Trade",
+      "Troop",
+      "World"
+    ],
+    "commonActions": {
+      "selfCastleInfo": "Get own castle information",
+      "cityInfo": "Get city details",
+      "heroInfo": "Get hero information",
+      "marchInfo": "Get march status",
+      "allianceInfo": "Get alliance details",
+      "resourceInfo": "Get current resources",
+      "troopInfo": "Get troop counts",
+      "buildingInfo": "Get building levels"
+    }
+  },
+  "amfProtocol": {
+    "description": "Evony uses AMF3 (Action Message Format) for client-server communication",
+    "structure": {
+      "header": "AMF3 envelope with command ID",
+      "body": "Serialized ActionScript objects",
+      "common_types": [
+        "Object",
+        "Array",
+        "String",
+        "Number",
+        "Boolean"
+      ]
+    },
+    "decoding": {
+      "steps": [
+        "Extract AMF3 envelope",
+        "Deserialize body",
+        "Parse action command",
+        "Extract parameters"
+      ]
+    }
+  },
+  "combatFormulas": {
+    "attack_power": "base_attack * (1 + hero_attack_bonus + research_bonus + buff_bonus)",
+    "defense_power": "base_defense * (1 + hero_defense_bonus + research_bonus + wall_bonus)",
+    "march_speed": "base_speed * (1 + hero_speed_bonus + research_bonus + items)",
+    "load_capacity": "base_load * troop_count * (1 + hero_politics + research_bonus)"
+  },
+  "chatbotCommands": {
+    "/protocol": "Search protocol actions",
+    "/training": "Calculate training costs",
+    "/combat": "Simulate combat outcomes",
+    "/march": "Calculate march times",
+    "/decode": "Decode AMF packet data",
+    "/search": "Search game knowledge",
+    "/scrape": "Scrape web for info",
+    "/status": "Show service status",
+    "/help": "Show available commands",
+    "/clear": "Clear chat history"
+  },
+  "automationTemplates": {
+    "gather_resources": {
+      "description": "Send troops to gather from resource tiles",
+      "steps": [
+        "Select city",
+        "Choose troops",
+        "Find tile",
+        "Send march"
+      ]
+    },
+    "train_troops": {
+      "description": "Queue troops for training",
+      "steps": [
+        "Select barracks",
+        "Choose troop type",
+        "Set quantity",
+        "Start training"
+      ]
+    },
+    "upgrade_building": {
+      "description": "Upgrade a building",
+      "steps": [
+        "Select building",
+        "Check resources",
+        "Start upgrade"
+      ]
+    },
+    "attack_target": {
+      "description": "Launch attack on target",
+      "steps": [
+        "Select target",
+        "Choose troops",
+        "Assign hero",
+        "Send attack"
+      ]
+    }
+  },
+  "finetuningPrompts": {
+    "system_prompt": "You are an Evony game expert assistant. You help players with strategy, protocol analysis, troop calculations, and game mechanics. Be concise and tactical.",
+    "context_examples": [
+      {
+        "user": "How many archers can I train with 100k food?",
+        "assistant": "With 100k food and archers consuming 2 food each, you can train 50,000 archers (100,000 ÷ 2 = 50,000)."
+      },
+      {
+        "user": "What counters cavalry?",
+        "assistant": "Pikemen and Halberdiers are effective counters against cavalry due to their anti-mounted bonus. Position them in front of your ranged units."
+      },
+      {
+        "user": "Decode this packet",
+        "assistant": "I'll decode the AMF3 packet for you. Please provide the hex data and I'll parse the action command and parameters."
+      }
+    ]
+  },
+  "serverList": {
+    "americas": [
+      "cc1",
+      "cc2",
+      "cc3"
+    ],
+    "europe": [
+      "cc4",
+      "cc5",
+      "cc6"
+    ],
+    "asia": [
+      "cc7",
+      "cc8",
+      "cc9"
+    ],
+    "special": [
+      "s1",
+      "s2",
+      "speed1"
+    ]
+  },
+  "tips": [
+    "Always keep your warehouse protected - upgrade it before other resource buildings",
+    "Join an alliance early for protection and teleport options",
+    "Focus on one troop type initially to maximize research benefits",
+    "Keep a hero with high politics assigned for resource gathering",
+    "Scout before attacking to avoid surprises",
+    "Use speed-ups wisely during kill events",
+    "Reinforce alliance members during attacks",
+    "Keep hospital capacity higher than troop count"
+  ]
+}
