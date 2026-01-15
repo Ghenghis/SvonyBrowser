@@ -425,10 +425,22 @@ function swapPanels() {
 
 function togglePanelMode(panel, mode) {
     if (panel === 'left') {
+        // Deactivate hybrid mode if switching away from it
+        if (state.leftPanelMode === 'hybrid' && mode !== 'hybrid') {
+            deactivateHybridMode('left');
+        }
+        
         state.leftPanelMode = mode;
         document.getElementById('left-web-toggle').classList.toggle('active', mode === 'web');
         document.getElementById('left-swf-toggle').classList.toggle('active', mode === 'swf');
         document.getElementById('left-hybrid-toggle')?.classList.toggle('active', mode === 'hybrid');
+        
+        if (mode === 'web') {
+            // Restore web mode - load the default AutoEvony URL
+            const autoevonyUrl = store.get('autoevonyUrl') || 'https://autoevony.com';
+            elements.leftWebview.src = autoevonyUrl;
+            return;
+        }
         
         if (mode === 'hybrid') {
             // Hybrid mode uses Playwright for enhanced automation
@@ -437,20 +449,33 @@ function togglePanelMode(panel, mode) {
         }
         
         if (mode === 'swf') {
-            // SWF files should be placed in the flashver/ directory
-            const swfPath = store.get('autoevonySwfPath') || path.join(__dirname, 'flashver', 'AutoEvony.swf');
+            // SWF files are in the swf/ directory
+            const swfPath = store.get('autoevonySwfPath') || path.join(__dirname, 'swf', 'AutoEvony.swf');
             // If file doesn't exist, show message
             if (!fs.existsSync(swfPath)) {
-                elements.leftWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>Place AutoEvony.swf in the flashver/ directory</p></div></body></html>';
+                elements.leftWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>AutoEvony.swf not found in swf/ directory</p></div></body></html>';
                 return;
             }
             elements.leftWebview.src = `file://${swfPath}`;
         }
     } else {
+        // Deactivate hybrid mode if switching away from it
+        if (state.rightPanelMode === 'hybrid' && mode !== 'hybrid') {
+            deactivateHybridMode('right');
+        }
+        
         state.rightPanelMode = mode;
         document.getElementById('right-web-toggle').classList.toggle('active', mode === 'web');
         document.getElementById('right-swf-toggle').classList.toggle('active', mode === 'swf');
         document.getElementById('right-hybrid-toggle')?.classList.toggle('active', mode === 'hybrid');
+        
+        if (mode === 'web') {
+            // Restore web mode - load the Evony game URL
+            const serverUrl = store.get('defaultServer') || 'cc2';
+            const evonyUrl = `https://${serverUrl}.evony.com/`;
+            elements.rightWebview.src = evonyUrl;
+            return;
+        }
         
         if (mode === 'hybrid') {
             // Hybrid mode uses Playwright for enhanced automation
@@ -459,11 +484,11 @@ function togglePanelMode(panel, mode) {
         }
         
         if (mode === 'swf') {
-            // SWF files should be placed in the flashver/ directory
-            const swfPath = store.get('evonySwfPath') || path.join(__dirname, 'flashver', 'EvonyClient.swf');
+            // SWF files are in the swf/ directory
+            const swfPath = store.get('evonySwfPath') || path.join(__dirname, 'swf', 'EvonyClient.swf');
             // If file doesn't exist, show message
             if (!fs.existsSync(swfPath)) {
-                elements.rightWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>Place EvonyClient.swf in the flashver/ directory</p></div></body></html>';
+                elements.rightWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>EvonyClient.swf not found in swf/ directory</p></div></body></html>';
                 return;
             }
             elements.rightWebview.src = `file://${swfPath}`;
@@ -501,8 +526,8 @@ async function activateHybridMode(panel) {
             return;
         }
         
-        // Store the Playwright page ID
-        state[`${panel}PlaywrightPageId`] = pageId;
+        // Store the Playwright page ID from result
+        state[`${panel}PlaywrightPageId`] = result.pageId || panel;
         
         // Show hybrid mode indicator
         const indicator = document.createElement('div');
