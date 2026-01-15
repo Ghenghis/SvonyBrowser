@@ -6,7 +6,8 @@ class Store {
   constructor(opts) {
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
     this.path = path.join(userDataPath, opts.configName + '.json');
-    this.data = parseDataFile(this.path, opts.defaults || {});
+    this.defaults = opts.defaults || {};
+    this.data = parseDataFile(this.path, this.defaults);
   }
   
   get(key) {
@@ -35,6 +36,12 @@ class Store {
   clear() {
     this.data = {};
     this.save();
+  }
+  
+  reset() {
+    this.data = JSON.parse(JSON.stringify(this.defaults));
+    this.save();
+    return this.data;
   }
   
   has(key) {

@@ -237,7 +237,32 @@ async function initializeServices() {
             const connected = await lmStudioClient.checkConnection();
             console.log('[Main] LM Studio Client initialized, connected:', connected);
             
-            // Notify renderer of connection status
+            // Start auto-reconnect monitoring
+            lmStudioClient.startAutoReconnect(30000);
+            
+            // Listen for connection events
+            lmStudioClient.on('connected', (data) => {
+                console.log('[Main] LM Studio connected:', data.models);
+                if (mainWindow) {
+                    sendWindow('lm-studio-status', { 
+                        connected: true, 
+                        models: data.models,
+                        url: lmStudioClient.config.baseUrl
+                    });
+                }
+            });
+            
+            lmStudioClient.on('disconnected', (data) => {
+                console.log('[Main] LM Studio disconnected:', data.error);
+                if (mainWindow) {
+                    sendWindow('lm-studio-status', { 
+                        connected: false, 
+                        error: data.error
+                    });
+                }
+            });
+            
+            // Notify renderer of initial connection status
             if (mainWindow) {
                 sendWindow('lm-studio-status', { 
                     connected, 
@@ -608,20 +633,74 @@ async function clearCookies() {
 
 // About dialog
 function showAbout() {
+    const version = app.getVersion();
     dialog.showMessageBox(mainWindow, {
         type: 'info',
         title: 'About Svony Browser',
-        message: 'Svony Browser v2.0.0',
-        detail: 'Evony Analysis Suite\n\nBuilt on FlashBrowser with:\n- Dual Panel Browser\n- Traffic Viewer\n- Protocol Explorer\n- AI Co-Pilot\n- MCP Integration\n- Combat Simulator\n- Session Recorder\n\n© 2024 Ghenghis'
+        message: `Svony Browser v${version}`,
+        detail: 'Evony Analysis Suite\n\nBuilt on FlashBrowser with:\n- Dual Panel Browser\n- Traffic Viewer\n- Protocol Explorer\n- AI Co-Pilot with LM Studio\n- MCP Integration\n- Combat Simulator\n- Session Recorder\n\n© 2024-2025 Ghenghis'
     });
 }
 
-function checkForUpdates() {
+async function checkForUpdates() {
+    const version = app.getVersion();
+    try {
+        // Check GitHub releases for latest version
+        const https = require('https');
+        const options = {
+            hostname: 'api.github.com',
+            path: '/repos/Ghenghis/Svony-Browser/releases/latest',
+            headers: { 'User-Agent': 'SvonyBrowser' }
+        };
+        
+        const req = https.get(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try {
+                    const release = JSON.parse(data);
+                    const latestVersion = release.tag_name.replace('v', '');
+                    
+                    if (latestVersion > version) {
+                        dialog.showMessageBox(mainWindow, {
+                            type: 'info',
+                            title: 'Update Available',
+                            message: `A new version is available: v${latestVersion}`,
+                            detail: `You are running v${version}\n\nWould you like to download the update?`,
+                            buttons: ['Download', 'Later'],
+                            defaultId: 0
+                        }).then(result => {
+                            if (result.response === 0) {
+                                shell.openExternal(release.html_url);
+                            }
+                        });
+                    } else {
+                        dialog.showMessageBox(mainWindow, {
+                            type: 'info',
+                            title: 'No Updates',
+                            message: 'You are running the latest version.',
+                            detail: `Svony Browser v${version}`
+                        });
+                    }
+                } catch (e) {
+                    showUpdateError(version);
+                }
+            });
+        });
+        
+        req.on('error', () => showUpdateError(version));
+        req.end();
+    } catch (error) {
+        showUpdateError(version);
+    }
+}
+
+function showUpdateError(version) {
     dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        title: 'Check for Updates',
-        message: 'You are running the latest version.',
-        detail: 'Svony Browser v2.0.0'
+        type: 'warning',
+        title: 'Update Check Failed',
+        message: 'Could not check for updates.',
+        detail: `Current version: v${version}\n\nPlease check manually at:\nhttps://github.com/Ghenghis/Svony-Browser/releases`
     });
 }
 
@@ -1202,6 +1281,107 @@ function setupIPC() {
         if (mainWindow) {
             mainWindow.setFullScreen(!mainWindow.isFullScreen());
         }
+    });
+
+    // ========================================================================
+    // Version and Status
+    // ========================================================================
+    ipcMain.handle('get-version', () => {
+        return app.getVersion();
+    });
+
+    ipcMain.handle('get-flash-status', () => {
+        return {
+            found: flashFound,
+            plugin: pluginName,
+            path: pluginName ? path.join(__dirname, pluginName) : null
+        };
+    });
+
+    // ========================================================================
+    // External Tools
+    // ========================================================================
+    ipcMain.on('open-fiddler', () => {
+        // Try to open Fiddler if installed
+        const fiddlerPaths = [
+            'C:\\Program Files\\Fiddler\\Fiddler.exe',
+            'C:\\Program Files (x86)\\Fiddler\\Fiddler.exe',
+            'C:\\Users\\' + process.env.USERNAME + '\\AppData\\Local\\Programs\\Fiddler\\Fiddler.exe'
+        ];
+        
+        let fiddlerFound = false;
+        for (const fiddlerPath of fiddlerPaths) {
+            if (fs.existsSync(fiddlerPath)) {
+                require('child_process').spawn(fiddlerPath, [], { detached: true });
+                fiddlerFound = true;
+                break;
+            }
+        }
+        
+        if (!fiddlerFound) {
+            dialog.showMessageBox(mainWindow, {
+                type: 'info',
+                title: 'Fiddler Not Found',
+                message: 'Fiddler is not installed.',
+                detail: 'Would you like to download Fiddler?',
+                buttons: ['Download', 'Cancel'],
+                defaultId: 0
+            }).then(result => {
+                if (result.response === 0) {
+                    shell.openExternal('https://www.telerik.com/fiddler');
+                }
+            });
+        }
+    });
+
+    ipcMain.on('open-sol-editor', async () => {
+        // Open file dialog to select SOL file
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: 'Open SOL File',
+            filters: [
+                { name: 'Flash Shared Objects', extensions: ['sol'] },
+                { name: 'All Files', extensions: ['*'] }
+            ],
+            properties: ['openFile']
+        });
+        
+        if (!result.canceled && result.filePaths.length > 0) {
+            const solPath = result.filePaths[0];
+            // Send to renderer for display
+            sendWindow('sol-file-opened', { path: solPath });
+        }
+    });
+
+    // ========================================================================
+    // File Browse Dialogs
+    // ========================================================================
+    ipcMain.handle('browse-file', async (event, options) => {
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: options.title || 'Select File',
+            filters: options.filters || [{ name: 'All Files', extensions: ['*'] }],
+            properties: ['openFile']
+        });
+        
+        if (!result.canceled && result.filePaths.length > 0) {
+            return result.filePaths[0];
+        }
+        return null;
+    });
+
+    ipcMain.handle('browse-swf', async () => {
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: 'Select SWF File',
+            filters: [
+                { name: 'Flash Files', extensions: ['swf'] },
+                { name: 'All Files', extensions: ['*'] }
+            ],
+            properties: ['openFile']
+        });
+        
+        if (!result.canceled && result.filePaths.length > 0) {
+            return result.filePaths[0];
+        }
+        return null;
     });
 }
 

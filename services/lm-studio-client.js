@@ -239,14 +239,53 @@ class LMStudioClient extends EventEmitter {
     }
     
     /**
+     * Start auto-reconnect monitoring
+     */
+    startAutoReconnect(intervalMs = 30000) {
+        if (this.reconnectInterval) {
+            clearInterval(this.reconnectInterval);
+        }
+        
+        this.reconnectInterval = setInterval(async () => {
+            if (!this.isConnected) {
+                console.log('[LMStudioClient] Attempting auto-reconnect...');
+                await this.checkConnection();
+            }
+        }, intervalMs);
+    }
+    
+    /**
+     * Stop auto-reconnect monitoring
+     */
+    stopAutoReconnect() {
+        if (this.reconnectInterval) {
+            clearInterval(this.reconnectInterval);
+            this.reconnectInterval = null;
+        }
+    }
+    
+    /**
+     * Connect to LM Studio with URL
+     */
+    async connect(url) {
+        if (url) {
+            this.config.baseUrl = url;
+        }
+        return await this.checkConnection();
+    }
+    
+    /**
      * Get current status
      */
     getStatus() {
         return {
             connected: this.isConnected,
+            url: this.config.baseUrl,
             baseUrl: this.config.baseUrl,
             model: this.config.model,
-            availableModels: this.availableModels
+            availableModels: this.availableModels,
+            temperature: this.config.temperature,
+            maxTokens: this.config.maxTokens
         };
     }
 }

@@ -22,7 +22,10 @@ const state = {
     trafficEntries: [],
     selectedTrafficEntry: null,
     mcpConnected: false,
-    protocolData: null
+    lmStudioConnected: false,
+    protocolData: null,
+    selectedProtocolAction: null,
+    appVersion: '2.0.5'
 };
 
 // DOM Elements
@@ -82,12 +85,14 @@ const elements = {
     trafficCounter: document.getElementById('traffic-counter')
 };
 
-// Initialize
-function init() {
+// Initialize - Main entry point
+async function init() {
+    console.log('[Renderer] Starting initialization...');
+    
+    // Core setup
     setupEventListeners();
     loadSettings();
     initializePanels();
-    initializeProtocolExplorer();
     updateStatusBar();
     
     // Initialize LM Studio connection
@@ -103,6 +108,51 @@ function init() {
     
     // Start memory monitoring
     setInterval(updateMemoryUsage, 5000);
+    
+    // Load version from main process
+    try {
+        const version = await ipcRenderer.invoke('get-version');
+        state.appVersion = version;
+        const versionEl = document.getElementById('version-info');
+        if (versionEl) versionEl.textContent = `v${version}`;
+    } catch (e) {
+        console.warn('Could not get version:', e);
+    }
+    
+    // Check Flash status
+    try {
+        const flashStatus = await ipcRenderer.invoke('get-flash-status');
+        if (flashStatus.found) {
+            updateStatus(`Flash plugin loaded: ${flashStatus.plugin}`);
+        } else {
+            updateStatus('Warning: Flash plugin not found');
+        }
+    } catch (e) {
+        console.warn('Could not get Flash status:', e);
+    }
+    
+    // Initialize enhanced features
+    try {
+        await initializeProtocolExplorerEnhanced();
+        await initializeCombatSimulator();
+        await initializeSessionRecorder();
+        await initializeGameState();
+    } catch (e) {
+        console.warn('Some enhanced features failed to initialize:', e);
+    }
+    
+    // Override chatbot send with enhanced version (uses LM Studio)
+    elements.chatbotSend.removeEventListener('click', sendChatMessage);
+    elements.chatbotSend.addEventListener('click', sendChatMessageEnhanced);
+    
+    // Override AMF decode with enhanced version (uses protocol-handler)
+    const amfDecodeBtn = document.getElementById('amf-decode');
+    if (amfDecodeBtn) {
+        amfDecodeBtn.removeEventListener('click', decodeAMF);
+        amfDecodeBtn.addEventListener('click', decodeAMFEnhanced);
+    }
+    
+    console.log('[Renderer] Initialization complete');
 }
 
 // Setup LM Studio settings event listeners
@@ -258,6 +308,29 @@ function setupEventListeners() {
     
     // MCP reconnect
     document.getElementById('mcp-reconnect')?.addEventListener('click', reconnectMCP);
+    
+    // Fiddler button
+    document.getElementById('btn-fiddler')?.addEventListener('click', () => {
+        ipcRenderer.send('open-fiddler');
+    });
+    
+    // SOL Editor button
+    document.getElementById('btn-sol-editor')?.addEventListener('click', () => {
+        ipcRenderer.send('open-sol-editor');
+    });
+    
+    // Browse buttons for SWF paths
+    document.querySelectorAll('.browse-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const input = e.target.previousElementSibling;
+            if (input && input.tagName === 'INPUT') {
+                const filePath = await ipcRenderer.invoke('browse-swf');
+                if (filePath) {
+                    input.value = filePath;
+                }
+            }
+        });
+    });
 }
 
 // Panel management
@@ -752,56 +825,100 @@ function switchSettingsSection(section) {
 function loadSettings() {
     const settings = store.getAll();
     
+    // Helper to safely set element value
+    const setElementValue = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value !== undefined) el.value = value;
+    };
+    
+    const setElementChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = value;
+    };
+    
     // Apply settings to form
-    if (settings.theme) document.getElementById('setting-theme').value = settings.theme;
-    if (settings.defaultServer) elements.serverSelector.value = settings.defaultServer;
-    if (settings.autoevonyUrl) document.getElementById('setting-autoevony-url').value = settings.autoevonyUrl;
-    if (settings.autoevonySwfPath) document.getElementById('setting-autoevony-swf').value = settings.autoevonySwfPath;
-    if (settings.evonySwfPath) document.getElementById('setting-evony-swf').value = settings.evonySwfPath;
-    if (settings.mcpUrl) document.getElementById('setting-mcp-url').value = settings.mcpUrl;
-    if (settings.llmProvider) document.getElementById('setting-llm-provider').value = settings.llmProvider;
-    if (settings.llmModel) document.getElementById('setting-llm-model').value = settings.llmModel;
+    setElementValue('setting-theme', settings.theme);
+    if (settings.defaultServer && elements.serverSelector) {
+        elements.serverSelector.value = settings.defaultServer;
+    }
+    setElementValue('setting-autoevony-url', settings.autoevonyUrl);
+    setElementValue('setting-autoevony-swf', settings.autoevonySwfPath);
+    setElementValue('setting-evony-swf', settings.evonySwfPath);
+    setElementValue('setting-mcp-url', settings.mcpUrl);
     
     // Checkboxes
-    document.getElementById('setting-autostart').checked = settings.autostart || false;
-    document.getElementById('setting-updates').checked = settings.checkUpdates !== false;
-    document.getElementById('setting-adblock').checked = settings.adblock !== false;
-    document.getElementById('setting-mcp-enabled').checked = settings.mcpEnabled !== false;
-    document.getElementById('setting-autopilot').checked = settings.autopilot || false;
-    document.getElementById('setting-auto-collect').checked = settings.autoCollect || false;
-    document.getElementById('setting-auto-train').checked = settings.autoTrain || false;
-    document.getElementById('setting-debug').checked = settings.debug || false;
+    setElementChecked('setting-autostart', settings.autostart || false);
+    setElementChecked('setting-updates', settings.checkUpdates !== false);
+    setElementChecked('setting-adblock', settings.adblock !== false);
+    setElementChecked('setting-mcp-enabled', settings.mcpEnabled !== false);
+    setElementChecked('setting-autopilot', settings.autopilot || false);
+    setElementChecked('setting-auto-collect', settings.autoCollect || false);
+    setElementChecked('setting-auto-train', settings.autoTrain || false);
+    setElementChecked('setting-debug', settings.debug || false);
+    
+    // LM Studio settings
+    setElementChecked('setting-lm-enabled', settings.lmStudioEnabled !== false);
+    setElementValue('setting-lm-url', settings.lmStudioUrl || 'http://localhost:1234');
+    setElementValue('setting-lm-model', settings.lmStudioModel || 'local-model');
+    setElementValue('setting-lm-temperature', settings.lmStudioTemperature || 0.7);
+    setElementValue('setting-lm-max-tokens', settings.lmStudioMaxTokens || 2048);
+    
+    // Update temperature display
+    const tempValue = document.getElementById('temperature-value');
+    if (tempValue) tempValue.textContent = settings.lmStudioTemperature || 0.7;
+    
+    // Advanced settings
+    setElementValue('setting-log-level', settings.logLevel || 'info');
+    setElementValue('setting-proxy', settings.proxy || '');
 }
 
 async function saveSettings() {
+    // Helper to safely get element value
+    const getElementValue = (id, defaultVal = '') => {
+        const el = document.getElementById(id);
+        return el ? el.value : defaultVal;
+    };
+    
+    const getElementChecked = (id, defaultVal = false) => {
+        const el = document.getElementById(id);
+        return el ? el.checked : defaultVal;
+    };
+    
     const settings = {
-        theme: document.getElementById('setting-theme').value,
-        defaultServer: elements.serverSelector.value,
-        autoevonyUrl: document.getElementById('setting-autoevony-url').value,
-        autoevonySwfPath: document.getElementById('setting-autoevony-swf').value,
-        evonySwfPath: document.getElementById('setting-evony-swf').value,
-        mcpUrl: document.getElementById('setting-mcp-url').value,
-        autostart: document.getElementById('setting-autostart').checked,
-        checkUpdates: document.getElementById('setting-updates').checked,
-        adblock: document.getElementById('setting-adblock').checked,
-        mcpEnabled: document.getElementById('setting-mcp-enabled').checked,
-        autopilot: document.getElementById('setting-autopilot').checked,
-        autoCollect: document.getElementById('setting-auto-collect').checked,
-        autoTrain: document.getElementById('setting-auto-train').checked,
-        debug: document.getElementById('setting-debug').checked,
-        logLevel: document.getElementById('setting-log-level').value,
-        proxy: document.getElementById('setting-proxy').value
+        theme: getElementValue('setting-theme', 'dark'),
+        defaultServer: elements.serverSelector?.value || 'cc2',
+        autoevonyUrl: getElementValue('setting-autoevony-url'),
+        autoevonySwfPath: getElementValue('setting-autoevony-swf'),
+        evonySwfPath: getElementValue('setting-evony-swf'),
+        mcpUrl: getElementValue('setting-mcp-url'),
+        autostart: getElementChecked('setting-autostart'),
+        checkUpdates: getElementChecked('setting-updates', true),
+        adblock: getElementChecked('setting-adblock', true),
+        mcpEnabled: getElementChecked('setting-mcp-enabled', true),
+        autopilot: getElementChecked('setting-autopilot'),
+        autoCollect: getElementChecked('setting-auto-collect'),
+        autoTrain: getElementChecked('setting-auto-train'),
+        debug: getElementChecked('setting-debug'),
+        logLevel: getElementValue('setting-log-level', 'info'),
+        proxy: getElementValue('setting-proxy'),
+        // LM Studio settings (also saved to store for persistence)
+        lmStudioEnabled: getElementChecked('setting-lm-enabled', true),
+        lmStudioUrl: getElementValue('setting-lm-url', 'http://localhost:1234'),
+        lmStudioModel: getElementValue('setting-lm-model', 'local-model'),
+        lmStudioTemperature: parseFloat(getElementValue('setting-lm-temperature', '0.7')),
+        lmStudioMaxTokens: parseInt(getElementValue('setting-lm-max-tokens', '2048'))
     };
     
-    // Save LM Studio settings separately
+    // LM Studio settings for IPC
     const lmStudioSettings = {
-        enabled: document.getElementById('setting-lm-enabled')?.checked ?? true,
-        url: document.getElementById('setting-lm-url')?.value || 'http://localhost:1234',
-        model: document.getElementById('setting-lm-model')?.value || 'local-model',
-        temperature: parseFloat(document.getElementById('setting-lm-temperature')?.value || 0.7),
-        maxTokens: parseInt(document.getElementById('setting-lm-max-tokens')?.value || 2048)
+        enabled: settings.lmStudioEnabled,
+        url: settings.lmStudioUrl,
+        model: settings.lmStudioModel,
+        temperature: settings.lmStudioTemperature,
+        maxTokens: settings.lmStudioMaxTokens
     };
     
+    // Save all settings to store
     for (const [key, value] of Object.entries(settings)) {
         store.set(key, value);
     }
@@ -827,7 +944,7 @@ async function saveSettings() {
 }
 
 function resetSettings() {
-    store.clear();
+    store.reset();
     loadSettings();
     updateStatus('Settings reset to defaults');
 }
@@ -1744,48 +1861,7 @@ ipcRenderer.on('zoom-reset', () => {
     elements.rightWebview.setZoomFactor(1);
 });
 
-// ============================================================================
-// Enhanced Initialization
-// ============================================================================
-
-async function initEnhanced() {
-    // Call original init
-    setupEventListeners();
-    loadSettings();
-    initializePanels();
-    updateStatusBar();
-    
-    // Check platform for window controls
-    if (process.platform === 'win32') {
-        document.getElementById('window-controls').style.display = 'grid';
-    }
-    
-    // Start memory monitoring
-    setInterval(updateMemoryUsage, 5000);
-    
-    // Initialize enhanced features
-    await initializeProtocolExplorerEnhanced();
-    await initializeCombatSimulator();
-    await initializeSessionRecorder();
-    await initializeGameState();
-    
-    // Override chatbot send with enhanced version
-    elements.chatbotSend.removeEventListener('click', sendChatMessage);
-    elements.chatbotSend.addEventListener('click', sendChatMessageEnhanced);
-    
-    // Override AMF decode with enhanced version
-    const amfDecodeBtn = document.getElementById('amf-decode');
-    if (amfDecodeBtn) {
-        amfDecodeBtn.removeEventListener('click', decodeAMF);
-        amfDecodeBtn.addEventListener('click', decodeAMFEnhanced);
-    }
-    
-    console.log('[Renderer] Enhanced initialization complete');
-}
-
-// Replace original init with enhanced version
-document.removeEventListener('DOMContentLoaded', init);
-document.addEventListener('DOMContentLoaded', initEnhanced);
+// Note: Enhanced initialization is now merged into main init() function
 
 
 // ============================================================================
