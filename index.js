@@ -96,7 +96,30 @@ let flashFound = false;
 
 // Function to find Flash plugin
 function findFlashPlugin() {
-    const flashDir = path.join(__dirname, 'flashver');
+    // Check multiple possible locations for packaged vs development
+    const possibleDirs = [
+        path.join(__dirname, 'flashver'),
+        path.join(process.resourcesPath || __dirname, 'flashver'),
+        path.join(app.getAppPath(), 'flashver'),
+        path.join(path.dirname(process.execPath), 'resources', 'flashver')
+    ];
+    
+    let flashDir = null;
+    for (const dir of possibleDirs) {
+        try {
+            if (fs.existsSync(dir)) {
+                flashDir = dir;
+                break;
+            }
+        } catch (e) { /* ignore */ }
+    }
+    
+    if (!flashDir) {
+        console.warn('[Flash] No flashver directory found in any location');
+        return null;
+    }
+    
+    console.log('[Flash] Using flashver directory:', flashDir);
     
     // Define possible Flash plugin names for each platform
     const flashNames = {
@@ -134,8 +157,8 @@ function findFlashPlugin() {
         for (const name of flashNames[platform][arch]) {
             const fullPath = path.join(flashDir, name);
             if (fs.existsSync(fullPath)) {
-                console.log(`[Flash] Found Flash plugin: ${name}`);
-                return `flashver/${name}`;
+                console.log(`[Flash] Found Flash plugin: ${fullPath}`);
+                return fullPath;
             }
         }
     }
@@ -146,8 +169,9 @@ function findFlashPlugin() {
             const files = fs.readdirSync(flashDir);
             for (const file of files) {
                 if (file.startsWith('pepflashplayer') && file.endsWith('.dll')) {
-                    console.log(`[Flash] Found Flash plugin: ${file}`);
-                    return `flashver/${file}`;
+                    const fullPath = path.join(flashDir, file);
+                    console.log(`[Flash] Found Flash plugin: ${fullPath}`);
+                    return fullPath;
                 }
             }
         } catch (e) {
