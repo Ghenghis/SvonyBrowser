@@ -2,6 +2,8 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - 'v*'
     tags:
       - 'v*'
   workflow_dispatch:
@@ -13,6 +15,7 @@ on:
 
 env:
   NODE_VERSION: '20.x'
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build-windows-x64:
@@ -41,11 +44,13 @@ jobs:
         
       - name: Build Windows x64 Portable
         run: npm run build:win-portable
-        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Build Windows x64 Installer
         run: npm run build:win-installer
-        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: List build output
         run: dir dist
@@ -83,7 +88,8 @@ jobs:
         
       - name: Build Windows x86 (32-bit)
         run: npm run build:win32
-        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Upload Windows x86
         uses: actions/upload-artifact@v4
@@ -110,7 +116,8 @@ jobs:
         
       - name: Build Windows ARM64
         run: npm run build:win-arm64
-        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Upload Windows ARM64
         uses: actions/upload-artifact@v4
