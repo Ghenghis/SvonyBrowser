@@ -98,36 +98,8 @@ jobs:
           path: dist/*ia32*.exe
           if-no-files-found: warn
 
-  build-windows-arm64:
-    runs-on: windows-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-        
-      - name: Build Windows ARM64
-        run: npm run build:win-arm64
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-      - name: Upload Windows ARM64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Svony-Browser-Windows-ARM64
-          path: dist/*arm64*.exe
-          if-no-files-found: warn
-
   create-release:
-    needs: [build-windows-x64, build-windows-x86, build-windows-arm64]
+    needs: [build-windows-x64, build-windows-x86]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -170,12 +142,9 @@ jobs:
             **Windows x86 (32-bit):**
             - For older 32-bit Windows systems
             
-            **Windows ARM64:**
-            - For ARM-based Windows devices (Surface Pro X, etc.)
-            
             ### Requirements
             - Windows 10 or later
-            - Flash Player plugin (place in flashver/ directory)
+            - Flash Player plugin (included in flashver/ directory)
             - LM Studio (optional, for AI features)
             
             ### Features
@@ -184,10 +153,15 @@ jobs:
             - AI Co-Pilot with MCP integration
             - Combat simulator and game calculators
             - Session recording and playback
+            - Enhanced error system with self-healing
             
             ### MCP Server Integration
             Configure with Claude Desktop, Claude Code, or Windsurf IDE.
             See `docs/mcp-setup/` for configuration guides.
+            
+            ### Note
+            ARM64 builds are not available due to Electron 9.x compatibility issues.
+            ARM64 support will be added when upgrading to Electron 22+.
           draft: false
           prerelease: false
           files: |
