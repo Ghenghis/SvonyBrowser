@@ -746,6 +746,63 @@ async function initializeServices() {
             gameStateTracker.loadState();
         }
         
+        // Error Tracking System
+        let errorTracker, errorHelper, selfHealer;
+        try {
+            const { ErrorTracker } = require('./services/error-tracker');
+            errorTracker = new ErrorTracker();
+            global.errorTracker = errorTracker;
+            console.log('[Main] Error Tracker initialized');
+            
+            // Track errors from all services
+            errorTracker.on('error-tracked', (error) => {
+                sendWindow('error-tracked', error);
+            });
+        } catch (e) {
+            console.warn('[Main] Error Tracker not available:', e.message);
+        }
+        
+        // Error Helper (solution suggestions)
+        try {
+            const { ErrorHelper } = require('./services/error-helper');
+            errorHelper = new ErrorHelper();
+            global.errorHelper = errorHelper;
+            console.log('[Main] Error Helper initialized');
+        } catch (e) {
+            console.warn('[Main] Error Helper not available:', e.message);
+        }
+        
+        // Self Healer (automatic error recovery)
+        try {
+            const { SelfHealer } = require('./services/self-healer');
+            selfHealer = new SelfHealer();
+            global.selfHealer = selfHealer;
+            console.log('[Main] Self Healer initialized');
+            
+            // Wire services for healing
+            selfHealer.setServices({
+                lmStudioClient,
+                mcpClientManager,
+                playwrightService,
+                panelManager
+            });
+            
+            // Listen for healing events
+            selfHealer.on('healing-start', (data) => {
+                sendWindow('healing-start', data);
+            });
+            
+            selfHealer.on('healing-complete', (data) => {
+                sendWindow('healing-complete', data);
+            });
+            
+            selfHealer.on('user-action-required', (data) => {
+                sendWindow('user-action-required', data);
+            });
+        } catch (e) {
+            console.warn('[Main] Self Healer not available:', e.message);
+        }
+        
         console.log('[Main] All services initialized');
         
     } catch (error) {
@@ -2863,6 +2920,129 @@ ipcMain.handle('health-get-history', async (event, serviceName) => {
     }
 });
 
+// ============================================================================
+// Error System IPC Handlers
+// ============================================================================
+
+ipcMain.handle('error-track', async (event, errorData) => {
+    if (!global.errorTracker) return { error: 'Error tracker not initialized' };
+    try {
+        const tracked = global.errorTracker.track(new Error(errorData.message), {
+            category: errorData.category || 'general',
+            severity: errorData.severity || 'error',
+            context: errorData.context || {}
+        });
+        return { success: true, id: tracked.id };
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-get-all', async (event, options) => {
+    if (!global.errorTracker) return { error: 'Error tracker not initialized' };
+    try {
+        return global.errorTracker.getErrors(options || {});
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-get-by-id', async (event, errorId) => {
+    if (!global.errorTracker) return { error: 'Error tracker not initialized' };
+    try {
+        return global.errorTracker.getError(errorId);
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-get-suggestions', async (event, errorId) => {
+    if (!global.errorTracker || !global.errorHelper) {
+        return { error: 'Error system not initialized' };
+    }
+    try {
+        const trackedError = global.errorTracker.getError(errorId);
+        if (!trackedError) return { error: 'Error not found' };
+        return global.errorHelper.getSuggestions(trackedError);
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-analyze', async (event, errorId) => {
+    if (!global.errorTracker || !global.errorHelper) {
+        return { error: 'Error system not initialized' };
+    }
+    try {
+        const trackedError = global.errorTracker.getError(errorId);
+        if (!trackedError) return { error: 'Error not found' };
+        return global.errorHelper.analyze(trackedError);
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-heal', async (event, errorId) => {
+    if (!global.errorTracker || !global.selfHealer) {
+        return { error: 'Error system not initialized' };
+    }
+    try {
+        const trackedError = global.errorTracker.getError(errorId);
+        if (!trackedError) return { error: 'Error not found' };
+        const result = await global.selfHealer.heal(trackedError);
+        return result;
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-clear', async (event, options) => {
+    if (!global.errorTracker) return { error: 'Error tracker not initialized' };
+    try {
+        global.errorTracker.clear(options);
+        return { success: true };
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('error-get-stats', async () => {
+    if (!global.errorTracker) return { error: 'Error tracker not initialized' };
+    try {
+        return global.errorTracker.getStats();
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('healer-get-status', async () => {
+    if (!global.selfHealer) return { error: 'Self healer not initialized' };
+    try {
+        return global.selfHealer.getStatus();
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('healer-get-history', async (event, count) => {
+    if (!global.selfHealer) return { error: 'Self healer not initialized' };
+    try {
+        return global.selfHealer.getHistory(count || 20);
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('healer-set-enabled', async (event, enabled) => {
+    if (!global.selfHealer) return { error: 'Self healer not initialized' };
+    try {
+        global.selfHealer.setEnabled(enabled);
+        return { success: true, enabled };
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
 // Window lifecycle
 app.on('window-all-closed', () => {
     // Stop services
@@ -2895,11 +3075,30 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
     callback(true);
 });
 
-// Handle uncaught exceptions
+// Handle uncaught exceptions - wire to error tracker
 process.on('uncaughtException', (error) => {
     console.error('[Main] Uncaught exception:', error);
+    
+    // Track in error system if available
+    if (global.errorTracker) {
+        global.errorTracker.track(error, {
+            category: 'system',
+            severity: 'critical',
+            context: { source: 'uncaughtException' }
+        });
+    }
 });
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('[Main] Unhandled rejection:', reason);
+    
+    // Track in error system if available
+    if (global.errorTracker) {
+        const error = reason instanceof Error ? reason : new Error(String(reason));
+        global.errorTracker.track(error, {
+            category: 'system',
+            severity: 'error',
+            context: { source: 'unhandledRejection' }
+        });
+    }
 });
