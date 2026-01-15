@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
         
       - name: Check JavaScript syntax - Core files
         run: |
@@ -83,7 +83,7 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
         
       - name: Test build (portable)
         run: npm run build:win-portable
