@@ -658,7 +658,216 @@ class PanelPlaywrightBridge extends EventEmitter {
             }))
         };
     }
-    
+
+    /**
+     * Start hybrid session for a panel
+     * Creates a Playwright context and page for enhanced automation
+     */
+    async startHybridSession(panelId, url) {
+        try {
+            // Initialize if needed
+            if (!this.isInitialized) {
+                const initResult = await this.initialize();
+                if (!initResult) {
+                    return { error: 'Failed to initialize Playwright' };
+                }
+            }
+
+            // Close existing context if any
+            if (this.contexts.has(panelId)) {
+                await this.closePanelContext(panelId);
+            }
+
+            // Create new context
+            const { context, page } = await this.createPanelContext(panelId);
+
+            // Navigate to URL if provided
+            if (url && url !== 'about:blank') {
+                try {
+                    await page.goto(url, {
+                        waitUntil: 'domcontentloaded',
+                        timeout: this.config.timeout
+                    });
+                } catch (navError) {
+                    console.warn(`[PanelPlaywrightBridge] Navigation error for ${panelId}: ${navError.message}`);
+                    // Don't fail session start if initial navigation fails
+                }
+            }
+
+            this.emit('hybrid-session-started', { panelId, url });
+
+            return {
+                success: true,
+                panelId,
+                pageId: panelId,
+                url: page.url()
+            };
+        } catch (error) {
+            console.error(`[PanelPlaywrightBridge] Failed to start hybrid session for ${panelId}:`, error);
+            return { error: error.message };
+        }
+    }
+
+    /**
+     * Stop hybrid session for a panel
+     */
+    async stopHybridSession(panelId) {
+        try {
+            // Save session before closing
+            await this.saveSession(panelId);
+
+            // Close context
+            await this.closePanelContext(panelId);
+
+            this.emit('hybrid-session-stopped', { panelId });
+
+            return { success: true, panelId };
+        } catch (error) {
+            console.error(`[PanelPlaywrightBridge] Failed to stop hybrid session for ${panelId}:`, error);
+            return { error: error.message };
+        }
+    }
+
+    /**
+     * Get session status for a panel
+     */
+    getSessionStatus(panelId) {
+        const hasContext = this.contexts.has(panelId);
+        const hasPage = this.pages.has(panelId);
+        const sessionInfo = this.sessions.get(panelId);
+
+        return {
+            active: hasContext && hasPage,
+            hasContext,
+            hasPage,
+            session: sessionInfo ? {
+                savedAt: sessionInfo.savedAt,
+                path: sessionInfo.path
+            } : null,
+            url: hasPage ? this.pages.get(panelId).url() : null
+        };
+    }
+
+    /**
+     * Navigate panel in hybrid mode
+     */
+    async navigate(panelId, url) {
+        const page = this.pages.get(panelId);
+        if (!page) {
+            return { error: `No hybrid session for panel ${panelId}` };
+        }
+
+        try {
+            await page.goto(url, {
+                waitUntil: 'domcontentloaded',
+                timeout: this.config.timeout
+            });
+            return { success: true, url: page.url() };
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
+    /**
+     * Get network log for a panel
+     */
+    getNetworkLog(panelId) {
+        // Return empty array if no active session
+        if (!this.pages.has(panelId)) {
+            return [];
+        }
+        // Network logs are emitted via events, this returns current state
+        return [];
+    }
+
+    /**
+     * Auto-fill form fields
+     * @param {string} panelId - Panel ID
+     * @param {Object} formData - Form data with field selectors and values
+     */
+    async autoFillForm(panelId, formData) {
+        const page = this.pages.get(panelId);
+        if (!page) {
+            return { error: `No hybrid session for panel ${panelId}` };
+        }
+
+        try {
+            const results = [];
+
+            for (const [selector, value] of Object.entries(formData)) {
+                try {
+                    const element = await page.$(selector);
+                    if (element) {
+                        const tagName = await element.evaluate(el => el.tagName.toLowerCase());
+                        const type = await element.evaluate(el => el.type || '');
+
+                        if (tagName === 'select') {
+                            await element.selectOption(value);
+                        } else if (type === 'checkbox' || type === 'radio') {
+                            if (value) {
+                                await element.check();
+                            } else {
+                                await element.uncheck();
+                            }
+                        } else {
+                            await element.fill(String(value));
+                        }
+                        results.push({ selector, success: true });
+                    } else {
+                        results.push({ selector, success: false, error: 'Element not found' });
+                    }
+                } catch (fieldError) {
+                    results.push({ selector, success: false, error: fieldError.message });
+                }
+            }
+
+            return { success: true, results };
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
+    /**
+     * Intercept requests matching a pattern
+     * @param {string} panelId - Panel ID
+     * @param {string} pattern - URL pattern to match (glob pattern)
+     */
+    async interceptRequests(panelId, pattern) {
+        const page = this.pages.get(panelId);
+        if (!page) {
+            return { error: `No hybrid session for panel ${panelId}` };
+        }
+
+        try {
+            const interceptedRequests = [];
+
+            await page.route(pattern || '**/*', async route => {
+                const request = route.request();
+
+                const intercepted = {
+                    url: request.url(),
+                    method: request.method(),
+                    headers: request.headers(),
+                    postData: request.postData(),
+                    timestamp: Date.now()
+                };
+
+                interceptedRequests.push(intercepted);
+                this.emit('request-intercepted', { panelId, ...intercepted });
+
+                // Continue the request (don't block)
+                await route.continue();
+            });
+
+            return {
+                success: true,
+                getIntercepted: () => [...interceptedRequests]
+            };
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
     /**
      * Close panel context
      */

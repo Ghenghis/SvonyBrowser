@@ -6,28 +6,6 @@
 const { ipcRenderer, remote } = require('electron');
 const path = require('path');
 const fs = require('fs');
-// Find SWF file in multiple locations (packaged vs development)
-function findSWFPath(swfName) {
-    const possibleDirs = [
-        path.join(__dirname, 'swf'),
-        path.join(process.resourcesPath || __dirname, 'swf'),
-        path.join(path.dirname(process.execPath), 'resources', 'swf')
-    ];
-    
-    for (const dir of possibleDirs) {
-        try {
-            const swfPath = path.join(dir, swfName);
-            if (fs.existsSync(swfPath)) {
-                console.log('[Renderer] Found SWF:', swfPath);
-                return swfPath;
-            }
-        } catch (e) { /* ignore */ }
-    }
-    
-    console.warn('[Renderer] SWF not found:', swfName);
-    return null;
-}
-
 const Store = require('./store');
 
 // Initialize store
@@ -47,7 +25,7 @@ const state = {
     lmStudioConnected: false,
     protocolData: null,
     selectedProtocolAction: null,
-    appVersion: '2.0.5'
+    appVersion: '2.2.7'
 };
 
 // DOM Elements
@@ -112,12 +90,22 @@ const elements = {
 // Initialize - Main entry point
 async function init() {
     console.log('[Renderer] Starting initialization...');
-    
+
     // Core setup
     setupEventListeners();
     loadSettings();
     initializePanels();
     updateStatusBar();
+
+    // Initialize Panel UI Controller (handles webbar, navigation, bookmarks)
+    if (window.panelUIController) {
+        try {
+            window.panelUIController.initialize();
+            console.log('[Renderer] PanelUIController initialized');
+        } catch (e) {
+            console.warn('PanelUIController initialization failed:', e);
+        }
+    }
     
     // Initialize LM Studio connection
     initLMStudioConnection();
@@ -295,7 +283,44 @@ function setupEventListeners() {
             togglePanelMode(isLeft ? 'left' : 'right', mode);
         });
     });
-    
+
+    // Panel navigation buttons (fallback if PanelUIController not loaded)
+    setupPanelNavigationHandlers('left', elements.leftWebview);
+    setupPanelNavigationHandlers('right', elements.rightWebview);
+
+    // Error overlay retry buttons
+    ['left', 'right'].forEach(panel => {
+        const webview = panel === 'left' ? elements.leftWebview : elements.rightWebview;
+
+        // Retry button
+        const retryBtn = document.getElementById(`${panel}-retry`);
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                hidePanelError(panel);
+                webview?.reload();
+            });
+        }
+
+        // Clear cache and retry
+        const clearRetryBtn = document.getElementById(`${panel}-clear-retry`);
+        if (clearRetryBtn) {
+            clearRetryBtn.addEventListener('click', async () => {
+                hidePanelError(panel);
+                await ipcRenderer.invoke('clear-cache');
+                webview?.reload();
+            });
+        }
+
+        // Fallback to web mode
+        const fallbackBtn = document.getElementById(`${panel}-fallback`);
+        if (fallbackBtn) {
+            fallbackBtn.addEventListener('click', () => {
+                hidePanelError(panel);
+                togglePanelMode(panel, 'web');
+            });
+        }
+    });
+
     // Traffic controls
     safeAddListener(elements.trafficStart, 'click', startTrafficCapture);
     safeAddListener(elements.trafficStop, 'click', stopTrafficCapture);
@@ -445,76 +470,101 @@ function swapPanels() {
     updatePanelToggles();
 }
 
-function togglePanelMode(panel, mode) {
-    if (panel === 'left') {
+/**
+ * Toggle panel mode (Web/SWF/Hybrid)
+ * @param {string} panel - 'left' or 'right'
+ * @param {string} mode - 'web', 'swf', or 'hybrid'
+ */
+async function togglePanelMode(panel, mode) {
+    // Prevent multiple simultaneous mode switches
+    const lockKey = `${panel}ModeSwitching`;
+    if (state[lockKey]) {
+        console.log(`[Mode] ${panel} panel mode switch already in progress`);
+        return;
+    }
+    state[lockKey] = true;
+
+    try {
+        const isLeft = panel === 'left';
+        const previousMode = isLeft ? state.leftPanelMode : state.rightPanelMode;
+        const webview = isLeft ? elements.leftWebview : elements.rightWebview;
+
         // Deactivate hybrid mode if switching away from it
-        if (state.leftPanelMode === 'hybrid' && mode !== 'hybrid') {
-            deactivateHybridMode('left');
+        if (previousMode === 'hybrid' && mode !== 'hybrid') {
+            await deactivateHybridMode(panel);
         }
-        
-        state.leftPanelMode = mode;
-        document.getElementById('left-web-toggle').classList.toggle('active', mode === 'web');
-        document.getElementById('left-swf-toggle').classList.toggle('active', mode === 'swf');
-        document.getElementById('left-hybrid-toggle')?.classList.toggle('active', mode === 'hybrid');
-        
+
+        // Update state
+        if (isLeft) {
+            state.leftPanelMode = mode;
+        } else {
+            state.rightPanelMode = mode;
+        }
+
+        // Update UI toggle buttons
+        document.getElementById(`${panel}-web-toggle`).classList.toggle('active', mode === 'web');
+        document.getElementById(`${panel}-swf-toggle`).classList.toggle('active', mode === 'swf');
+        document.getElementById(`${panel}-hybrid-toggle`)?.classList.toggle('active', mode === 'hybrid');
+
+        // Update mode badge
+        const badge = document.getElementById(`${panel}-mode-badge`);
+        if (badge) {
+            badge.textContent = mode.toUpperCase();
+            badge.className = `panel-mode-badge ${mode}`;
+        }
+
+        // Handle mode-specific actions
         if (mode === 'web') {
-            // Restore web mode - load the default AutoEvony URL
-            const autoevonyUrl = store.get('autoevonyUrl') || 'https://autoevony.com';
-            elements.leftWebview.src = autoevonyUrl;
-            return;
-        }
-        
-        if (mode === 'hybrid') {
-            // Hybrid mode uses Playwright for enhanced automation
-            activateHybridMode('left');
-            return;
-        }
-        
-        if (mode === 'swf') {
-            // SWF files are in the swf/ directory
-            const swfPath = store.get('autoevonySwfPath') || findSWFPath('AutoEvony.swf');
-            // If file doesn't exist, show message
-            if (!swfPath || !fs.existsSync(swfPath)) {
-                elements.leftWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>AutoEvony.swf not found in swf/ directory</p></div></body></html>';
-                return;
+            // Restore web mode - load the appropriate URL
+            if (isLeft) {
+                const autoevonyUrl = store.get('autoevonyUrl') || 'https://autoevony.com';
+                webview.src = autoevonyUrl;
+            } else {
+                const serverUrl = store.get('defaultServer') || 'cc2';
+                const evonyUrl = `https://${serverUrl}.evony.com/`;
+                webview.src = evonyUrl;
             }
-            elements.leftWebview.src = `file://${swfPath}`;
-        }
-    } else {
-        // Deactivate hybrid mode if switching away from it
-        if (state.rightPanelMode === 'hybrid' && mode !== 'hybrid') {
-            deactivateHybridMode('right');
-        }
-        
-        state.rightPanelMode = mode;
-        document.getElementById('right-web-toggle').classList.toggle('active', mode === 'web');
-        document.getElementById('right-swf-toggle').classList.toggle('active', mode === 'swf');
-        document.getElementById('right-hybrid-toggle')?.classList.toggle('active', mode === 'hybrid');
-        
-        if (mode === 'web') {
-            // Restore web mode - load the Evony game URL
-            const serverUrl = store.get('defaultServer') || 'cc2';
-            const evonyUrl = `https://${serverUrl}.evony.com/`;
-            elements.rightWebview.src = evonyUrl;
-            return;
-        }
-        
-        if (mode === 'hybrid') {
-            // Hybrid mode uses Playwright for enhanced automation
-            activateHybridMode('right');
-            return;
-        }
-        
-        if (mode === 'swf') {
-            // SWF files are in the swf/ directory
-            const swfPath = store.get('evonySwfPath') || findSWFPath('AutoEvony.swf');
-            // If file doesn't exist, show message
-            if (!swfPath || !fs.existsSync(swfPath)) {
-                elements.rightWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>EvonyClient.swf not found in swf/ directory</p></div></body></html>';
-                return;
+            updatePanelStatus(panel, 'Web mode active');
+        } else if (mode === 'swf') {
+            // Get SWF path from main process (handles packaged app paths)
+            try {
+                const swfPath = await ipcRenderer.invoke('get-swf-path', panel);
+                if (swfPath) {
+                    webview.src = `file://${swfPath}`;
+                    updatePanelStatus(panel, 'Loading SWF...');
+                } else {
+                    const swfName = isLeft ? 'AutoEvony.swf' : 'EvonyClient.swf';
+                    webview.src = `data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div style="text-align:center"><h2>⚠️ SWF File Not Found</h2><p>${swfName} not found in swf/ directory</p><p style="color:#888;font-size:12px">Place the SWF file in the swf/ folder and restart the application</p></div></body></html>`;
+                    updatePanelStatus(panel, 'SWF not found');
+                }
+            } catch (error) {
+                console.error(`[Mode] Error getting SWF path for ${panel}:`, error);
+                webview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>Error Loading SWF</h2><p>' + error.message + '</p></div></body></html>';
+                updatePanelStatus(panel, 'SWF error');
             }
-            elements.rightWebview.src = `file://${swfPath}`;
+        } else if (mode === 'hybrid') {
+            // Hybrid mode uses Playwright for enhanced automation
+            await activateHybridMode(panel);
         }
+
+        // Save mode to store for persistence
+        store.set(isLeft ? 'leftPanelMode' : 'rightPanelMode', mode);
+
+    } catch (error) {
+        console.error(`[Mode] Error switching ${panel} panel to ${mode}:`, error);
+        showNotification(`Mode switch failed: ${error.message}`, 'error');
+    } finally {
+        state[lockKey] = false;
+    }
+}
+
+/**
+ * Update panel status indicator
+ */
+function updatePanelStatus(panel, message) {
+    const statusEl = document.getElementById(`${panel}-status`);
+    if (statusEl) {
+        statusEl.textContent = message;
     }
 }
 
@@ -1281,25 +1331,209 @@ function toggleSidePanel() {
 
 // Webview events
 function setupWebviewEvents(webview, panel) {
+    // Loading started
     webview.addEventListener('did-start-loading', () => {
         document.getElementById(`${panel}-status`).textContent = 'Loading...';
+        // Show loading bar
+        const loadingProgress = document.getElementById(`${panel}-loading-progress`);
+        if (loadingProgress) {
+            loadingProgress.classList.add('active');
+            loadingProgress.style.width = '';  // Let CSS animation handle it
+        }
     });
-    
+
+    // Loading finished
     webview.addEventListener('did-stop-loading', () => {
         document.getElementById(`${panel}-status`).textContent = '';
+        // Hide loading bar
+        const loadingProgress = document.getElementById(`${panel}-loading-progress`);
+        if (loadingProgress) {
+            loadingProgress.classList.remove('active');
+            loadingProgress.style.width = '100%';
+            setTimeout(() => {
+                loadingProgress.style.width = '0%';
+            }, 200);
+        }
     });
-    
+
+    // Navigation completed - update URL bar
+    webview.addEventListener('did-navigate', (e) => {
+        const urlInput = document.getElementById(`${panel}-url`);
+        if (urlInput && e.url) {
+            urlInput.value = e.url;
+        }
+        // Update navigation button states
+        updateNavigationButtons(panel, webview);
+    });
+
+    // In-page navigation - update URL bar
+    webview.addEventListener('did-navigate-in-page', (e) => {
+        if (e.isMainFrame) {
+            const urlInput = document.getElementById(`${panel}-url`);
+            if (urlInput && e.url) {
+                urlInput.value = e.url;
+            }
+        }
+    });
+
+    // Load failed
     webview.addEventListener('did-fail-load', (e) => {
         if (e.errorCode !== -3) { // Ignore aborted loads
             document.getElementById(`${panel}-status`).textContent = 'Load failed';
+            // Show error overlay
+            showPanelError(panel, e.errorDescription || 'Failed to load page', e.errorCode);
+        }
+        // Hide loading bar
+        const loadingProgress = document.getElementById(`${panel}-loading-progress`);
+        if (loadingProgress) {
+            loadingProgress.classList.remove('active');
+            loadingProgress.style.width = '0%';
         }
     });
-    
+
+    // Console messages
     webview.addEventListener('console-message', (e) => {
         if (store.get('debug')) {
             console.log(`[${panel}]`, e.message);
         }
     });
+
+    // Page title update
+    webview.addEventListener('page-title-updated', (e) => {
+        // Could update tab title or window title
+        if (store.get('debug')) {
+            console.log(`[${panel}] Title: ${e.title}`);
+        }
+    });
+}
+
+/**
+ * Update navigation button states (back/forward)
+ */
+function updateNavigationButtons(panel, webview) {
+    const backBtn = document.getElementById(`${panel}-back`);
+    const forwardBtn = document.getElementById(`${panel}-forward`);
+
+    if (backBtn) {
+        backBtn.disabled = !webview.canGoBack();
+    }
+    if (forwardBtn) {
+        forwardBtn.disabled = !webview.canGoForward();
+    }
+}
+
+/**
+ * Show error overlay on a panel
+ */
+function showPanelError(panel, message, errorCode) {
+    const overlay = document.getElementById(`${panel}-error-overlay`);
+    const messageEl = document.getElementById(`${panel}-error-message`);
+    const detailsEl = document.getElementById(`${panel}-error-details`);
+
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+    if (messageEl) {
+        messageEl.textContent = message;
+    }
+    if (detailsEl) {
+        detailsEl.textContent = `Error code: ${errorCode}`;
+    }
+}
+
+/**
+ * Hide error overlay on a panel
+ */
+function hidePanelError(panel) {
+    const overlay = document.getElementById(`${panel}-error-overlay`);
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+
+/**
+ * Setup navigation handlers for a panel (back, forward, refresh, URL bar)
+ */
+function setupPanelNavigationHandlers(panel, webview) {
+    if (!webview) return;
+
+    // Back button
+    const backBtn = document.getElementById(`${panel}-back`);
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            if (webview.canGoBack()) {
+                webview.goBack();
+            }
+        });
+    }
+
+    // Forward button
+    const forwardBtn = document.getElementById(`${panel}-forward`);
+    if (forwardBtn) {
+        forwardBtn.addEventListener('click', () => {
+            if (webview.canGoForward()) {
+                webview.goForward();
+            }
+        });
+    }
+
+    // Refresh button
+    const refreshBtn = document.getElementById(`${panel}-refresh`);
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            webview.reload();
+        });
+    }
+
+    // Stop button
+    const stopBtn = document.getElementById(`${panel}-stop`);
+    if (stopBtn) {
+        stopBtn.addEventListener('click', () => {
+            webview.stop();
+        });
+    }
+
+    // URL input and Go button
+    const urlInput = document.getElementById(`${panel}-url`);
+    const goBtn = document.getElementById(`${panel}-go`);
+
+    const navigateToUrl = () => {
+        if (!urlInput) return;
+        let url = urlInput.value.trim();
+        if (!url) return;
+
+        // Add protocol if missing
+        if (!url.startsWith('http://') && !url.startsWith('https://') &&
+            !url.startsWith('file://') && !url.startsWith('about:')) {
+            // Check if it looks like a domain
+            if (url.includes('.') && !url.includes(' ')) {
+                url = 'https://' + url;
+            } else {
+                // Treat as search query
+                url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+            }
+        }
+
+        webview.src = url;
+    };
+
+    if (urlInput) {
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                navigateToUrl();
+            }
+        });
+
+        // Select all text on focus
+        urlInput.addEventListener('focus', () => {
+            urlInput.select();
+        });
+    }
+
+    if (goBtn) {
+        goBtn.addEventListener('click', navigateToUrl);
+    }
 }
 
 // Initialize panels with default URLs
@@ -4557,6 +4791,3 @@ if (document.readyState === 'loading') {
 window.ErrorNotification = ErrorNotification;
 window.safeIpcCall = safeIpcCall;
 window.withRetry = withRetry;
-
-
-
