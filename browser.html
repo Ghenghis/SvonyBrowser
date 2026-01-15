@@ -37,6 +37,18 @@
             <button id="btn-right-only" class="toolbar-btn" title="Show Evony Client panel only (Ctrl+3)">Client ▶</button>
             <div class="toolbar-divider"></div>
             <button id="btn-swap-panels" class="toolbar-btn" title="Swap left and right panels (Ctrl+S)">⇄ Swap</button>
+            <div class="toolbar-divider"></div>
+            <span class="toolbar-label">Size:</span>
+            <select id="panel-size-preset" class="toolbar-select" title="Auto-size panels for optimal view">
+                <option value="balanced">50/50 Balanced</option>
+                <option value="evony-optimal" selected>40/60 Evony Optimal</option>
+                <option value="game-focus">35/65 Game Focus</option>
+                <option value="wide-game">30/70 Wide Game</option>
+                <option value="bot-focus">65/35 Bot Focus</option>
+                <option value="16:9-game">16:9 Game Ratio</option>
+                <option value="4:3-game">4:3 Game Ratio</option>
+            </select>
+            <button id="btn-auto-fit" class="toolbar-btn" title="Auto-fit panels to window (Ctrl+F)">⊞ Fit</button>
         </div>
         
         <!-- Server Selection -->

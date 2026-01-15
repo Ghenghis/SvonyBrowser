@@ -43,6 +43,8 @@ const elements = {
     btnBothPanels: document.getElementById('btn-both-panels'),
     btnRightOnly: document.getElementById('btn-right-only'),
     btnSwapPanels: document.getElementById('btn-swap-panels'),
+    panelSizePreset: document.getElementById('panel-size-preset'),
+    btnAutoFit: document.getElementById('btn-auto-fit'),
     btnReloadLeft: document.getElementById('btn-reload-left'),
     btnReloadRight: document.getElementById('btn-reload-right'),
     btnClearCache: document.getElementById('btn-clear-cache'),
@@ -191,6 +193,45 @@ function setupEventListeners() {
     safeAddListener(elements.btnBothPanels, 'click', () => setPanelView('both'));
     safeAddListener(elements.btnRightOnly, 'click', () => setPanelView('right'));
     safeAddListener(elements.btnSwapPanels, 'click', swapPanels);
+    
+    // Panel size presets
+    safeAddListener(elements.panelSizePreset, 'change', (e) => {
+        const preset = e.target.value;
+        autoSizePanels(preset);
+        store.set('panelSizePreset', preset);
+    });
+    
+    // Auto-fit button
+    safeAddListener(elements.btnAutoFit, 'click', () => {
+        // Auto-fit based on window size and game aspect ratio
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const aspectRatio = windowWidth / windowHeight;
+        
+        // Choose optimal preset based on window aspect ratio
+        let preset = 'evony-optimal';
+        if (aspectRatio > 2.0) {
+            preset = 'wide-game';  // Ultra-wide monitors
+        } else if (aspectRatio > 1.7) {
+            preset = '16:9-game';  // Standard widescreen
+        } else if (aspectRatio > 1.5) {
+            preset = 'evony-optimal';  // Standard monitors
+        } else {
+            preset = '4:3-game';  // Older/square monitors
+        }
+        
+        autoSizePanels(preset);
+        elements.panelSizePreset.value = preset;
+        store.set('panelSizePreset', preset);
+    });
+    
+    // Restore saved preset on load
+    try {
+        const savedPreset = store.get('panelSizePreset', 'evony-optimal');
+        if (elements.panelSizePreset) {
+            elements.panelSizePreset.value = savedPreset;
+        }
+    } catch (err) {}
     
     // Reload buttons
     safeAddListener(elements.btnReloadLeft, 'click', () => elements.leftWebview?.reload());
@@ -520,35 +561,150 @@ function updatePanelToggles() {
 function setupPanelSplitter() {
     let isDragging = false;
     let startX, startLeftWidth;
+    const splitter = elements.panelSplitter;
+    const browserPanels = document.getElementById('browser-panels');
     
-    elements.panelSplitter.addEventListener('mousedown', (e) => {
+    // Store the current panel ratio for persistence
+    let currentRatio = 0.5;
+    
+    // Get position from mouse or touch event
+    function getClientX(e) {
+        if (e.touches && e.touches.length > 0) {
+            return e.touches[0].clientX;
+        }
+        return e.clientX;
+    }
+    
+    // Start dragging (mouse or touch)
+    function startDrag(e) {
         isDragging = true;
-        startX = e.clientX;
+        startX = getClientX(e);
         startLeftWidth = elements.leftPanel.offsetWidth;
         document.body.style.cursor = 'col-resize';
-    });
+        document.body.style.userSelect = 'none';
+        splitter.classList.add('dragging');
+        
+        // Prevent default to avoid text selection and scrolling
+        e.preventDefault();
+    }
     
-    document.addEventListener('mousemove', (e) => {
+    // Handle drag movement
+    function handleDrag(e) {
         if (!isDragging) return;
         
-        const diff = e.clientX - startX;
+        const clientX = getClientX(e);
+        const diff = clientX - startX;
         const newLeftWidth = startLeftWidth + diff;
-        const containerWidth = document.getElementById('browser-panels').offsetWidth;
+        const containerWidth = browserPanels.offsetWidth;
+        const splitterWidth = 8;
         
-        const minWidth = 200;
-        const maxWidth = containerWidth - minWidth - 6;
+        const minWidth = 150;
+        const maxWidth = containerWidth - minWidth - splitterWidth;
         
         if (newLeftWidth >= minWidth && newLeftWidth <= maxWidth) {
             elements.leftPanel.style.flex = 'none';
             elements.leftPanel.style.width = `${newLeftWidth}px`;
             elements.rightPanel.style.flex = '1';
+            
+            // Store the ratio
+            currentRatio = newLeftWidth / containerWidth;
+            
+            // Dispatch resize event for webviews
+            window.dispatchEvent(new CustomEvent('panels-resized', { detail: { ratio: currentRatio } }));
         }
+        
+        e.preventDefault();
+    }
+    
+    // End dragging
+    function endDrag() {
+        if (isDragging) {
+            isDragging = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            splitter.classList.remove('dragging');
+            
+            // Save ratio to store
+            try {
+                store.set('panelRatio', currentRatio);
+            } catch (err) {
+                console.warn('Could not save panel ratio:', err);
+            }
+        }
+    }
+    
+    // Mouse events
+    splitter.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener('mouseup', endDrag);
+    
+    // Touch events for finger/touchscreen support
+    splitter.addEventListener('touchstart', startDrag, { passive: false });
+    document.addEventListener('touchmove', handleDrag, { passive: false });
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('touchcancel', endDrag);
+    
+    // Double-click to reset to 50/50
+    splitter.addEventListener('dblclick', () => {
+        setPanelRatio(0.5);
     });
     
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.body.style.cursor = '';
-    });
+    // Restore saved ratio on load
+    try {
+        const savedRatio = store.get('panelRatio', 0.5);
+        if (savedRatio && savedRatio > 0.1 && savedRatio < 0.9) {
+            currentRatio = savedRatio;
+            setPanelRatio(savedRatio);
+        }
+    } catch (err) {
+        console.warn('Could not restore panel ratio:', err);
+    }
+    
+    console.log('[Renderer] Panel splitter initialized with touch support');
+}
+
+// Set panel ratio programmatically (0.0 to 1.0)
+function setPanelRatio(ratio) {
+    const browserPanels = document.getElementById('browser-panels');
+    if (!browserPanels) return;
+    
+    const containerWidth = browserPanels.offsetWidth;
+    const splitterWidth = 8;
+    const minWidth = 150;
+    
+    let leftWidth = containerWidth * ratio;
+    leftWidth = Math.max(minWidth, Math.min(leftWidth, containerWidth - minWidth - splitterWidth));
+    
+    elements.leftPanel.style.flex = 'none';
+    elements.leftPanel.style.width = `${leftWidth}px`;
+    elements.rightPanel.style.flex = '1';
+    
+    // Save and dispatch event
+    try {
+        store.set('panelRatio', ratio);
+    } catch (err) {}
+    
+    window.dispatchEvent(new CustomEvent('panels-resized', { detail: { ratio } }));
+}
+
+// Auto-size panels for optimal game view
+function autoSizePanels(preset = 'balanced') {
+    const presets = {
+        'balanced': 0.5,           // 50/50 split
+        'game-focus': 0.35,        // 35% left (bot), 65% right (game)
+        'bot-focus': 0.65,         // 65% left (bot), 35% right (game)
+        'game-only': 0.15,         // Minimal left panel
+        'evony-optimal': 0.4,      // 40% left, 60% right - optimal for Evony game screen
+        'wide-game': 0.3,          // 30% left, 70% right - wide game view
+        '16:9-game': 0.38,         // Optimized for 16:9 game aspect ratio
+        '4:3-game': 0.42           // Optimized for 4:3 game aspect ratio
+    };
+    
+    const ratio = presets[preset] || 0.5;
+    setPanelRatio(ratio);
+    
+    console.log(`[Renderer] Auto-sized panels to ${preset} (${Math.round(ratio * 100)}% / ${Math.round((1 - ratio) * 100)}%)`);
+    return ratio;
 }
 
 // Tab switching
