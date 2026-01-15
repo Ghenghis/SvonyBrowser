@@ -30,10 +30,22 @@ Svony Browser is a comprehensive Evony game analysis suite built on Electron wit
 
 ### Dual-Panel Browser
 - **Side-by-side panels** for AutoEvony bot and Evony client
-- **Web/SWF toggle** for each panel
+- **Web/SWF/Hybrid mode toggle** for each panel
+- **Webbar navigation** with back, forward, refresh, URL entry
 - **Server selector** (cc1-cc5)
 - **Panel swap and resize** functionality
 - **Session synchronization** between panels
+- **Loading progress bar** with smooth animations
+- **Error overlay** with retry and fallback options
+
+### Hybrid Mode (Playwright)
+- **Playwright-powered automation** for enhanced web interaction
+- **Auto-login** with intelligent form detection
+- **Form auto-fill** by CSS selector
+- **Request interception** for network monitoring
+- **Session persistence** across restarts
+- **Screenshot capture** for debugging
+- **Network request logging**
 
 ### Traffic Viewer
 - **Real-time packet capture** from game traffic
@@ -214,7 +226,15 @@ Svony-Browser/
 │   ├── game-state.js
 │   ├── packet-analysis.js
 │   ├── combat-simulator.js
-│   └── session-recorder.js
+│   ├── session-recorder.js
+│   ├── panel-manager.js       # Panel state management
+│   ├── panel-ui-controller.js # UI interactions
+│   ├── panel-playwright-bridge.js  # Playwright integration
+│   ├── playwright-service.js  # Playwright browser instance
+│   ├── agent-controller.js    # AI agent automation
+│   ├── error-tracker.js       # Error tracking
+│   ├── error-helper.js        # Error solutions
+│   └── self-healer.js         # Auto-recovery
 └── themes/
     └── svony-theme.css   # Application styling
 ```
@@ -229,8 +249,13 @@ Svony-Browser/
 | `Ctrl+S` | Swap panels |
 | `F5` | Reload left panel |
 | `F6` | Reload right panel |
+| `Ctrl+L` | Focus URL bar |
+| `Ctrl+D` | Add bookmark |
+| `Alt+Left` | Go back |
+| `Alt+Right` | Go forward |
 | `Ctrl+Shift+I` | Open DevTools |
 | `F11` | Toggle fullscreen |
+| `Escape` | Close context menu/dropdown |
 
 ## API Reference
 

@@ -2,6 +2,82 @@
 
 All notable changes to Svony Browser will be documented in this file.
 
+## [2.2.7] - 2026-01-15 - Complete SWF/Web/Hybrid Mode Fix
+
+### Highlights
+This release provides a complete fix for all mode switching functionality, webbar navigation, and Hybrid mode Playwright integration. The application now reliably switches between SWF, Web, and Hybrid modes without freezing.
+
+### Bug Fixes
+
+#### SWF Mode
+- **Fixed SWF path resolution** for packaged apps - now searches multiple locations
+- **Added findSwfFile() helper** that checks `__dirname/swf`, `resourcesPath/swf`, `appPath/swf`
+- **Added getSwfPathForPanel()** to properly resolve SWF paths for left/right panels
+- **Better error messages** when SWF files are not found
+
+#### Mode Switching
+- **Fixed freezing issue** by adding mutex lock for async operations
+- **Made togglePanelMode() fully async** with proper await handling
+- **Proper deactivation** of hybrid mode before switching to other modes
+- **Mode badge and toggle buttons** now update correctly
+- **Mode persistence** to store for session recovery
+
+#### Webbar Navigation
+- **URL input updates** on navigation events (did-navigate, did-navigate-in-page)
+- **Back/Forward buttons** update enabled/disabled state correctly
+- **Enter key** in URL bar triggers navigation
+- **Go button** works properly
+- **Protocol auto-detection** (adds https:// if missing)
+- **Search query support** for non-URL inputs (redirects to Google)
+
+#### Hybrid Mode
+- **Added startHybridSession()** - Creates Playwright context and navigates
+- **Added stopHybridSession()** - Saves session and closes context properly
+- **Added getSessionStatus()** - Returns active session state info
+- **Added autoFillForm()** - Fill form fields by selector
+- **Added interceptRequests()** - Intercept and log matching network requests
+- **Added navigate()** - Navigate panel in hybrid mode
+- **Added getNetworkLog()** - Get network activity log for panel
+
+### UI Improvements
+- **Loading bar animation** now works properly with CSS classes
+- **Error overlay** with retry, clear cache & retry, and fallback buttons
+- **Panel status updates** showing current mode state
+- **Navigation button states** managed correctly
+- **PanelUIController** properly initialized on startup
+
+### Technical Details
+
+#### Modified Files
+- `index.js` - SWF path helpers, store defaults, IPC handler improvements
+- `renderer.js` - Mode switching async/await, webbar handlers, loading bar
+- `services/panel-playwright-bridge.js` - 7 new methods for hybrid mode
+- `package.json` - Version bump to 2.2.7
+
+#### New Functions in index.js
+- `findSwfFile(swfName)` - Find SWF in multiple locations
+- `getSwfPathForPanel(panelId)` - Get SWF path with fallback
+
+#### New Methods in PanelPlaywrightBridge
+- `startHybridSession(panelId, url)`
+- `stopHybridSession(panelId)`
+- `getSessionStatus(panelId)`
+- `autoFillForm(panelId, formData)`
+- `interceptRequests(panelId, pattern)`
+- `navigate(panelId, url)`
+- `getNetworkLog(panelId)`
+
+### Downloads
+
+| Platform    | Type      | File                                 |
+| ----------- | --------- | ------------------------------------ |
+| Windows x64 | Portable  | SvonyBrowser-Portable-2.2.7-x64.exe  |
+| Windows x64 | Installer | SvonyBrowser-Setup-2.2.7-x64.exe     |
+| Windows x86 | Portable  | SvonyBrowser-Portable-2.2.7-ia32.exe |
+| Windows x86 | Installer | SvonyBrowser-Setup-2.2.7-ia32.exe    |
+
+---
+
 ## [2.2.1] - 2026-01-15 - Full CLI Access & Evony Knowledge Base
 
 ### New Features
