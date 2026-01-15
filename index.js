@@ -38,6 +38,11 @@ let gameState = null;
 let packetAnalysis = null;
 let combatSimulator = null;
 let sessionRecorder = null;
+let fiddlerBridge = null;
+let gameStateTracker = null;
+let mcpClientManager = null;
+let playwrightService = null;
+let amf3Decoder = null;
 
 // Store for preferences
 const store = new Store({
@@ -368,6 +373,87 @@ async function initializeServices() {
             });
         } catch (e) {
             console.warn('[Main] Session Recorder not available:', e.message);
+        }
+        
+        // AMF3 Decoder
+        try {
+            const { AMF3Decoder } = require('./services/amf3-decoder');
+            amf3Decoder = new AMF3Decoder();
+            console.log('[Main] AMF3 Decoder initialized');
+        } catch (e) {
+            console.warn('[Main] AMF3 Decoder not available:', e.message);
+        }
+        
+        // Fiddler Bridge
+        try {
+            const { FiddlerBridge } = require('./services/fiddler-bridge');
+            fiddlerBridge = new FiddlerBridge();
+            console.log('[Main] Fiddler Bridge initialized');
+            
+            fiddlerBridge.on('connected', () => {
+                sendWindow('fiddler-connected');
+            });
+            
+            fiddlerBridge.on('disconnected', () => {
+                sendWindow('fiddler-disconnected');
+            });
+            
+            fiddlerBridge.on('traffic', (entry) => {
+                sendWindow('fiddler-traffic', entry);
+                // Feed to packet analysis
+                if (packetAnalysis && entry.body) {
+                    packetAnalysis.processPacket(entry);
+                }
+            });
+        } catch (e) {
+            console.warn('[Main] Fiddler Bridge not available:', e.message);
+        }
+        
+        // Game State Tracker
+        try {
+            const { GameStateTracker } = require('./services/game-state-tracker');
+            gameStateTracker = new GameStateTracker();
+            console.log('[Main] Game State Tracker initialized');
+            
+            gameStateTracker.on('stateUpdated', (state) => {
+                sendWindow('game-state-updated', state);
+            });
+            
+            gameStateTracker.on('eventDetected', (event) => {
+                sendWindow('game-event-detected', event);
+            });
+        } catch (e) {
+            console.warn('[Main] Game State Tracker not available:', e.message);
+        }
+        
+        // MCP Client Manager
+        try {
+            const { MCPClientManager } = require('./services/mcp-client-manager');
+            mcpClientManager = new MCPClientManager();
+            console.log('[Main] MCP Client Manager initialized');
+            
+            mcpClientManager.on('serverConnected', (serverName) => {
+                sendWindow('mcp-server-connected', serverName);
+            });
+            
+            mcpClientManager.on('serverDisconnected', (serverName) => {
+                sendWindow('mcp-server-disconnected', serverName);
+            });
+            
+            mcpClientManager.on('toolResult', (result) => {
+                sendWindow('mcp-tool-result', result);
+            });
+        } catch (e) {
+            console.warn('[Main] MCP Client Manager not available:', e.message);
+        }
+        
+        // Playwright Service (lazy load - only when needed)
+        try {
+            const { PlaywrightService } = require('./services/playwright-service');
+            playwrightService = new PlaywrightService();
+            console.log('[Main] Playwright Service loaded (not started)');
+        } catch (e) {
+            console.warn('[Main] Playwright Service not available:', e.message);
         }
         
         console.log('[Main] All services initialized');
@@ -1382,6 +1468,223 @@ function setupIPC() {
             return result.filePaths[0];
         }
         return null;
+    });
+
+    // ========================================================================
+    // AMF3 Decoder
+    // ========================================================================
+    ipcMain.handle('amf3-decode', async (event, hexData) => {
+        if (!amf3Decoder) return { error: 'AMF3 Decoder not available' };
+        try {
+            const buffer = Buffer.from(hexData, 'hex');
+            return amf3Decoder.decode(buffer);
+        } catch (error) {
+            return { error: error.message };
+        }
+    });
+
+    ipcMain.handle('amf3-encode', async (event, data) => {
+        if (!amf3Decoder) return { error: 'AMF3 Decoder not available' };
+        try {
+            const buffer = amf3Decoder.encode(data);
+            return buffer.toString('hex');
+        } catch (error) {
+            return { error: error.message };
+        }
+    });
+
+    // ========================================================================
+    // Fiddler Bridge
+    // ========================================================================
+    ipcMain.handle('fiddler-connect', async () => {
+        if (!fiddlerBridge) return { error: 'Fiddler Bridge not available' };
+        return fiddlerBridge.connect();
+    });
+
+    ipcMain.handle('fiddler-disconnect', async () => {
+        if (!fiddlerBridge) return false;
+        return fiddlerBridge.disconnect();
+    });
+
+    ipcMain.handle('fiddler-status', async () => {
+        if (!fiddlerBridge) return { connected: false };
+        return fiddlerBridge.getStatus();
+    });
+
+    ipcMain.handle('fiddler-get-traffic', async (event, filter) => {
+        if (!fiddlerBridge) return [];
+        return fiddlerBridge.getTraffic(filter);
+    });
+
+    ipcMain.handle('fiddler-clear-traffic', async () => {
+        if (!fiddlerBridge) return false;
+        fiddlerBridge.clearTraffic();
+        return true;
+    });
+
+    ipcMain.handle('fiddler-inject-request', async (event, request) => {
+        if (!fiddlerBridge) return { error: 'Fiddler Bridge not available' };
+        return fiddlerBridge.injectRequest(request);
+    });
+
+    ipcMain.handle('fiddler-set-breakpoint', async (event, pattern, enabled) => {
+        if (!fiddlerBridge) return false;
+        return fiddlerBridge.setBreakpoint(pattern, enabled);
+    });
+
+    ipcMain.handle('fiddler-get-breakpoints', async () => {
+        if (!fiddlerBridge) return [];
+        return fiddlerBridge.getBreakpoints();
+    });
+
+    // ========================================================================
+    // Game State Tracker
+    // ========================================================================
+    ipcMain.handle('game-tracker-get-state', async () => {
+        if (!gameStateTracker) return null;
+        return gameStateTracker.getState();
+    });
+
+    ipcMain.handle('game-tracker-get-player', async () => {
+        if (!gameStateTracker) return null;
+        return gameStateTracker.getPlayer();
+    });
+
+    ipcMain.handle('game-tracker-get-cities', async () => {
+        if (!gameStateTracker) return [];
+        return gameStateTracker.getCities();
+    });
+
+    ipcMain.handle('game-tracker-get-heroes', async () => {
+        if (!gameStateTracker) return [];
+        return gameStateTracker.getHeroes();
+    });
+
+    ipcMain.handle('game-tracker-get-armies', async () => {
+        if (!gameStateTracker) return [];
+        return gameStateTracker.getArmies();
+    });
+
+    ipcMain.handle('game-tracker-get-resources', async () => {
+        if (!gameStateTracker) return {};
+        return gameStateTracker.getResources();
+    });
+
+    ipcMain.handle('game-tracker-get-events', async (event, limit) => {
+        if (!gameStateTracker) return [];
+        return gameStateTracker.getEvents(limit);
+    });
+
+    ipcMain.handle('game-tracker-export', async (event, format) => {
+        if (!gameStateTracker) return null;
+        return gameStateTracker.exportState(format);
+    });
+
+    ipcMain.handle('game-tracker-reset', async () => {
+        if (!gameStateTracker) return false;
+        gameStateTracker.reset();
+        return true;
+    });
+
+    // ========================================================================
+    // MCP Client Manager
+    // ========================================================================
+    ipcMain.handle('mcp-manager-connect-all', async () => {
+        if (!mcpClientManager) return { error: 'MCP Manager not available' };
+        return mcpClientManager.connectAll();
+    });
+
+    ipcMain.handle('mcp-manager-disconnect-all', async () => {
+        if (!mcpClientManager) return false;
+        return mcpClientManager.disconnectAll();
+    });
+
+    ipcMain.handle('mcp-manager-get-status', async () => {
+        if (!mcpClientManager) return { servers: {} };
+        return mcpClientManager.getStatus();
+    });
+
+    ipcMain.handle('mcp-manager-call-tool', async (event, serverName, toolName, args) => {
+        if (!mcpClientManager) return { error: 'MCP Manager not available' };
+        return mcpClientManager.callTool(serverName, toolName, args);
+    });
+
+    ipcMain.handle('mcp-manager-list-tools', async (event, serverName) => {
+        if (!mcpClientManager) return [];
+        return mcpClientManager.listTools(serverName);
+    });
+
+    ipcMain.handle('mcp-manager-get-all-tools', async () => {
+        if (!mcpClientManager) return {};
+        return mcpClientManager.getAllTools();
+    });
+
+    ipcMain.handle('mcp-manager-route-query', async (event, query, context) => {
+        if (!mcpClientManager) return { error: 'MCP Manager not available' };
+        return mcpClientManager.routeQuery(query, context);
+    });
+
+    // ========================================================================
+    // Playwright Service
+    // ========================================================================
+    ipcMain.handle('playwright-start', async () => {
+        if (!playwrightService) return { error: 'Playwright not available' };
+        return playwrightService.start();
+    });
+
+    ipcMain.handle('playwright-stop', async () => {
+        if (!playwrightService) return false;
+        return playwrightService.stop();
+    });
+
+    ipcMain.handle('playwright-status', async () => {
+        if (!playwrightService) return { running: false };
+        return playwrightService.getStatus();
+    });
+
+    ipcMain.handle('playwright-scrape', async (event, url, options) => {
+        if (!playwrightService) return { error: 'Playwright not available' };
+        return playwrightService.scrape(url, options);
+    });
+
+    ipcMain.handle('playwright-scrape-wiki', async (event, topic) => {
+        if (!playwrightService) return { error: 'Playwright not available' };
+        return playwrightService.scrapeEvonyWiki(topic);
+    });
+
+    ipcMain.handle('playwright-scrape-forum', async (event, query) => {
+        if (!playwrightService) return { error: 'Playwright not available' };
+        return playwrightService.scrapeEvonyForum(query);
+    });
+
+    ipcMain.handle('playwright-screenshot', async (event, url, options) => {
+        if (!playwrightService) return { error: 'Playwright not available' };
+        return playwrightService.screenshot(url, options);
+    });
+
+    ipcMain.handle('playwright-execute', async (event, script) => {
+        if (!playwrightService) return { error: 'Playwright not available' };
+        return playwrightService.executeScript(script);
+    });
+
+    // ========================================================================
+    // Intent Router (for chatbot)
+    // ========================================================================
+    ipcMain.handle('route-intent', async (event, message, context) => {
+        try {
+            const { IntentRouter } = require('./services/intent-router');
+            const router = new IntentRouter({
+                mcpManager: mcpClientManager,
+                lmStudioClient: global.lmStudioClient,
+                protocolHandler,
+                gameStateTracker,
+                combatSimulator,
+                playwrightService
+            });
+            return router.route(message, context);
+        } catch (error) {
+            return { error: error.message };
+        }
     });
 }
 

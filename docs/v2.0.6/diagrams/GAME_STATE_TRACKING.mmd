@@ -1,0 +1,130 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#8b5cf6'}}}%%
+flowchart TB
+    subgraph Traffic["📊 Traffic Sources"]
+        Webview["🌐 Webview Traffic"]
+        Fiddler["🔬 Fiddler Proxy"]
+        Replay["📹 Session Replay"]
+    end
+    
+    subgraph Parser["🔓 Protocol Parser"]
+        AMF3["AMF3 Decoder"]
+        ActionID["Action Identifier"]
+        PayloadExtract["Payload Extractor"]
+    end
+    
+    subgraph Handlers["🎯 State Handlers"]
+        direction TB
+        
+        subgraph ServerHandlers["Server Actions"]
+            LoginHandler["server.LoginResponse"]
+            LogoutHandler["server.Logout"]
+            HeartbeatHandler["system.heartbeat"]
+        end
+        
+        subgraph CityHandlers["City Actions"]
+            CityInfoHandler["city.getInfo"]
+            BuildingsHandler["city.getBuildings"]
+            ResourcesHandler["city.getResources"]
+        end
+        
+        subgraph HeroHandlers["Hero Actions"]
+            HeroListHandler["hero.getList"]
+            HeroInfoHandler["hero.getInfo"]
+            HeroEquipHandler["hero.equipItem"]
+        end
+        
+        subgraph ArmyHandlers["Army Actions"]
+            TroopsHandler["army.getTroops"]
+            MarchHandler["army.march"]
+            MarchCompleteHandler["army.marchComplete"]
+        end
+        
+        subgraph AllianceHandlers["Alliance Actions"]
+            AllianceInfoHandler["alliance.getInfo"]
+            MembersHandler["alliance.getMembers"]
+        end
+    end
+    
+    subgraph State["🎮 Game State Store"]
+        direction TB
+        
+        PlayerState["👤 Player State<br/>id, name, level, prestige"]
+        CitiesState["🏰 Cities Map<br/>cityId → CityState"]
+        HeroesState["⚔️ Heroes Map<br/>heroId → HeroState"]
+        MarchesState["🚶 Marches Map<br/>marchId → MarchState"]
+        ResourcesState["💰 Resources<br/>food, lumber, stone, iron"]
+        AllianceState["🏛️ Alliance State<br/>id, name, members"]
+    end
+    
+    subgraph Output["📤 State Consumers"]
+        CoPilot["🤖 Co-Pilot Context"]
+        StatePanel["📋 State Panel UI"]
+        Alerts["🔔 Alert System"]
+        Export["📁 State Export"]
+    end
+    
+    %% Traffic to Parser
+    Webview --> AMF3
+    Fiddler --> AMF3
+    Replay --> AMF3
+    
+    %% Parser flow
+    AMF3 --> ActionID
+    ActionID --> PayloadExtract
+    
+    %% Route to handlers
+    PayloadExtract -->|"1001"| LoginHandler
+    PayloadExtract -->|"1002"| LogoutHandler
+    PayloadExtract -->|"2001"| CityInfoHandler
+    PayloadExtract -->|"2002"| BuildingsHandler
+    PayloadExtract -->|"2006"| ResourcesHandler
+    PayloadExtract -->|"3001"| HeroListHandler
+    PayloadExtract -->|"3002"| HeroInfoHandler
+    PayloadExtract -->|"4001"| TroopsHandler
+    PayloadExtract -->|"4004"| MarchHandler
+    PayloadExtract -->|"4006"| MarchCompleteHandler
+    PayloadExtract -->|"5001"| AllianceInfoHandler
+    
+    %% Handlers to State
+    LoginHandler --> PlayerState
+    LoginHandler --> CitiesState
+    CityInfoHandler --> CitiesState
+    BuildingsHandler --> CitiesState
+    ResourcesHandler --> ResourcesState
+    HeroListHandler --> HeroesState
+    HeroInfoHandler --> HeroesState
+    TroopsHandler --> CitiesState
+    MarchHandler --> MarchesState
+    MarchCompleteHandler --> MarchesState
+    AllianceInfoHandler --> AllianceState
+    MembersHandler --> AllianceState
+    
+    %% State to Output
+    PlayerState --> CoPilot
+    CitiesState --> CoPilot
+    HeroesState --> CoPilot
+    MarchesState --> CoPilot
+    ResourcesState --> CoPilot
+    
+    PlayerState --> StatePanel
+    CitiesState --> StatePanel
+    HeroesState --> StatePanel
+    MarchesState --> StatePanel
+    
+    MarchesState --> Alerts
+    ResourcesState --> Alerts
+    
+    State --> Export
+    
+    %% Styling
+    classDef traffic fill:#6366f1,stroke:#818cf8,color:#fff
+    classDef parser fill:#f59e0b,stroke:#fbbf24,color:#000
+    classDef handler fill:#10b981,stroke:#34d399,color:#fff
+    classDef state fill:#8b5cf6,stroke:#a78bfa,color:#fff
+    classDef output fill:#ec4899,stroke:#f472b6,color:#fff
+    
+    class Webview,Fiddler,Replay traffic
+    class AMF3,ActionID,PayloadExtract parser
+    class LoginHandler,LogoutHandler,HeartbeatHandler,CityInfoHandler,BuildingsHandler,ResourcesHandler,HeroListHandler,HeroInfoHandler,HeroEquipHandler,TroopsHandler,MarchHandler,MarchCompleteHandler,AllianceInfoHandler,MembersHandler handler
+    class PlayerState,CitiesState,HeroesState,MarchesState,ResourcesState,AllianceState state
+    class CoPilot,StatePanel,Alerts,Export output

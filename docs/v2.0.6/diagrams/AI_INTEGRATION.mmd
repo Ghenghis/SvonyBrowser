@@ -1,0 +1,112 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#ec4899'}}}%%
+flowchart TB
+    subgraph UserInput["👤 User Input"]
+        Chat["💬 Chat Message"]
+        Voice["🎤 Voice Input"]
+        Context["📋 Game Context"]
+    end
+    
+    subgraph CoPilot["🤖 Co-Pilot System"]
+        direction TB
+        
+        subgraph Router["🔀 Intent Router"]
+            IntentClassifier["🎯 Intent Classifier"]
+            ContextBuilder["📦 Context Builder"]
+        end
+        
+        subgraph MCPLayer["🔌 MCP Integration"]
+            MCPClient["📡 MCP Client"]
+            
+            subgraph RAGServer["📚 evony-rag"]
+                Search["🔍 evony_search"]
+                Lookup["📖 evony_lookup"]
+                GetContext["📋 evony_context"]
+            end
+            
+            subgraph RTEServer["⚡ evony-rte"]
+                ProtoLookup["📜 protocol_lookup"]
+                ProtoSearch["🔎 protocol_search"]
+                DecodePacket["📦 decode_packet"]
+                AnalyzeTraffic["📊 analyze_traffic"]
+            end
+            
+            subgraph ToolsServer["🧮 evony-tools"]
+                CalcTraining["🎖️ calc_training"]
+                CalcMarch["🚶 calc_march"]
+                CalcCombat["⚔️ calc_combat"]
+                CalcResources["💰 calc_resources"]
+                CalcBuilding["🏗️ calc_building"]
+            end
+        end
+        
+        subgraph LLMLayer["🧠 LLM Processing"]
+            LMStudio["🖥️ LM Studio Client"]
+            PromptBuilder["📝 Prompt Builder"]
+            ResponseParser["📤 Response Parser"]
+        end
+    end
+    
+    subgraph Output["📤 Output"]
+        TextResponse["💬 Text Response"]
+        ActionSuggestion["🎯 Action Suggestion"]
+        DataVisualization["📊 Data Visualization"]
+        ProtocolAction["📜 Protocol Action"]
+    end
+    
+    %% Input Flow
+    Chat --> IntentClassifier
+    Voice --> IntentClassifier
+    Context --> ContextBuilder
+    
+    %% Intent Classification
+    IntentClassifier -->|"Knowledge Query"| Search
+    IntentClassifier -->|"Specific Topic"| Lookup
+    IntentClassifier -->|"Game Situation"| GetContext
+    IntentClassifier -->|"Protocol Question"| ProtoLookup
+    IntentClassifier -->|"Find Protocol"| ProtoSearch
+    IntentClassifier -->|"Decode Data"| DecodePacket
+    IntentClassifier -->|"Traffic Analysis"| AnalyzeTraffic
+    IntentClassifier -->|"Training Calc"| CalcTraining
+    IntentClassifier -->|"March Time"| CalcMarch
+    IntentClassifier -->|"Combat Sim"| CalcCombat
+    IntentClassifier -->|"Resource Calc"| CalcResources
+    IntentClassifier -->|"Building Calc"| CalcBuilding
+    IntentClassifier -->|"General Chat"| PromptBuilder
+    
+    %% MCP to Context
+    Search --> ContextBuilder
+    Lookup --> ContextBuilder
+    GetContext --> ContextBuilder
+    ProtoLookup --> ContextBuilder
+    ProtoSearch --> ContextBuilder
+    DecodePacket --> ContextBuilder
+    AnalyzeTraffic --> ContextBuilder
+    CalcTraining --> ContextBuilder
+    CalcMarch --> ContextBuilder
+    CalcCombat --> ContextBuilder
+    CalcResources --> ContextBuilder
+    CalcBuilding --> ContextBuilder
+    
+    %% LLM Processing
+    ContextBuilder --> PromptBuilder
+    PromptBuilder --> LMStudio
+    LMStudio --> ResponseParser
+    
+    %% Output
+    ResponseParser --> TextResponse
+    ResponseParser --> ActionSuggestion
+    ResponseParser --> DataVisualization
+    ResponseParser --> ProtocolAction
+    
+    %% Styling
+    classDef input fill:#6366f1,stroke:#818cf8,color:#fff
+    classDef router fill:#f59e0b,stroke:#fbbf24,color:#000
+    classDef mcp fill:#ec4899,stroke:#f472b6,color:#fff
+    classDef llm fill:#10b981,stroke:#34d399,color:#fff
+    classDef output fill:#8b5cf6,stroke:#a78bfa,color:#fff
+    
+    class Chat,Voice,Context input
+    class IntentClassifier,ContextBuilder router
+    class MCPClient,Search,Lookup,GetContext,ProtoLookup,ProtoSearch,DecodePacket,AnalyzeTraffic,CalcTraining,CalcMarch,CalcCombat,CalcResources,CalcBuilding mcp
+    class LMStudio,PromptBuilder,ResponseParser llm
+    class TextResponse,ActionSuggestion,DataVisualization,ProtocolAction output

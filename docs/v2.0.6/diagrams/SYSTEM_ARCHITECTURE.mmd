@@ -1,0 +1,124 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#6366f1', 'primaryTextColor': '#fff', 'primaryBorderColor': '#818cf8', 'lineColor': '#94a3b8', 'secondaryColor': '#1e293b', 'tertiaryColor': '#0f172a'}}}%%
+flowchart TB
+    subgraph User["👤 User Interface Layer"]
+        direction TB
+        Browser["🌐 Browser Window<br/>(browser.html)"]
+        LeftPanel["📱 Left Panel<br/>(AutoEvony/Web)"]
+        RightPanel["📱 Right Panel<br/>(Evony Client/Web)"]
+        SidePanel["🤖 Co-Pilot Panel"]
+        
+        subgraph Tabs["📑 Feature Tabs"]
+            TrafficTab["📊 Traffic Viewer"]
+            ProtocolTab["📋 Protocol Explorer"]
+            ToolsTab["🔧 Tools"]
+        end
+    end
+    
+    subgraph Renderer["⚡ Renderer Process (renderer.js)"]
+        direction TB
+        EventHandlers["🎯 Event Handlers"]
+        StateManager["📦 State Manager"]
+        UIUpdater["🖼️ UI Updater"]
+        IPCClient["📡 IPC Client"]
+    end
+    
+    subgraph Main["🖥️ Main Process (index.js)"]
+        direction TB
+        WindowManager["🪟 Window Manager"]
+        IPCServer["📡 IPC Server"]
+        FlashLoader["⚡ Flash Plugin Loader"]
+        MenuBuilder["📋 Menu Builder"]
+        UpdateChecker["🔄 Update Checker"]
+    end
+    
+    subgraph Services["⚙️ Service Layer"]
+        direction TB
+        LMStudio["🧠 LM Studio Client"]
+        Chatbot["💬 Chatbot Service"]
+        Combat["⚔️ Combat Simulator"]
+        Protocol["📜 Protocol Handler"]
+        GameState["🎮 Game State"]
+        Session["📹 Session Recorder"]
+        MCPConn["🔌 MCP Connection"]
+        Proxy["🔍 Proxy Monitor"]
+        Packet["📦 Packet Analysis"]
+    end
+    
+    subgraph MCP["🤖 MCP Servers"]
+        direction TB
+        RAG["📚 evony-rag<br/>(Knowledge Search)"]
+        RTE["⚡ evony-rte<br/>(Protocol Analysis)"]
+        Tools["🧮 evony-tools<br/>(Calculations)"]
+    end
+    
+    subgraph External["🌍 External Systems"]
+        direction TB
+        LMStudioServer["🖥️ LM Studio Server<br/>(localhost:1234)"]
+        EvonyServer["🎮 Evony Game Server"]
+        Fiddler["🔬 Fiddler Proxy"]
+        GitHub["📦 GitHub Releases"]
+    end
+    
+    subgraph Storage["💾 Storage Layer"]
+        direction TB
+        Store["⚙️ Settings Store"]
+        KnowledgeBase["📖 Knowledge Base"]
+        ProtocolDB["📋 Protocol Database"]
+        Sessions["📁 Session Files"]
+    end
+    
+    %% User Interface connections
+    Browser --> LeftPanel
+    Browser --> RightPanel
+    Browser --> SidePanel
+    Browser --> Tabs
+    
+    %% Renderer connections
+    Browser <--> Renderer
+    EventHandlers --> StateManager
+    StateManager --> UIUpdater
+    EventHandlers <--> IPCClient
+    
+    %% Main Process connections
+    IPCClient <--> IPCServer
+    IPCServer --> WindowManager
+    IPCServer --> FlashLoader
+    IPCServer --> UpdateChecker
+    
+    %% Service connections
+    IPCServer <--> Services
+    LMStudio <--> LMStudioServer
+    Chatbot --> LMStudio
+    Chatbot --> MCPConn
+    MCPConn <--> MCP
+    Protocol --> ProtocolDB
+    GameState --> Packet
+    Session --> Storage
+    Proxy <--> Fiddler
+    
+    %% External connections
+    LeftPanel <--> EvonyServer
+    RightPanel <--> EvonyServer
+    UpdateChecker --> GitHub
+    
+    %% Storage connections
+    Main --> Store
+    RAG --> KnowledgeBase
+    RTE --> ProtocolDB
+    
+    %% Styling
+    classDef userLayer fill:#6366f1,stroke:#818cf8,color:#fff
+    classDef rendererLayer fill:#10b981,stroke:#34d399,color:#fff
+    classDef mainLayer fill:#f59e0b,stroke:#fbbf24,color:#000
+    classDef serviceLayer fill:#8b5cf6,stroke:#a78bfa,color:#fff
+    classDef mcpLayer fill:#ec4899,stroke:#f472b6,color:#fff
+    classDef externalLayer fill:#64748b,stroke:#94a3b8,color:#fff
+    classDef storageLayer fill:#0ea5e9,stroke:#38bdf8,color:#fff
+    
+    class Browser,LeftPanel,RightPanel,SidePanel,TrafficTab,ProtocolTab,ToolsTab userLayer
+    class EventHandlers,StateManager,UIUpdater,IPCClient rendererLayer
+    class WindowManager,IPCServer,FlashLoader,MenuBuilder,UpdateChecker mainLayer
+    class LMStudio,Chatbot,Combat,Protocol,GameState,Session,MCPConn,Proxy,Packet serviceLayer
+    class RAG,RTE,Tools mcpLayer
+    class LMStudioServer,EvonyServer,Fiddler,GitHub externalLayer
+    class Store,KnowledgeBase,ProtocolDB,Sessions storageLayer

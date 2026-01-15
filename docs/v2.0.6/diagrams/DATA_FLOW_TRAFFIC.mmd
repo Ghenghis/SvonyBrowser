@@ -1,0 +1,73 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#6366f1'}}}%%
+sequenceDiagram
+    autonumber
+    participant User as 👤 User
+    participant Browser as 🌐 Browser Panel
+    participant Webview as 📱 Webview
+    participant Proxy as 🔍 Proxy Monitor
+    participant Protocol as 📜 Protocol Handler
+    participant Packet as 📦 Packet Analysis
+    participant GameState as 🎮 Game State
+    participant UI as 🖼️ Traffic UI
+    participant Session as 📹 Session Recorder
+    participant MCP as 🤖 MCP (evony-rte)
+    
+    Note over User,MCP: Traffic Capture Flow
+    
+    User->>Browser: Interact with game
+    Browser->>Webview: User action
+    Webview->>Proxy: HTTP/AMF Request
+    
+    rect rgb(30, 41, 59)
+        Note over Proxy,Protocol: Request Interception
+        Proxy->>Proxy: Capture headers & body
+        Proxy->>Protocol: Raw packet data
+        Protocol->>Protocol: Detect AMF3 format
+        Protocol->>MCP: decode_packet(hexData)
+        MCP-->>Protocol: Decoded structure
+        Protocol->>Packet: Decoded packet
+    end
+    
+    rect rgb(30, 58, 59)
+        Note over Packet,GameState: State Extraction
+        Packet->>Packet: Identify action type
+        Packet->>GameState: Update game state
+        GameState->>GameState: Track cities, heroes, troops
+    end
+    
+    rect rgb(59, 30, 41)
+        Note over UI,Session: UI & Recording
+        Packet->>UI: Traffic entry
+        UI->>UI: Add to traffic list
+        UI->>UI: Update counters
+        
+        alt Recording Active
+            Packet->>Session: Record packet
+            Session->>Session: Add to session buffer
+        end
+    end
+    
+    Proxy-->>Webview: Forward request
+    Webview-->>Browser: Response
+    
+    Note over User,MCP: Response Capture Flow
+    
+    Browser->>Proxy: Server response
+    Proxy->>Protocol: Response packet
+    Protocol->>MCP: decode_packet(hexData)
+    MCP-->>Protocol: Decoded response
+    Protocol->>Packet: Decoded response
+    Packet->>GameState: Update state
+    Packet->>UI: Response entry
+    
+    Note over User,MCP: Analysis Features
+    
+    User->>UI: Click traffic entry
+    UI->>Packet: Get packet details
+    Packet->>UI: JSON + Hex + Headers
+    UI->>UI: Display in tabs
+    
+    User->>UI: Request analysis
+    UI->>MCP: analyze_traffic(packets)
+    MCP-->>UI: Patterns & statistics
+    UI->>UI: Display analysis

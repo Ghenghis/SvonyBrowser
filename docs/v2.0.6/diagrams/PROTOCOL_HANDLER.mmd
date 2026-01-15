@@ -1,0 +1,95 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#f59e0b'}}}%%
+flowchart TB
+    subgraph Input["📥 Input Sources"]
+        RawPacket["📦 Raw Packet<br/>(Hex/Binary)"]
+        FiddlerCapture["🔬 Fiddler Capture"]
+        WebviewTraffic["🌐 Webview Traffic"]
+        ManualInput["✏️ Manual Input"]
+    end
+    
+    subgraph Decoder["🔓 AMF3 Decoder"]
+        direction TB
+        
+        subgraph Header["📋 Header Parser"]
+            Version["Version Byte"]
+            HeaderCount["Header Count"]
+            MessageCount["Message Count"]
+        end
+        
+        subgraph TypeDecoder["🏷️ Type Decoder"]
+            Undefined["0x00 Undefined"]
+            Null["0x01 Null"]
+            Boolean["0x02-03 Boolean"]
+            Integer["0x04 Integer (U29)"]
+            Double["0x05 Double"]
+            String["0x06 String"]
+            XMLDoc["0x07 XML Doc"]
+            Date["0x08 Date"]
+            Array["0x09 Array"]
+            Object["0x0A Object"]
+            XML["0x0B XML"]
+            ByteArray["0x0C ByteArray"]
+            VectorInt["0x0D Vector<int>"]
+            VectorUint["0x0E Vector<uint>"]
+            VectorDouble["0x0F Vector<double>"]
+            VectorObject["0x10 Vector<Object>"]
+            Dictionary["0x11 Dictionary"]
+        end
+        
+        subgraph References["🔗 Reference Tables"]
+            StringTable["String Table"]
+            ObjectTable["Object Table"]
+            TraitsTable["Traits Table"]
+        end
+    end
+    
+    subgraph ActionIdentifier["🎯 Action Identifier"]
+        direction TB
+        CommandExtractor["📜 Command Extractor"]
+        ProtocolDB["📚 Protocol Database"]
+        ActionMatcher["🔍 Action Matcher"]
+    end
+    
+    subgraph Output["📤 Output Formats"]
+        JSONView["📋 JSON View"]
+        HexView["🔢 Hex View"]
+        TreeView["🌳 Tree View"]
+        ActionInfo["📜 Action Info"]
+    end
+    
+    %% Input to Decoder
+    RawPacket --> Header
+    FiddlerCapture --> Header
+    WebviewTraffic --> Header
+    ManualInput --> Header
+    
+    %% Header to Type Decoder
+    Header --> TypeDecoder
+    
+    %% Type Decoder uses References
+    String --> StringTable
+    Object --> ObjectTable
+    Object --> TraitsTable
+    Array --> ObjectTable
+    
+    %% Type Decoder to Action Identifier
+    TypeDecoder --> CommandExtractor
+    CommandExtractor --> ProtocolDB
+    ProtocolDB --> ActionMatcher
+    
+    %% To Output
+    TypeDecoder --> JSONView
+    TypeDecoder --> HexView
+    TypeDecoder --> TreeView
+    ActionMatcher --> ActionInfo
+    
+    %% Styling
+    classDef input fill:#6366f1,stroke:#818cf8,color:#fff
+    classDef decoder fill:#f59e0b,stroke:#fbbf24,color:#000
+    classDef identifier fill:#10b981,stroke:#34d399,color:#fff
+    classDef output fill:#8b5cf6,stroke:#a78bfa,color:#fff
+    
+    class RawPacket,FiddlerCapture,WebviewTraffic,ManualInput input
+    class Version,HeaderCount,MessageCount,Undefined,Null,Boolean,Integer,Double,String,XMLDoc,Date,Array,Object,XML,ByteArray,VectorInt,VectorUint,VectorDouble,VectorObject,Dictionary,StringTable,ObjectTable,TraitsTable decoder
+    class CommandExtractor,ProtocolDB,ActionMatcher identifier
+    class JSONView,HexView,TreeView,ActionInfo output

@@ -1,20 +1,30 @@
 /**
- * Svony Browser - Chatbot Service (Co-Pilot)
- * AI-powered assistant with RAG knowledge retrieval
+ * Chatbot Service
+ * Evony Co-Pilot with full MCP integration, LM Studio support, and Playwright scraping
  */
 
-const EventEmitter = require('events');
+const { EventEmitter } = require('events');
 const path = require('path');
+
+// Lazy-loaded dependencies
+let IntentRouter = null;
+let MCPClientManager = null;
+let PlaywrightService = null;
 
 class ChatbotService extends EventEmitter {
     constructor() {
         super();
-        this.mcpManager = null; // Lazy loaded
-        this.protocolHandler = null; // Lazy loaded
-        this.conversationHistory = [];
-        this.currentContext = {};
+        this.lmStudioClient = null;
+        this.mcpManager = null;
+        this.intentRouter = null;
+        this.playwrightService = null;
+        this.protocolHandler = null;
+        this.gameState = null;
+        this.isInitialized = false;
         this.isProcessing = false;
+        this.conversationHistory = [];
         this.maxHistoryLength = 50;
+        this.currentContext = {};
         
         // Quick actions configuration
         this.quickActions = [
@@ -23,143 +33,216 @@ class ChatbotService extends EventEmitter {
                 label: 'Protocol Lookup', 
                 icon: '📡',
                 description: 'Search Evony protocol commands',
-                handler: 'handleProtocolLookup'
+                command: '/protocol'
             },
             { 
-                id: 'calculator', 
+                id: 'training', 
                 label: 'Training Calculator', 
                 icon: '🔢',
                 description: 'Calculate troop training costs',
-                handler: 'handleCalculator'
-            },
-            { 
-                id: 'traffic', 
-                label: 'Traffic Analysis', 
-                icon: '📊',
-                description: 'Analyze captured traffic',
-                handler: 'handleTrafficAnalysis'
-            },
-            { 
-                id: 'knowledge', 
-                label: 'Knowledge Base', 
-                icon: '📚',
-                description: 'Search game knowledge',
-                handler: 'handleKnowledgeSearch'
+                command: '/training'
             },
             { 
                 id: 'combat', 
                 label: 'Combat Simulator', 
                 icon: '⚔️',
                 description: 'Simulate battle outcomes',
-                handler: 'handleCombatSimulation'
+                command: '/combat'
             },
             { 
                 id: 'march', 
                 label: 'March Time', 
                 icon: '🏃',
                 description: 'Calculate march times',
-                handler: 'handleMarchTime'
+                command: '/march'
+            },
+            { 
+                id: 'decode', 
+                label: 'Decode Packet', 
+                icon: '🔓',
+                description: 'Decode AMF packet data',
+                command: '/decode'
+            },
+            { 
+                id: 'search', 
+                label: 'Knowledge Search', 
+                icon: '📚',
+                description: 'Search game knowledge',
+                command: '/search'
+            },
+            { 
+                id: 'scrape', 
+                label: 'Web Scrape', 
+                icon: '🌐',
+                description: 'Scrape web for info',
+                command: '/scrape'
+            },
+            { 
+                id: 'status', 
+                label: 'Status', 
+                icon: '📊',
+                description: 'Show service status',
+                command: '/status'
             }
         ];
         
-        // System prompts for different contexts
-        this.systemPrompts = {
-            general: `You are Evony Co-Pilot, an AI assistant specialized in the game Evony: The King's Return. 
-You help players with:
-- Understanding game mechanics and strategies
-- Analyzing protocol traffic and AMF data
-- Calculating troop training costs and march times
-- Optimizing city builds and hero development
-- Combat simulation and battle predictions
-
-Always be helpful, accurate, and provide specific game-related advice when possible.`,
-            
-            protocol: `You are analyzing Evony game protocol data. Help the user understand:
-- What actions/commands are being sent
-- The structure of request/response data
-- How to interpret AMF3 encoded data
-- Common patterns in game communication`,
-            
-            combat: `You are helping with combat analysis in Evony. Consider:
-- Troop types and their counters
-- Hero skills and buffs
-- Wall defenses and traps
-- March composition optimization`
+        // Command handlers
+        this.commandHandlers = {
+            '/training': this.handleTrainingCalc.bind(this),
+            '/march': this.handleMarchCalc.bind(this),
+            '/combat': this.handleCombatSim.bind(this),
+            '/protocol': this.handleProtocolLookup.bind(this),
+            '/decode': this.handleDecodePacket.bind(this),
+            '/search': this.handleKnowledgeSearch.bind(this),
+            '/scrape': this.handleWebScrape.bind(this),
+            '/help': this.handleHelp.bind(this),
+            '/clear': this.handleClear.bind(this),
+            '/status': this.handleStatus.bind(this)
         };
     }
-
+    
     /**
-     * Initialize the chatbot service
+     * Initialize the chatbot with all services
      */
-    async initialize() {
+    async initialize(lmStudioClient, appPath) {
+        this.lmStudioClient = lmStudioClient;
+        
+        // Load protocol handler
         try {
-            this.mcpManager = require('./mcp-connection');
             this.protocolHandler = require('./protocol-handler');
-            
-            console.log('[ChatbotService] Initialized');
-            this.emit('initialized');
-            return true;
+        } catch (e) {
+            console.warn('[ChatbotService] Protocol handler not available');
+        }
+        
+        // Initialize MCP Manager
+        try {
+            const { getMCPClientManager } = require('./mcp-client-manager');
+            this.mcpManager = getMCPClientManager();
+            await this.mcpManager.initialize(appPath);
+            console.log('[ChatbotService] MCP servers initialized');
         } catch (error) {
-            console.error('[ChatbotService] Initialization failed:', error);
-            return false;
+            console.warn('[ChatbotService] MCP initialization failed:', error.message);
+        }
+        
+        // Initialize Intent Router
+        try {
+            const { IntentRouter: IR } = require('./intent-router');
+            this.intentRouter = new IR(this.mcpManager, this.lmStudioClient);
+            
+            this.intentRouter.on('intent-classified', (classification) => {
+                this.emit('intent', classification);
+            });
+        } catch (error) {
+            console.warn('[ChatbotService] Intent router not available:', error.message);
+        }
+        
+        // Playwright is lazy-loaded when needed
+        
+        this.isInitialized = true;
+        this.emit('initialized');
+        
+        return true;
+    }
+    
+    /**
+     * Set LM Studio client (for dynamic connection)
+     */
+    setLMStudioClient(client) {
+        this.lmStudioClient = client;
+        if (this.intentRouter) {
+            this.intentRouter.lmStudioClient = client;
         }
     }
-
+    
     /**
-     * Process user message and generate response
+     * Set game state for context-aware responses
+     */
+    setGameState(state) {
+        this.gameState = state;
+        this.currentContext.gameState = state;
+        if (this.intentRouter) {
+            this.intentRouter.setGameContext(state);
+        }
+    }
+    
+    /**
+     * Process user message
      */
     async processMessage(userMessage, context = {}) {
+        if (!userMessage || typeof userMessage !== 'string') {
+            return { 
+                id: Date.now(),
+                role: 'assistant',
+                content: 'Please enter a message.',
+                type: 'error' 
+            };
+        }
+        
         if (this.isProcessing) {
-            return { error: 'Already processing a message' };
+            return { 
+                id: Date.now(),
+                role: 'assistant',
+                content: 'Already processing a message. Please wait.',
+                type: 'error' 
+            };
         }
         
         this.isProcessing = true;
         this.emit('processingStarted');
         
+        const trimmedMessage = userMessage.trim();
+        
+        // Add user message to history
+        const userEntry = {
+            id: Date.now(),
+            role: 'user',
+            content: trimmedMessage,
+            timestamp: Date.now(),
+            context: { ...this.currentContext, ...context }
+        };
+        this.conversationHistory.push(userEntry);
+        this.emit('messageAdded', userEntry);
+        
         try {
-            // Add user message to history
-            const userEntry = {
-                id: Date.now(),
-                role: 'user',
-                content: userMessage,
-                timestamp: Date.now(),
-                context: { ...this.currentContext, ...context }
-            };
-            this.conversationHistory.push(userEntry);
-            this.emit('messageAdded', userEntry);
+            let result;
             
-            // Detect intent and route to appropriate handler
-            const intent = this.detectIntent(userMessage);
-            let response;
-            
-            switch (intent.type) {
-                case 'protocol_lookup':
-                    response = await this.handleProtocolLookup(intent.query);
-                    break;
-                case 'calculator':
-                    response = await this.handleCalculator(intent.params);
-                    break;
-                case 'combat':
-                    response = await this.handleCombatSimulation(intent.params);
-                    break;
-                case 'march_time':
-                    response = await this.handleMarchTime(intent.params);
-                    break;
-                case 'knowledge':
-                    response = await this.handleKnowledgeSearch(userMessage);
-                    break;
-                default:
-                    response = await this.handleGeneralQuery(userMessage);
+            // Check for quick actions (commands starting with /)
+            if (trimmedMessage.startsWith('/')) {
+                const [command, ...args] = trimmedMessage.split(' ');
+                const handler = this.commandHandlers[command.toLowerCase()];
+                
+                if (handler) {
+                    result = await handler(args.join(' '));
+                } else {
+                    result = {
+                        content: `Unknown command: ${command}. Type /help for available commands.`,
+                        type: 'error'
+                    };
+                }
+            } else if (this.intentRouter) {
+                // Route through intent router for intelligent response
+                const routeResult = await this.intentRouter.route(trimmedMessage);
+                result = {
+                    content: routeResult.response,
+                    type: 'success',
+                    intent: routeResult.intent,
+                    mcpResults: routeResult.mcpResults,
+                    confidence: routeResult.confidence
+                };
+            } else {
+                // Fallback if intent router not available
+                result = await this.handleGeneralQuery(trimmedMessage);
             }
             
             // Add assistant response to history
             const assistantEntry = {
                 id: Date.now(),
                 role: 'assistant',
-                content: response.text || response,
+                content: result.content || result.response || result,
                 timestamp: Date.now(),
-                intent: intent.type,
-                data: response.data || null
+                type: result.type || 'success',
+                intent: result.intent,
+                data: result.data
             };
             this.conversationHistory.push(assistantEntry);
             this.emit('messageAdded', assistantEntry);
@@ -175,11 +258,12 @@ Always be helpful, accurate, and provide specific game-related advice when possi
             const errorEntry = {
                 id: Date.now(),
                 role: 'assistant',
-                content: `I encountered an error: ${error.message}. Please try again.`,
+                content: `Error: ${error.message}`,
                 timestamp: Date.now(),
-                error: true
+                type: 'error'
             };
             this.conversationHistory.push(errorEntry);
+            this.emit('messageAdded', errorEntry);
             
             return errorEntry;
             
@@ -188,522 +272,674 @@ Always be helpful, accurate, and provide specific game-related advice when possi
             this.emit('processingFinished');
         }
     }
-
+    
     /**
-     * Detect user intent from message
+     * Handle training calculation command
      */
-    detectIntent(message) {
-        const lowerMessage = message.toLowerCase();
+    async handleTrainingCalc(args) {
+        const parts = args.split(' ');
+        const quantity = parseInt(parts[0]) || 1000;
+        const troopType = parts[1] || 'cavalry';
         
-        // Protocol lookup patterns
-        if (lowerMessage.includes('protocol') || 
-            lowerMessage.includes('command') ||
-            lowerMessage.includes('action') ||
-            lowerMessage.match(/\b(city|hero|army|alliance|map|trade|quest|system)\.\w+/)) {
-            
-            const actionMatch = message.match(/\b(\w+\.\w+)\b/);
-            return {
-                type: 'protocol_lookup',
-                query: actionMatch ? actionMatch[1] : message
-            };
-        }
-        
-        // Calculator patterns
-        if (lowerMessage.includes('calculate') || 
-            lowerMessage.includes('training') ||
-            lowerMessage.includes('cost') ||
-            lowerMessage.includes('how many') ||
-            lowerMessage.includes('how much')) {
-            
-            return {
-                type: 'calculator',
-                params: this.extractCalculatorParams(message)
-            };
-        }
-        
-        // Combat patterns
-        if (lowerMessage.includes('battle') || 
-            lowerMessage.includes('attack') ||
-            lowerMessage.includes('defend') ||
-            lowerMessage.includes('combat') ||
-            lowerMessage.includes('simulate')) {
-            
-            return {
-                type: 'combat',
-                params: this.extractCombatParams(message)
-            };
-        }
-        
-        // March time patterns
-        if (lowerMessage.includes('march') || 
-            lowerMessage.includes('travel') ||
-            lowerMessage.includes('distance') ||
-            lowerMessage.includes('how long')) {
-            
-            return {
-                type: 'march_time',
-                params: this.extractMarchParams(message)
-            };
-        }
-        
-        // Default to knowledge search
-        return {
-            type: 'knowledge',
-            query: message
-        };
-    }
-
-    /**
-     * Handle protocol lookup requests
-     */
-    async handleProtocolLookup(query) {
-        if (!this.protocolHandler) {
-            this.protocolHandler = require('./protocol-handler');
-        }
-        
-        // Try exact match first
-        let action = this.protocolHandler.lookupAction(query);
-        
-        if (action) {
-            return {
-                text: this.formatProtocolAction(action),
-                data: action
-            };
-        }
-        
-        // Try search
-        const results = this.protocolHandler.searchActions(query);
-        
-        if (results.length > 0) {
-            const formatted = results.slice(0, 5).map(a => 
-                `• **${a.name}** (${a.category}): ${a.description}`
-            ).join('\n');
-            
-            return {
-                text: `Found ${results.length} matching protocol actions:\n\n${formatted}`,
-                data: results.slice(0, 5)
-            };
-        }
-        
-        // List categories if no match
-        const categories = this.protocolHandler.getCategories();
-        return {
-            text: `No protocol action found for "${query}".\n\nAvailable categories: ${categories.join(', ')}\n\nTry searching with a category name or action like "city.getInfo"`,
-            data: { categories }
-        };
-    }
-
-    /**
-     * Format protocol action for display
-     */
-    formatProtocolAction(action) {
-        let text = `## ${action.name}\n\n`;
-        text += `**Category:** ${action.category}\n`;
-        text += `**Command ID:** ${action.commandId}\n`;
-        text += `**Description:** ${action.description}\n\n`;
-        
-        if (action.request && Object.keys(action.request).length > 0) {
-            text += `### Request Parameters\n`;
-            for (const [key, type] of Object.entries(action.request)) {
-                text += `• \`${key}\`: ${type}\n`;
-            }
-            text += '\n';
-        }
-        
-        if (action.response && Object.keys(action.response).length > 0) {
-            text += `### Response Fields\n`;
-            for (const [key, type] of Object.entries(action.response)) {
-                text += `• \`${key}\`: ${type}\n`;
-            }
-        }
-        
-        return text;
-    }
-
-    /**
-     * Handle calculator requests
-     */
-    async handleCalculator(params) {
-        const troopCosts = {
-            worker: { food: 50, gold: 0, lumber: 0, stone: 0, iron: 0, time: 15 },
-            warrior: { food: 100, gold: 0, lumber: 0, stone: 0, iron: 20, time: 30 },
-            scout: { food: 50, gold: 0, lumber: 0, stone: 0, iron: 0, time: 20 },
-            pikeman: { food: 150, gold: 0, lumber: 0, stone: 0, iron: 50, time: 60 },
-            swordsman: { food: 200, gold: 0, lumber: 50, stone: 0, iron: 100, time: 90 },
-            archer: { food: 150, gold: 0, lumber: 100, stone: 0, iron: 50, time: 75 },
-            cavalry: { food: 300, gold: 0, lumber: 0, stone: 0, iron: 150, time: 120 },
-            cataphract: { food: 500, gold: 0, lumber: 0, stone: 0, iron: 300, time: 180 },
-            ballista: { food: 500, gold: 0, lumber: 500, stone: 0, iron: 200, time: 300 },
-            ram: { food: 600, gold: 0, lumber: 600, stone: 0, iron: 300, time: 360 },
-            catapult: { food: 800, gold: 0, lumber: 800, stone: 0, iron: 400, time: 450 }
-        };
-        
-        if (!params.troopType || !params.count) {
-            // Return available troop types
-            const types = Object.keys(troopCosts).join(', ');
-            return {
-                text: `Please specify a troop type and count.\n\n**Available troops:** ${types}\n\n**Example:** "Calculate cost for 10000 cavalry"`,
-                data: { troopTypes: Object.keys(troopCosts) }
-            };
-        }
-        
-        const troopType = params.troopType.toLowerCase();
-        const count = params.count;
-        
-        if (!troopCosts[troopType]) {
-            return {
-                text: `Unknown troop type: ${troopType}. Available: ${Object.keys(troopCosts).join(', ')}`,
-                data: null
-            };
-        }
-        
-        const cost = troopCosts[troopType];
-        const totalCost = {
-            food: cost.food * count,
-            gold: cost.gold * count,
-            lumber: cost.lumber * count,
-            stone: cost.stone * count,
-            iron: cost.iron * count,
-            time: cost.time * count // in seconds
-        };
-        
-        const formatNumber = (n) => n.toLocaleString();
-        const formatTime = (seconds) => {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-        };
-        
-        let text = `## Training Cost: ${formatNumber(count)} ${troopType}\n\n`;
-        text += `| Resource | Amount |\n`;
-        text += `|----------|--------|\n`;
-        text += `| Food | ${formatNumber(totalCost.food)} |\n`;
-        if (totalCost.lumber > 0) text += `| Lumber | ${formatNumber(totalCost.lumber)} |\n`;
-        if (totalCost.stone > 0) text += `| Stone | ${formatNumber(totalCost.stone)} |\n`;
-        if (totalCost.iron > 0) text += `| Iron | ${formatNumber(totalCost.iron)} |\n`;
-        text += `\n**Base Training Time:** ${formatTime(totalCost.time)}\n`;
-        text += `\n*Note: Actual time depends on barracks level and buffs.*`;
-        
-        return { text, data: totalCost };
-    }
-
-    /**
-     * Handle combat simulation requests
-     */
-    async handleCombatSimulation(params) {
-        try {
-            const combatSimulator = require('./combat-simulator');
-            
-            if (!params.attacker || !params.defender) {
-                return {
-                    text: `To simulate combat, please provide attacker and defender armies.\n\n**Example:** "Simulate 10000 cavalry vs 5000 pikeman"\n\nOr use the Combat Simulator tool in the Tools panel.`,
-                    data: null
-                };
-            }
-            
-            const result = combatSimulator.simulate(params.attacker, params.defender, params.options || {});
-            
-            let text = `## Combat Simulation Results\n\n`;
-            text += `**Winner:** ${result.winner === 'attacker' ? '⚔️ Attacker' : '🛡️ Defender'}\n`;
-            text += `**Rounds:** ${result.rounds.length}\n\n`;
-            
-            text += `### Attacker Losses\n`;
-            for (const [troop, count] of Object.entries(result.attackerLosses)) {
-                if (count > 0) text += `• ${troop}: ${count.toLocaleString()}\n`;
-            }
-            
-            text += `\n### Defender Losses\n`;
-            for (const [troop, count] of Object.entries(result.defenderLosses)) {
-                if (count > 0) text += `• ${troop}: ${count.toLocaleString()}\n`;
-            }
-            
-            return { text, data: result };
-            
-        } catch (error) {
-            return {
-                text: `Combat simulation error: ${error.message}`,
-                data: null
-            };
-        }
-    }
-
-    /**
-     * Handle march time calculation
-     */
-    async handleMarchTime(params) {
-        try {
-            const combatSimulator = require('./combat-simulator');
-            
-            if (!params.distance) {
-                return {
-                    text: `To calculate march time, please provide the distance.\n\n**Example:** "How long to march 50 tiles with cavalry?"\n\nDistance is measured in tiles on the map.`,
-                    data: null
-                };
-            }
-            
-            const troops = params.troops || { cavalry: 1 }; // Default to cavalry speed
-            const distance = params.distance;
-            const speedBuffs = params.speedBuffs || {};
-            
-            const seconds = combatSimulator.calculateMarchTime(troops, distance, speedBuffs);
-            
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-            
-            let timeStr = '';
-            if (hours > 0) timeStr += `${hours}h `;
-            if (minutes > 0) timeStr += `${minutes}m `;
-            timeStr += `${secs}s`;
-            
-            return {
-                text: `## March Time Calculation\n\n**Distance:** ${distance} tiles\n**Estimated Time:** ${timeStr}\n\n*Note: Actual time depends on hero skills, research, and items.*`,
-                data: { distance, seconds, formatted: timeStr }
-            };
-            
-        } catch (error) {
-            return {
-                text: `March time calculation error: ${error.message}`,
-                data: null
-            };
-        }
-    }
-
-    /**
-     * Handle knowledge base search
-     */
-    async handleKnowledgeSearch(query) {
-        try {
-            if (this.mcpManager && this.mcpManager.isConnected('evony-knowledge')) {
-                const result = await this.mcpManager.callTool(
-                    'evony-knowledge',
-                    'evony_search',
-                    { query, k: 5 }
-                );
-                
-                if (result && result.content) {
-                    return {
-                        text: result.content,
-                        data: result
-                    };
-                }
-            }
-            
-            // Fallback to built-in knowledge
-            return this.handleGeneralQuery(query);
-            
-        } catch (error) {
-            console.error('[ChatbotService] Knowledge search error:', error);
-            return this.handleGeneralQuery(query);
-        }
-    }
-
-    /**
-     * Handle general queries with built-in knowledge or LM Studio
-     */
-    async handleGeneralQuery(message) {
-        // Try LM Studio first if available
-        if (this.lmStudioClient && this.lmStudioClient.isConnected) {
+        // Try MCP first
+        if (this.mcpManager && this.mcpManager.isInitialized) {
             try {
-                const systemPrompt = this.systemPrompts.general;
-                const messages = [
-                    { role: 'system', content: systemPrompt },
-                    ...this.conversationHistory.slice(-10).map(m => ({
-                        role: m.role,
-                        content: m.content
-                    })),
-                    { role: 'user', content: message }
-                ];
-                
-                const response = await this.lmStudioClient.chatCompletion(messages);
-                
-                if (response && response.message && response.message.content) {
+                const result = await this.mcpManager.calcTraining(troopType, quantity);
+                return {
+                    content: this.formatTrainingResult(result),
+                    type: 'calculation',
+                    data: result
+                };
+            } catch (error) {
+                console.warn('[ChatbotService] MCP training calc failed:', error.message);
+            }
+        }
+        
+        // Fallback to local calculation
+        const troopCosts = {
+            worker: { food: 50, lumber: 0, stone: 0, iron: 0, time: 15, tier: 1 },
+            warrior: { food: 100, lumber: 0, stone: 0, iron: 20, time: 30, tier: 1 },
+            scout: { food: 50, lumber: 0, stone: 0, iron: 0, time: 20, tier: 1 },
+            pikeman: { food: 150, lumber: 0, stone: 0, iron: 50, time: 60, tier: 2 },
+            swordsman: { food: 200, lumber: 50, stone: 0, iron: 100, time: 90, tier: 2 },
+            archer: { food: 150, lumber: 100, stone: 0, iron: 50, time: 75, tier: 2 },
+            cavalry: { food: 300, lumber: 0, stone: 0, iron: 150, time: 120, tier: 3 },
+            cataphract: { food: 500, lumber: 0, stone: 0, iron: 300, time: 180, tier: 3 },
+            ballista: { food: 500, lumber: 500, stone: 0, iron: 200, time: 300, tier: 4 },
+            ram: { food: 600, lumber: 600, stone: 0, iron: 300, time: 360, tier: 4 },
+            catapult: { food: 800, lumber: 800, stone: 0, iron: 400, time: 450, tier: 4 }
+        };
+        
+        const type = troopType.toLowerCase();
+        if (!troopCosts[type]) {
+            return {
+                content: `Unknown troop type: ${troopType}\n\nAvailable: ${Object.keys(troopCosts).join(', ')}\n\nUsage: /training <quantity> <troop_type>\nExample: /training 10000 cavalry`,
+                type: 'error'
+            };
+        }
+        
+        const cost = troopCosts[type];
+        const totalTime = cost.time * quantity;
+        const hours = Math.floor(totalTime / 3600);
+        const minutes = Math.floor((totalTime % 3600) / 60);
+        
+        const result = {
+            troopType: type,
+            tier: cost.tier,
+            quantity,
+            formattedTime: hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`,
+            resources: {
+                food: cost.food * quantity,
+                lumber: cost.lumber * quantity,
+                stone: cost.stone * quantity,
+                iron: cost.iron * quantity
+            }
+        };
+        
+        return {
+            content: this.formatTrainingResult(result),
+            type: 'calculation',
+            data: result
+        };
+    }
+    
+    /**
+     * Handle march calculation command
+     */
+    async handleMarchCalc(args) {
+        const coords = args.match(/(\d+)/g);
+        
+        if (!coords || coords.length < 4) {
+            return {
+                content: 'Usage: /march <fromX> <fromY> <toX> <toY>\nExample: /march 100 200 300 400',
+                type: 'error'
+            };
+        }
+        
+        const fromX = parseInt(coords[0]);
+        const fromY = parseInt(coords[1]);
+        const toX = parseInt(coords[2]);
+        const toY = parseInt(coords[3]);
+        
+        // Try MCP first
+        if (this.mcpManager && this.mcpManager.isInitialized) {
+            try {
+                const result = await this.mcpManager.calcMarch(fromX, fromY, toX, toY, { cavalry: 1000 });
+                return {
+                    content: this.formatMarchResult(result),
+                    type: 'calculation',
+                    data: result
+                };
+            } catch (error) {
+                console.warn('[ChatbotService] MCP march calc failed:', error.message);
+            }
+        }
+        
+        // Fallback calculation
+        const distance = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+        const baseSpeed = 200; // tiles per hour for cavalry
+        const timeHours = distance / baseSpeed;
+        const hours = Math.floor(timeHours);
+        const minutes = Math.floor((timeHours - hours) * 60);
+        
+        const result = {
+            from: { x: fromX, y: fromY },
+            to: { x: toX, y: toY },
+            distance: Math.round(distance * 100) / 100,
+            formattedTime: hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`,
+            slowestTroop: 'cavalry'
+        };
+        
+        return {
+            content: this.formatMarchResult(result),
+            type: 'calculation',
+            data: result
+        };
+    }
+    
+    /**
+     * Handle combat simulation command
+     */
+    async handleCombatSim(args) {
+        const [attackerStr, defenderStr] = args.split(/\s+vs\s+/i);
+        
+        if (!attackerStr || !defenderStr) {
+            return {
+                content: 'Usage: /combat <attacker_troops> vs <defender_troops>\nExample: /combat 10000 cavalry vs 8000 archer',
+                type: 'error'
+            };
+        }
+        
+        const parseArmy = (str) => {
+            const match = str.match(/(\d+)\s+(\w+)/);
+            if (match) {
+                return { [match[2].toLowerCase()]: parseInt(match[1]) };
+            }
+            return { cavalry: 1000 };
+        };
+        
+        // Try MCP first
+        if (this.mcpManager && this.mcpManager.isInitialized) {
+            try {
+                const result = await this.mcpManager.calcCombat(
+                    { troops: parseArmy(attackerStr) },
+                    { troops: parseArmy(defenderStr) }
+                );
+                return {
+                    content: this.formatCombatResult(result),
+                    type: 'combat',
+                    data: result
+                };
+            } catch (error) {
+                console.warn('[ChatbotService] MCP combat calc failed:', error.message);
+            }
+        }
+        
+        // Fallback simulation
+        try {
+            const combatSimulator = require('./combat-simulator');
+            const result = combatSimulator.simulate(
+                parseArmy(attackerStr),
+                parseArmy(defenderStr)
+            );
+            return {
+                content: this.formatCombatResult(result),
+                type: 'combat',
+                data: result
+            };
+        } catch (error) {
+            return {
+                content: `Combat simulation failed: ${error.message}`,
+                type: 'error'
+            };
+        }
+    }
+    
+    /**
+     * Handle protocol lookup command
+     */
+    async handleProtocolLookup(args) {
+        if (!args) {
+            return {
+                content: 'Usage: /protocol <action_name or command_id>\nExample: /protocol city.getInfo\nExample: /protocol 2001',
+                type: 'error'
+            };
+        }
+        
+        // Try MCP first
+        if (this.mcpManager && this.mcpManager.isInitialized) {
+            try {
+                const result = await this.mcpManager.lookupProtocol(args);
+                if (result.found) {
                     return {
-                        text: response.message.content,
-                        data: { source: 'lm-studio', model: response.model }
+                        content: this.formatProtocolResult(result.action),
+                        type: 'protocol',
+                        data: result.action
                     };
                 }
             } catch (error) {
-                console.warn('[ChatbotService] LM Studio error, falling back to built-in:', error.message);
+                console.warn('[ChatbotService] MCP protocol lookup failed:', error.message);
             }
         }
         
-        // Built-in knowledge base for common questions
-        const knowledge = {
-            'hero': `**Heroes in Evony**\n\nHeroes are essential for leading armies and managing cities. Key aspects:\n\n• **Attributes:** Politics, Attack, Defense, Intelligence\n• **Skills:** Each hero has unique skills that affect combat and city management\n• **Levels:** Heroes gain experience from battles and can be leveled up\n• **Equipment:** Equip gear to boost hero stats\n\nTop heroes for combat: Roland, Elektra, Hannibal Barca\nTop heroes for development: Queen Jindeok, Cleopatra`,
+        // Fallback to local protocol handler
+        if (this.protocolHandler) {
+            const action = this.protocolHandler.lookupAction(args);
+            if (action) {
+                return {
+                    content: this.formatProtocolResult(action),
+                    type: 'protocol',
+                    data: action
+                };
+            }
             
-            'troops': `**Troop Types in Evony**\n\n| Type | Strong Against | Weak Against |\n|------|----------------|---------------|\n| Infantry | Cavalry | Archers |\n| Cavalry | Archers | Infantry |\n| Archers | Infantry | Cavalry |\n| Siege | Walls | All troops |\n\n**Training Tips:**\n• Train troops matching your hero's specialty\n• Balance your army composition\n• Use siege for attacking cities`,
-            
-            'resources': `**Resources in Evony**\n\n• **Food:** Required for troops and most buildings\n• **Lumber:** Used for buildings and siege weapons\n• **Stone:** Needed for walls and advanced buildings\n• **Iron:** Essential for troops and equipment\n• **Gold:** Used for research, healing, and speedups\n• **Gems:** Premium currency for special items\n\n**Tips:** Build resource tiles, join rallies, and complete events for resources.`,
-            
-            'alliance': `**Alliance System**\n\n• Join an alliance early for protection and benefits\n• Donate resources to earn alliance honor\n• Participate in alliance wars and events\n• Help alliance members with construction and research\n• Alliance territory provides buffs to members`,
-            
-            'combat': `**Combat Mechanics**\n\n1. **Scouting:** Always scout before attacking\n2. **Hero Selection:** Choose heroes with combat skills\n3. **Troop Composition:** Counter enemy troop types\n4. **Buffs:** Activate war buffs before major battles\n5. **Timing:** Coordinate with alliance for rallies\n\n**Attack Types:**\n• Solo attacks for farming\n• Rallies for strong targets\n• Reinforcements for defense`
-        };
-        
-        // Check for keyword matches
-        const lowerMessage = message.toLowerCase();
-        for (const [key, response] of Object.entries(knowledge)) {
-            if (lowerMessage.includes(key)) {
-                return { text: response, data: { source: 'builtin' } };
+            const results = this.protocolHandler.searchActions(args);
+            if (results.length > 0) {
+                return {
+                    content: this.formatProtocolSearchResults(results),
+                    type: 'protocol',
+                    data: results
+                };
             }
         }
         
-        // Default response
         return {
-            text: `I can help you with Evony gameplay! Try asking about:\n\n• **Protocol commands** - e.g., "lookup city.getInfo"\n• **Training costs** - e.g., "calculate 10000 cavalry cost"\n• **Combat simulation** - e.g., "simulate battle"\n• **March times** - e.g., "march time for 50 tiles"\n• **Game mechanics** - e.g., "how do heroes work?"\n\nOr use the quick action buttons below for common tasks.`,
-            data: null
+            content: `Protocol "${args}" not found. Try a different search term.`,
+            type: 'error'
         };
     }
-
+    
     /**
-     * Extract calculator parameters from message
+     * Handle packet decode command
      */
-    extractCalculatorParams(message) {
-        const params = {};
+    async handleDecodePacket(args) {
+        const hexData = args.replace(/\s/g, '');
         
-        // Extract troop type
-        const troopTypes = ['worker', 'warrior', 'scout', 'pikeman', 'swordsman', 
-                          'archer', 'cavalry', 'cataphract', 'ballista', 'ram', 'catapult'];
-        for (const troop of troopTypes) {
-            if (message.toLowerCase().includes(troop)) {
-                params.troopType = troop;
-                break;
+        if (!hexData || hexData.length < 8) {
+            return {
+                content: 'Usage: /decode <hex_data>\nExample: /decode 00030000000100',
+                type: 'error'
+            };
+        }
+        
+        // Try MCP first
+        if (this.mcpManager && this.mcpManager.isInitialized) {
+            try {
+                const result = await this.mcpManager.decodePacket(hexData);
+                return {
+                    content: this.formatDecodeResult(result),
+                    type: 'decode',
+                    data: result
+                };
+            } catch (error) {
+                console.warn('[ChatbotService] MCP decode failed:', error.message);
             }
         }
         
-        // Extract count
-        const countMatch = message.match(/(\d+(?:,\d{3})*|\d+k|\d+m)/i);
-        if (countMatch) {
-            let count = countMatch[1].replace(/,/g, '');
-            if (count.toLowerCase().endsWith('k')) {
-                count = parseInt(count) * 1000;
-            } else if (count.toLowerCase().endsWith('m')) {
-                count = parseInt(count) * 1000000;
+        // Fallback to local decoder
+        try {
+            const { AMF3Decoder } = require('./amf3-decoder');
+            const decoder = new AMF3Decoder();
+            const result = decoder.decodePacket(hexData);
+            return {
+                content: this.formatDecodeResult(result),
+                type: 'decode',
+                data: result
+            };
+        } catch (error) {
+            return {
+                content: `Decode failed: ${error.message}`,
+                type: 'error'
+            };
+        }
+    }
+    
+    /**
+     * Handle knowledge search command
+     */
+    async handleKnowledgeSearch(args) {
+        if (!args) {
+            return {
+                content: 'Usage: /search <query>\nExample: /search cavalry training',
+                type: 'error'
+            };
+        }
+        
+        // Try MCP first
+        if (this.mcpManager && this.mcpManager.isInitialized) {
+            try {
+                const result = await this.mcpManager.searchKnowledge(args, 5);
+                if (result.results && result.results.length > 0) {
+                    return {
+                        content: this.formatSearchResults(result.results),
+                        type: 'search',
+                        data: result.results
+                    };
+                }
+            } catch (error) {
+                console.warn('[ChatbotService] MCP search failed:', error.message);
+            }
+        }
+        
+        return {
+            content: `No results found for "${args}". Try different keywords.`,
+            type: 'info'
+        };
+    }
+    
+    /**
+     * Handle web scrape command
+     */
+    async handleWebScrape(args) {
+        if (!args) {
+            return {
+                content: 'Usage: /scrape <topic>\nExample: /scrape cavalry guide',
+                type: 'error'
+            };
+        }
+        
+        try {
+            // Lazy load Playwright
+            const { getPlaywrightService } = require('./playwright-service');
+            this.playwrightService = getPlaywrightService();
+            
+            if (!this.playwrightService.isInitialized) {
+                await this.playwrightService.initialize({ headless: true });
+            }
+            
+            const results = await this.playwrightService.scrapeEvonyWiki(args);
+            
+            if (results.length > 0) {
+                let content = `**Web Search Results for "${args}"**:\n\n`;
+                for (const result of results) {
+                    content += `**Source**: ${result.source}\n`;
+                    content += `**Title**: ${result.title}\n`;
+                    content += `${result.content.substring(0, 500)}...\n\n`;
+                }
+                return {
+                    content,
+                    type: 'scrape',
+                    data: results
+                };
             } else {
-                count = parseInt(count);
+                return {
+                    content: `No web results found for "${args}".`,
+                    type: 'info'
+                };
             }
-            params.count = count;
+        } catch (error) {
+            return {
+                content: `Web scrape failed: ${error.message}. Playwright may not be installed.\n\nInstall with: npm install playwright`,
+                type: 'error'
+            };
         }
-        
-        return params;
     }
-
+    
     /**
-     * Extract combat parameters from message
+     * Handle help command
      */
-    extractCombatParams(message) {
-        // This is a simplified extraction - full implementation would parse complex army compositions
+    async handleHelp() {
+        const helpText = `**Evony Co-Pilot Commands**
+
+**Calculations:**
+• \`/training <qty> <troop>\` - Calculate training time/resources
+• \`/march <x1> <y1> <x2> <y2>\` - Calculate march time
+• \`/combat <troops> vs <troops>\` - Simulate combat
+
+**Protocol Analysis:**
+• \`/protocol <name|id>\` - Look up protocol action
+• \`/decode <hex>\` - Decode AMF packet
+
+**Knowledge:**
+• \`/search <query>\` - Search knowledge base
+• \`/scrape <topic>\` - Scrape web for info
+
+**System:**
+• \`/status\` - Show service status
+• \`/clear\` - Clear conversation
+• \`/help\` - Show this help
+
+**Natural Language:**
+Just type your question naturally! Examples:
+• "How do I train cavalry?"
+• "What's the protocol for city.getInfo?"
+• "Calculate training 10000 archers"`;
+
         return {
-            attacker: null,
-            defender: null,
-            options: {}
+            content: helpText,
+            type: 'help'
         };
     }
-
+    
     /**
-     * Extract march parameters from message
+     * Handle clear command
      */
-    extractMarchParams(message) {
-        const params = {};
-        
-        // Extract distance
-        const distanceMatch = message.match(/(\d+)\s*(?:tiles?|distance)/i);
-        if (distanceMatch) {
-            params.distance = parseInt(distanceMatch[1]);
-        }
-        
-        return params;
-    }
-
-    /**
-     * Execute a quick action
-     */
-    async executeQuickAction(actionId, params = {}) {
-        const action = this.quickActions.find(a => a.id === actionId);
-        if (!action) {
-            return { error: `Unknown action: ${actionId}` };
-        }
-        
-        switch (actionId) {
-            case 'protocol':
-                return this.handleProtocolLookup(params.query || '');
-            case 'calculator':
-                return this.handleCalculator(params);
-            case 'combat':
-                return this.handleCombatSimulation(params);
-            case 'march':
-                return this.handleMarchTime(params);
-            case 'knowledge':
-                return this.handleKnowledgeSearch(params.query || '');
-            case 'traffic':
-                return this.handleTrafficAnalysis(params);
-            default:
-                return { error: `Action not implemented: ${actionId}` };
-        }
-    }
-
-    /**
-     * Handle traffic analysis request
-     */
-    async handleTrafficAnalysis(params) {
-        return {
-            text: `Open the **Traffic Viewer** panel to capture and analyze game traffic.\n\n**Steps:**\n1. Start Fiddler proxy on port 8888\n2. Click "Start Capture" in Traffic Viewer\n3. Play the game to generate traffic\n4. Click on packets to view decoded data`,
-            data: null
-        };
-    }
-
-    /**
-     * Get quick actions list
-     */
-    getQuickActions() {
-        return this.quickActions;
-    }
-
-    /**
-     * Get conversation history
-     */
-    getHistory() {
-        return [...this.conversationHistory];
-    }
-
-    /**
-     * Clear conversation history
-     */
-    clearHistory() {
+    async handleClear() {
         this.conversationHistory = [];
+        if (this.intentRouter) {
+            this.intentRouter.clearHistory();
+        }
         this.emit('historyCleared');
+        
+        return {
+            content: 'Conversation cleared.',
+            type: 'info'
+        };
     }
-
+    
     /**
-     * Trim history to max length
+     * Handle status command
+     */
+    async handleStatus() {
+        const status = {
+            chatbot: this.isInitialized,
+            lmStudio: this.lmStudioClient?.isConnected?.() || false,
+            mcp: this.mcpManager?.getStatus?.() || { initialized: false },
+            playwright: this.playwrightService?.getStatus?.() || { initialized: false },
+            gameState: !!this.gameState
+        };
+        
+        let content = '**Service Status**\n\n';
+        content += `• Chatbot: ${status.chatbot ? '✅ Ready' : '❌ Not initialized'}\n`;
+        content += `• LM Studio: ${status.lmStudio ? '✅ Connected' : '❌ Disconnected'}\n`;
+        content += `• MCP Manager: ${status.mcp.initialized ? '✅ Initialized' : '❌ Not initialized'}\n`;
+        
+        if (status.mcp.servers) {
+            for (const [name, serverStatus] of Object.entries(status.mcp.servers)) {
+                content += `  - ${name}: ${serverStatus.connected ? '✅' : '❌'} (${serverStatus.tools} tools)\n`;
+            }
+        }
+        
+        content += `• Playwright: ${status.playwright.initialized ? '✅ Ready' : '⚪ Not started'}\n`;
+        content += `• Game State: ${status.gameState ? '✅ Available' : '⚪ Not set'}\n`;
+        
+        return {
+            content,
+            type: 'status',
+            data: status
+        };
+    }
+    
+    /**
+     * Handle general query (fallback)
+     */
+    async handleGeneralQuery(message) {
+        // Try LM Studio if connected
+        if (this.lmStudioClient && this.lmStudioClient.isConnected()) {
+            try {
+                const systemPrompt = `You are the Evony Co-Pilot, an AI assistant for the Evony game analysis suite. 
+You help players with game strategies, troop training, combat calculations, protocol analysis, and more.
+Be concise and helpful.`;
+
+                const response = await this.lmStudioClient.chat([
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: message }
+                ]);
+                
+                return {
+                    content: response,
+                    type: 'ai'
+                };
+            } catch (error) {
+                console.warn('[ChatbotService] LM Studio query failed:', error.message);
+            }
+        }
+        
+        // Fallback responses
+        const lowerMessage = message.toLowerCase();
+        
+        if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+            return {
+                content: "Hello! I'm the Evony Co-Pilot. How can I help you today? Type /help for available commands.",
+                type: 'greeting'
+            };
+        }
+        
+        if (lowerMessage.includes('thank')) {
+            return {
+                content: "You're welcome! Let me know if you need anything else.",
+                type: 'acknowledgment'
+            };
+        }
+        
+        return {
+            content: "I'm here to help with Evony game analysis. Try asking about training, combat, protocols, or type /help for commands.\n\nConnect to LM Studio for AI-powered responses!",
+            type: 'fallback'
+        };
+    }
+    
+    // Formatting helpers
+    formatTrainingResult(result) {
+        return `**Training Calculation**
+
+**Troop**: ${result.troopType} (Tier ${result.tier})
+**Quantity**: ${result.quantity?.toLocaleString() || 0}
+**Time**: ${result.formattedTime}
+
+**Resources Required**:
+• Food: ${result.resources?.food?.toLocaleString() || 0}
+• Lumber: ${result.resources?.lumber?.toLocaleString() || 0}
+• Stone: ${result.resources?.stone?.toLocaleString() || 0}
+• Iron: ${result.resources?.iron?.toLocaleString() || 0}`;
+    }
+    
+    formatMarchResult(result) {
+        return `**March Calculation**
+
+**From**: (${result.from?.x || 0}, ${result.from?.y || 0})
+**To**: (${result.to?.x || 0}, ${result.to?.y || 0})
+**Distance**: ${result.distance} tiles
+**Time**: ${result.formattedTime}
+**Slowest Troop**: ${result.slowestTroop || 'N/A'}`;
+    }
+    
+    formatCombatResult(result) {
+        return `**Combat Simulation**
+
+**Winner**: ${(result.winner || 'unknown').toUpperCase()}
+**Rounds**: ${result.rounds || 'N/A'}
+
+**Attacker**:
+• Losses: ${result.attacker?.lossPercentage || result.attackerLosses || 'N/A'}%
+
+**Defender**:
+• Losses: ${result.defender?.lossPercentage || result.defenderLosses || 'N/A'}%`;
+    }
+    
+    formatProtocolResult(action) {
+        let content = `**Protocol: ${action.name}**
+
+**Command ID**: ${action.commandId}
+**Category**: ${action.category}
+**Description**: ${action.description}`;
+
+        if (action.request && Object.keys(action.request).length > 0) {
+            content += `\n\n**Request Parameters**:\n`;
+            for (const [key, type] of Object.entries(action.request)) {
+                content += `• ${key}: ${type}\n`;
+            }
+        }
+        
+        if (action.response && Object.keys(action.response).length > 0) {
+            content += `\n**Response Fields**:\n`;
+            for (const [key, type] of Object.entries(action.response)) {
+                content += `• ${key}: ${type}\n`;
+            }
+        }
+        
+        return content;
+    }
+    
+    formatProtocolSearchResults(results) {
+        let content = `**Found ${results.length} protocols**:\n\n`;
+        
+        for (const action of results.slice(0, 10)) {
+            content += `• **${action.name}** (${action.commandId}) - ${action.description || action.category}\n`;
+        }
+        
+        return content;
+    }
+    
+    formatDecodeResult(result) {
+        if (result.error) {
+            return `**Decode Error**: ${result.error}`;
+        }
+        
+        let content = `**Decoded Packet**
+
+**Length**: ${result.rawLength || 'N/A'} bytes`;
+
+        if (result.version !== undefined) {
+            content += `\n**Version**: ${result.version}`;
+        }
+        
+        if (result.messages && result.messages.length > 0) {
+            content += `\n**Messages**: ${result.messages.length}`;
+            for (const msg of result.messages.slice(0, 3)) {
+                content += `\n• Target: ${msg.targetURI || 'N/A'}`;
+                if (msg.value) {
+                    content += ` = ${JSON.stringify(msg.value).substring(0, 100)}`;
+                }
+            }
+        }
+        
+        return content;
+    }
+    
+    formatSearchResults(results) {
+        let content = `**Found ${results.length} results**:\n\n`;
+        
+        for (const result of results) {
+            content += `**${result.category || 'Info'}** (Score: ${result.score?.toFixed(2) || 'N/A'})\n`;
+            content += `${result.content?.substring(0, 200) || ''}\n\n`;
+        }
+        
+        return content;
+    }
+    
+    /**
+     * Trim conversation history
      */
     trimHistory() {
         if (this.conversationHistory.length > this.maxHistoryLength) {
             this.conversationHistory = this.conversationHistory.slice(-this.maxHistoryLength);
         }
     }
-
+    
     /**
-     * Set current context
+     * Get conversation history
      */
-    setContext(context) {
-        this.currentContext = { ...this.currentContext, ...context };
+    getHistory() {
+        return this.conversationHistory;
     }
-
+    
     /**
-     * Get current context
+     * Get quick actions
      */
-    getContext() {
-        return { ...this.currentContext };
+    getQuickActions() {
+        return this.quickActions;
     }
-
+    
     /**
-     * Clear context
+     * Get service status
      */
-    clearContext() {
-        this.currentContext = {};
+    getStatus() {
+        return {
+            initialized: this.isInitialized,
+            lmStudioConnected: this.lmStudioClient?.isConnected?.() || false,
+            mcpStatus: this.mcpManager?.getStatus?.() || null,
+            hasGameState: !!this.gameState,
+            historyLength: this.conversationHistory.length
+        };
+    }
+    
+    /**
+     * Cleanup
+     */
+    async cleanup() {
+        if (this.mcpManager) {
+            await this.mcpManager.shutdown?.();
+        }
+        
+        if (this.playwrightService) {
+            await this.playwrightService.close?.();
+        }
+        
+        this.isInitialized = false;
     }
 }
 
-module.exports = new ChatbotService();
+// Singleton instance
+let instance = null;
+
+function getChatbotService() {
+    if (!instance) {
+        instance = new ChatbotService();
+    }
+    return instance;
+}
+
+module.exports = {
+    ChatbotService,
+    getChatbotService
+};

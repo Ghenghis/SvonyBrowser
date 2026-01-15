@@ -1,0 +1,50 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#f43f5e'}}}%%
+stateDiagram-v2
+    [*] --> Idle: App Start
+    
+    Idle --> Recording: Start Recording
+    Recording --> Paused: Pause
+    Paused --> Recording: Resume
+    Recording --> Saving: Stop Recording
+    Paused --> Saving: Stop Recording
+    Saving --> Idle: Save Complete
+    
+    Idle --> Loading: Load Session
+    Loading --> Ready: Session Loaded
+    Ready --> Playing: Play
+    Playing --> Paused2: Pause
+    Paused2 --> Playing: Resume
+    Playing --> Ready: Stop/Complete
+    Ready --> Idle: Close Session
+    
+    state Recording {
+        [*] --> Capturing
+        Capturing --> Capturing: Packet Received
+        Capturing --> BufferFull: Buffer Limit
+        BufferFull --> Flushing: Auto-flush
+        Flushing --> Capturing: Flush Complete
+    }
+    
+    state Playing {
+        [*] --> Emitting
+        Emitting --> Waiting: Packet Emitted
+        Waiting --> Emitting: Delay Complete
+        Emitting --> [*]: Last Packet
+    }
+    
+    note right of Recording
+        Captures:
+        - Timestamp
+        - Direction
+        - Raw hex
+        - Decoded JSON
+        - Action name
+    end note
+    
+    note right of Playing
+        Replay Options:
+        - Speed: 0.5x - 4x
+        - Seek to position
+        - Step forward/back
+        - Filter by action
+    end note

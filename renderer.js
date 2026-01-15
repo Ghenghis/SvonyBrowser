@@ -2878,6 +2878,289 @@ window.toggleBreakpoint = toggleBreakpoint;
 window.removeBreakpoint = removeBreakpoint;
 window.exportChatHistory = exportChatHistory;
 
+// ============================================================================
+// v2.0.6 - New IPC Listeners
+// ============================================================================
+
+// Fiddler Bridge events
+ipcRenderer.on('fiddler-connected', () => {
+    updateStatus('Fiddler connected');
+    const indicator = document.getElementById('proxy-status');
+    if (indicator) {
+        indicator.classList.remove('inactive', 'warning');
+        indicator.classList.add('active');
+        indicator.title = 'Fiddler: Connected';
+    }
+});
+
+ipcRenderer.on('fiddler-disconnected', () => {
+    updateStatus('Fiddler disconnected');
+    const indicator = document.getElementById('proxy-status');
+    if (indicator) {
+        indicator.classList.remove('active', 'warning');
+        indicator.classList.add('inactive');
+        indicator.title = 'Fiddler: Disconnected';
+    }
+});
+
+ipcRenderer.on('fiddler-traffic', (event, entry) => {
+    // Add to traffic view
+    addTrafficEntry(entry);
+});
+
+// Game State Tracker events
+ipcRenderer.on('game-state-updated', (event, state) => {
+    updateGameStateUI(state);
+});
+
+ipcRenderer.on('game-event-detected', (event, gameEvent) => {
+    console.log('[Game Event]', gameEvent);
+    updateStatus(`Event: ${gameEvent.type}`);
+    
+    // Add to event log if visible
+    const eventLog = document.getElementById('game-event-log');
+    if (eventLog) {
+        const entry = document.createElement('div');
+        entry.className = 'event-entry';
+        entry.innerHTML = `<span class="event-time">${new Date().toLocaleTimeString()}</span>
+                          <span class="event-type">${gameEvent.type}</span>
+                          <span class="event-data">${JSON.stringify(gameEvent.data).substring(0, 50)}...</span>`;
+        eventLog.insertBefore(entry, eventLog.firstChild);
+    }
+});
+
+// MCP Client Manager events
+ipcRenderer.on('mcp-server-connected', (event, serverName) => {
+    console.log('[MCP] Server connected:', serverName);
+    updateMCPStatus();
+});
+
+ipcRenderer.on('mcp-server-disconnected', (event, serverName) => {
+    console.log('[MCP] Server disconnected:', serverName);
+    updateMCPStatus();
+});
+
+ipcRenderer.on('mcp-tool-result', (event, result) => {
+    console.log('[MCP] Tool result:', result);
+});
+
+// Update MCP status indicator
+async function updateMCPStatus() {
+    try {
+        const status = await ipcRenderer.invoke('mcp-manager-get-status');
+        const indicator = document.getElementById('mcp-status');
+        if (indicator) {
+            const connectedCount = Object.values(status.servers || {}).filter(s => s.connected).length;
+            const totalCount = Object.keys(status.servers || {}).length;
+            
+            if (connectedCount === totalCount && totalCount > 0) {
+                indicator.classList.remove('inactive', 'warning');
+                indicator.classList.add('active');
+                indicator.title = `MCP: ${connectedCount}/${totalCount} servers connected`;
+            } else if (connectedCount > 0) {
+                indicator.classList.remove('inactive', 'active');
+                indicator.classList.add('warning');
+                indicator.title = `MCP: ${connectedCount}/${totalCount} servers connected`;
+            } else {
+                indicator.classList.remove('active', 'warning');
+                indicator.classList.add('inactive');
+                indicator.title = 'MCP: No servers connected';
+            }
+        }
+        
+        // Update MCP status list in Tools tab
+        updateMCPStatusList(status);
+    } catch (e) {
+        console.warn('Could not update MCP status:', e);
+    }
+}
+
+// Update MCP status list in Tools tab
+function updateMCPStatusList(status) {
+    const container = document.getElementById('mcp-status-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const servers = status.servers || {};
+    for (const [name, info] of Object.entries(servers)) {
+        const item = document.createElement('div');
+        item.className = `mcp-server-item ${info.connected ? 'connected' : 'disconnected'}`;
+        item.innerHTML = `
+            <span class="server-name">${name}</span>
+            <span class="server-status">${info.connected ? '✓ Connected' : '✗ Disconnected'}</span>
+            <span class="server-tools">${info.tools?.length || 0} tools</span>
+        `;
+        container.appendChild(item);
+    }
+    
+    if (Object.keys(servers).length === 0) {
+        container.innerHTML = '<div class="no-servers">No MCP servers configured</div>';
+    }
+}
+
+// Update game state UI
+function updateGameStateUI(state) {
+    if (!state) return;
+    
+    // Update summary
+    const playerEl = document.getElementById('state-player');
+    const citiesEl = document.getElementById('state-cities');
+    const heroesEl = document.getElementById('state-heroes');
+    const marchesEl = document.getElementById('state-marches');
+    
+    if (playerEl && state.player) {
+        playerEl.textContent = state.player.name || 'Unknown';
+    }
+    if (citiesEl && state.cities) {
+        citiesEl.textContent = Object.keys(state.cities).length;
+    }
+    if (heroesEl && state.heroes) {
+        heroesEl.textContent = Object.keys(state.heroes).length;
+    }
+    if (marchesEl && state.armies) {
+        const activeMarches = Object.values(state.armies).filter(a => a.status === 'marching').length;
+        marchesEl.textContent = activeMarches;
+    }
+}
+
+// Refresh game state button handler
+async function refreshGameStateFromTracker() {
+    try {
+        const state = await ipcRenderer.invoke('game-tracker-get-state');
+        updateGameStateUI(state);
+        updateStatus('Game state refreshed');
+    } catch (e) {
+        console.warn('Could not refresh game state:', e);
+    }
+}
+
+// Export game state button handler
+async function exportGameStateFromTracker() {
+    try {
+        const data = await ipcRenderer.invoke('game-tracker-export', 'json');
+        if (data) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `game-state-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            updateStatus('Game state exported');
+        }
+    } catch (e) {
+        console.warn('Could not export game state:', e);
+    }
+}
+
+// Connect to MCP servers
+async function connectMCPServers() {
+    try {
+        updateStatus('Connecting to MCP servers...');
+        const result = await ipcRenderer.invoke('mcp-manager-connect-all');
+        if (result.error) {
+            updateStatus('MCP connection error: ' + result.error);
+        } else {
+            updateStatus('MCP servers connected');
+            updateMCPStatus();
+        }
+    } catch (e) {
+        console.warn('Could not connect MCP servers:', e);
+        updateStatus('MCP connection failed');
+    }
+}
+
+// Enhanced AMF decode using new AMF3 decoder
+async function decodeAMFEnhancedV2() {
+    const input = document.getElementById('amf-input');
+    const output = document.getElementById('amf-output');
+    
+    if (!input || !output) return;
+    
+    const hexData = input.value.trim().replace(/\s+/g, '');
+    if (!hexData) {
+        output.textContent = 'Please enter hex data to decode';
+        return;
+    }
+    
+    try {
+        const result = await ipcRenderer.invoke('amf3-decode', hexData);
+        if (result.error) {
+            output.textContent = 'Decode error: ' + result.error;
+        } else {
+            output.textContent = JSON.stringify(result, null, 2);
+        }
+    } catch (e) {
+        output.textContent = 'Error: ' + e.message;
+    }
+}
+
+// Traffic injection
+async function injectTrafficPacket() {
+    const action = prompt('Enter action name (e.g., city.getInfo):');
+    if (!action) return;
+    
+    const paramsStr = prompt('Enter parameters as JSON:');
+    let params = {};
+    if (paramsStr) {
+        try {
+            params = JSON.parse(paramsStr);
+        } catch (e) {
+            alert('Invalid JSON: ' + e.message);
+            return;
+        }
+    }
+    
+    try {
+        const result = await ipcRenderer.invoke('fiddler-inject-request', { action, params });
+        if (result.error) {
+            updateStatus('Injection error: ' + result.error);
+        } else {
+            updateStatus('Packet injected successfully');
+        }
+    } catch (e) {
+        updateStatus('Injection failed: ' + e.message);
+    }
+}
+
+// Wire up new button handlers
+document.addEventListener('DOMContentLoaded', () => {
+    // Game state buttons
+    const refreshStateBtn = document.getElementById('refresh-game-state');
+    if (refreshStateBtn) {
+        refreshStateBtn.addEventListener('click', refreshGameStateFromTracker);
+    }
+    
+    const exportStateBtn = document.getElementById('export-game-state');
+    if (exportStateBtn) {
+        exportStateBtn.addEventListener('click', exportGameStateFromTracker);
+    }
+    
+    // MCP reconnect button
+    const mcpReconnectBtn = document.getElementById('mcp-reconnect');
+    if (mcpReconnectBtn) {
+        mcpReconnectBtn.removeEventListener('click', reconnectMCP);
+        mcpReconnectBtn.addEventListener('click', connectMCPServers);
+    }
+    
+    // Traffic inject button
+    const injectBtn = document.getElementById('traffic-inject');
+    if (injectBtn) {
+        injectBtn.addEventListener('click', injectTrafficPacket);
+    }
+    
+    // Initial MCP status check
+    setTimeout(updateMCPStatus, 2000);
+});
+
+// Make new functions globally accessible
+window.refreshGameStateFromTracker = refreshGameStateFromTracker;
+window.exportGameStateFromTracker = exportGameStateFromTracker;
+window.connectMCPServers = connectMCPServers;
+window.injectTrafficPacket = injectTrafficPacket;
+window.updateMCPStatus = updateMCPStatus;
+
 // Initialize traffic enhancements
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(initializeTrafficEnhancements, 150);

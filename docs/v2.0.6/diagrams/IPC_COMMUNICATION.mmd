@@ -1,0 +1,70 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#10b981'}}}%%
+sequenceDiagram
+    autonumber
+    participant R as 🖼️ Renderer<br/>(renderer.js)
+    participant P as 📡 Preload<br/>(preload.js)
+    participant M as 🖥️ Main<br/>(index.js)
+    participant S as ⚙️ Services
+    participant MCP as 🤖 MCP Servers
+    participant LM as 🧠 LM Studio
+    
+    Note over R,LM: Application Initialization
+    
+    R->>P: DOMContentLoaded
+    P->>M: ipcRenderer.invoke('get-version')
+    M-->>P: { version: '2.0.6' }
+    P-->>R: version
+    
+    R->>P: Initialize LM Studio
+    P->>M: ipcRenderer.invoke('lm-studio-connect', url)
+    M->>S: lmStudioClient.connect(url)
+    S->>LM: HTTP GET /v1/models
+    LM-->>S: { models: [...] }
+    S-->>M: { connected: true, models }
+    M-->>P: status
+    P-->>R: Update UI
+    
+    Note over R,LM: Chat Message Flow
+    
+    R->>P: User sends chat message
+    P->>M: ipcRenderer.invoke('chatbot-message', msg)
+    M->>S: chatbotService.processMessage(msg)
+    
+    alt Intent: Knowledge Query
+        S->>MCP: evony_search(query)
+        MCP-->>S: { results: [...] }
+    else Intent: Calculation
+        S->>MCP: calc_training(params)
+        MCP-->>S: { result: {...} }
+    else Intent: Protocol
+        S->>MCP: protocol_lookup(id)
+        MCP-->>S: { action: {...} }
+    end
+    
+    S->>S: Build context from MCP results
+    S->>LM: POST /v1/chat/completions
+    LM-->>S: { response: '...' }
+    S-->>M: formatted response
+    M-->>P: response
+    P-->>R: Display in chat
+    
+    Note over R,LM: Traffic Capture Flow
+    
+    R->>P: Webview traffic detected
+    P->>M: ipcRenderer.send('traffic-captured', packet)
+    M->>S: proxyMonitor.processPacket(packet)
+    S->>S: Decode AMF3
+    S->>S: Identify action
+    S->>S: Update game state
+    M->>P: mainWindow.webContents.send('traffic-update', entry)
+    P->>R: Update traffic list
+    
+    Note over R,LM: Settings Flow
+    
+    R->>P: User saves settings
+    P->>M: ipcRenderer.invoke('save-settings', settings)
+    M->>S: store.set(settings)
+    M->>S: lmStudioClient.updateSettings(settings.lmStudio)
+    S->>LM: Reconnect if URL changed
+    M-->>P: { success: true }
+    P-->>R: Show confirmation
