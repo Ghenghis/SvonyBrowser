@@ -358,6 +358,125 @@ class PlaywrightService extends EventEmitter {
     }
     
     /**
+     * Switch panel to Hybrid mode with Playwright
+     * @param {string} panelId - 'left' or 'right'
+     * @param {string} url - URL to load in Playwright
+     */
+    async activateHybridMode(panelId, url) {
+        console.log(`[PlaywrightService] Activating hybrid mode for ${panelId} panel`);
+        
+        if (!this.isInitialized) {
+            const success = await this.initialize({ headless: false });
+            if (!success) {
+                throw new Error('Failed to initialize Playwright');
+            }
+        }
+        
+        const pageId = `hybrid-${panelId}`;
+        
+        // Close existing page if any
+        if (this.pages.has(pageId)) {
+            await this.closePage(pageId);
+        }
+        
+        // Create new page
+        const page = await this.createPage(pageId);
+        
+        // Navigate to URL if provided
+        if (url) {
+            await page.goto(url, {
+                waitUntil: 'domcontentloaded',
+                timeout: 30000
+            });
+        }
+        
+        this.emit('hybrid-activated', { panelId, pageId, url });
+        
+        return {
+            success: true,
+            pageId,
+            url: page.url()
+        };
+    }
+    
+    /**
+     * Deactivate Hybrid mode for a panel
+     * @param {string} panelId - 'left' or 'right'
+     */
+    async deactivateHybridMode(panelId) {
+        console.log(`[PlaywrightService] Deactivating hybrid mode for ${panelId} panel`);
+        
+        const pageId = `hybrid-${panelId}`;
+        
+        if (this.pages.has(pageId)) {
+            await this.closePage(pageId);
+        }
+        
+        this.emit('hybrid-deactivated', { panelId });
+        
+        return { success: true, panelId };
+    }
+    
+    /**
+     * Get hybrid mode status for a panel
+     * @param {string} panelId - 'left' or 'right'
+     */
+    getHybridStatus(panelId) {
+        const pageId = `hybrid-${panelId}`;
+        const page = this.pages.get(pageId);
+        
+        return {
+            active: !!page,
+            pageId,
+            url: page ? page.url() : null
+        };
+    }
+    
+    /**
+     * Execute action in hybrid mode
+     * @param {string} panelId - 'left' or 'right'
+     * @param {string} action - Action type
+     * @param {object} params - Action parameters
+     */
+    async executeHybridAction(panelId, action, params = {}) {
+        const pageId = `hybrid-${panelId}`;
+        const page = this.pages.get(pageId);
+        
+        if (!page) {
+            throw new Error(`No hybrid page for panel ${panelId}`);
+        }
+        
+        switch (action) {
+            case 'navigate':
+                await page.goto(params.url, { waitUntil: 'domcontentloaded' });
+                return { url: page.url() };
+                
+            case 'click':
+                await page.click(params.selector);
+                return { clicked: params.selector };
+                
+            case 'fill':
+                await page.fill(params.selector, params.value);
+                return { filled: params.selector };
+                
+            case 'screenshot':
+                const screenshot = await page.screenshot({ type: 'png' });
+                return { screenshot: screenshot.toString('base64') };
+                
+            case 'evaluate':
+                const result = await page.evaluate(params.script);
+                return { result };
+                
+            case 'waitForSelector':
+                await page.waitForSelector(params.selector, { timeout: params.timeout || 10000 });
+                return { found: params.selector };
+                
+            default:
+                throw new Error(`Unknown action: ${action}`);
+        }
+    }
+    
+    /**
      * Cleanup and close browser
      */
     async close() {

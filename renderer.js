@@ -449,14 +449,8 @@ function togglePanelMode(panel, mode) {
         }
         
         if (mode === 'swf') {
-            // SWF files are in the swf/ directory
-            const swfPath = store.get('autoevonySwfPath') || path.join(__dirname, 'swf', 'AutoEvony.swf');
-            // If file doesn't exist, show message
-            if (!fs.existsSync(swfPath)) {
-                elements.leftWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>AutoEvony.swf not found in swf/ directory</p></div></body></html>';
-                return;
-            }
-            elements.leftWebview.src = `file://${swfPath}`;
+            // SWF files are in the swf/ directory - use IPC to get correct path
+            loadSwfPanel('left', 'AutoEvony.swf');
         }
     } else {
         // Deactivate hybrid mode if switching away from it
@@ -484,15 +478,57 @@ function togglePanelMode(panel, mode) {
         }
         
         if (mode === 'swf') {
-            // SWF files are in the swf/ directory
-            const swfPath = store.get('evonySwfPath') || path.join(__dirname, 'swf', 'EvonyClient.swf');
-            // If file doesn't exist, show message
-            if (!fs.existsSync(swfPath)) {
-                elements.rightWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>EvonyClient.swf not found in swf/ directory</p></div></body></html>';
+            // SWF files are in the swf/ directory - use IPC to get correct path
+            loadSwfPanel('right', 'EvonyClient.swf');
+        }
+    }
+}
+
+/**
+ * Load SWF file into a panel using IPC to get correct resource path
+ */
+async function loadSwfPanel(panel, swfFileName) {
+    const webview = panel === 'left' ? elements.leftWebview : elements.rightWebview;
+    
+    try {
+        // Get the correct SWF path from main process
+        const swfDir = await ipcRenderer.invoke('get-resource-path', 'swf');
+        const swfPath = path.join(swfDir, swfFileName);
+        
+        // Check if file exists
+        if (!fs.existsSync(swfPath)) {
+            // Try alternative: AutoEvony.swf for both panels as fallback
+            const altPath = path.join(swfDir, 'AutoEvony.swf');
+            if (fs.existsSync(altPath)) {
+                console.log(`[SWF] Using fallback: ${altPath}`);
+                webview.src = `file://${altPath}`;
                 return;
             }
-            elements.rightWebview.src = `file://${swfPath}`;
+            
+            // Show error with helpful information
+            const allPaths = await ipcRenderer.invoke('get-all-resource-paths', 'swf');
+            const pathList = allPaths.map(p => `<li>${p}</li>`).join('');
+            
+            webview.src = `data:text/html,<html><body style="background:#1a1a2e;color:#fff;padding:20px;font-family:sans-serif">
+                <h2 style="color:#e94560">SWF File Not Found</h2>
+                <p><strong>${swfFileName}</strong> was not found.</p>
+                <p>Expected location: <code>${swfPath}</code></p>
+                <h3>Checked locations:</h3>
+                <ul style="font-size:12px;color:#888">${pathList}</ul>
+                <p style="margin-top:20px">Please ensure the SWF file is in the <code>swf/</code> directory.</p>
+            </body></html>`;
+            return;
         }
+        
+        console.log(`[SWF] Loading: ${swfPath}`);
+        webview.src = `file://${swfPath}`;
+        
+    } catch (error) {
+        console.error('[SWF] Error loading SWF:', error);
+        webview.src = `data:text/html,<html><body style="background:#1a1a2e;color:#fff;padding:20px;font-family:sans-serif">
+            <h2 style="color:#e94560">Error Loading SWF</h2>
+            <p>${error.message}</p>
+        </body></html>`;
     }
 }
 

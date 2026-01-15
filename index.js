@@ -93,10 +93,64 @@ const store = new Store({
 // Flash plugin configuration
 let pluginName = null;
 let flashFound = false;
+let flashPluginPath = null;
+let checkedPaths = [];
 
-// Function to find Flash plugin
+// Helper function to get all possible resource paths (for failsafe checking)
+function getAllResourcePaths(subPath) {
+    const paths = [];
+    const appPath = app.getAppPath();
+    const exePath = path.dirname(process.execPath);
+    
+    // 1. process.resourcesPath (packaged app extraResources location)
+    if (process.resourcesPath) {
+        paths.push(path.join(process.resourcesPath, subPath));
+    }
+    
+    // 2. Next to the executable (portable mode)
+    paths.push(path.join(exePath, subPath));
+    
+    // 3. In resources folder next to executable
+    paths.push(path.join(exePath, 'resources', subPath));
+    
+    // 4. __dirname (development mode)
+    paths.push(path.join(__dirname, subPath));
+    
+    // 5. App path (inside asar or unpacked)
+    paths.push(path.join(appPath, subPath));
+    
+    // 6. Parent of app path
+    paths.push(path.join(path.dirname(appPath), subPath));
+    
+    // 7. User data directory (fallback for user-installed plugins)
+    const userDataPath = app.getPath('userData');
+    paths.push(path.join(userDataPath, subPath));
+    
+    return [...new Set(paths)]; // Remove duplicates
+}
+
+// Helper function to get the first existing resource path
+function getResourcePath(subPath) {
+    const possiblePaths = getAllResourcePaths(subPath);
+    
+    for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+            console.log(`[Resources] Found ${subPath} at: ${p}`);
+            return p;
+        }
+    }
+    
+    // Return the most likely path even if it doesn't exist (for error messages)
+    if (app.isPackaged) {
+        return path.join(process.resourcesPath, subPath);
+    }
+    return path.join(__dirname, subPath);
+}
+
+// Function to find Flash plugin with comprehensive failsafes
 function findFlashPlugin() {
-    const flashDir = path.join(__dirname, 'flashver');
+    const platform = process.platform;
+    const arch = process.arch;
     
     // Define possible Flash plugin names for each platform
     const flashNames = {
@@ -127,32 +181,55 @@ function findFlashPlugin() {
         }
     };
     
-    const platform = process.platform;
-    const arch = process.arch;
+    // Get all possible flashver directories
+    const flashDirs = getAllResourcePaths('flashver');
+    const pluginNames = flashNames[platform]?.[arch] || [];
     
-    if (flashNames[platform] && flashNames[platform][arch]) {
-        for (const name of flashNames[platform][arch]) {
+    console.log(`[Flash] Searching for Flash plugin (${platform}/${arch})...`);
+    console.log(`[Flash] Checking ${flashDirs.length} possible locations...`);
+    
+    // Check each directory for each plugin name
+    for (const flashDir of flashDirs) {
+        if (!fs.existsSync(flashDir)) {
+            checkedPaths.push({ path: flashDir, exists: false });
+            continue;
+        }
+        
+        checkedPaths.push({ path: flashDir, exists: true });
+        
+        // Check specific plugin names first
+        for (const name of pluginNames) {
             const fullPath = path.join(flashDir, name);
             if (fs.existsSync(fullPath)) {
-                console.log(`[Flash] Found Flash plugin: ${name}`);
-                return `flashver/${name}`;
+                console.log(`[Flash] ✓ Found Flash plugin: ${fullPath}`);
+                flashPluginPath = fullPath;
+                return fullPath;
+            }
+        }
+        
+        // Fallback: scan directory for any pepflashplayer file
+        if (platform === 'win32') {
+            try {
+                const files = fs.readdirSync(flashDir);
+                for (const file of files) {
+                    if (file.toLowerCase().includes('pepflashplayer') && file.endsWith('.dll')) {
+                        const fullPath = path.join(flashDir, file);
+                        console.log(`[Flash] ✓ Found Flash plugin (scan): ${fullPath}`);
+                        flashPluginPath = fullPath;
+                        return fullPath;
+                    }
+                }
+            } catch (e) {
+                console.warn(`[Flash] Error scanning ${flashDir}:`, e.message);
             }
         }
     }
     
-    // Also check for any pepflashplayer*.dll file
-    if (platform === 'win32' && fs.existsSync(flashDir)) {
-        try {
-            const files = fs.readdirSync(flashDir);
-            for (const file of files) {
-                if (file.startsWith('pepflashplayer') && file.endsWith('.dll')) {
-                    console.log(`[Flash] Found Flash plugin: ${file}`);
-                    return `flashver/${file}`;
-                }
-            }
-        } catch (e) {
-            console.warn('[Flash] Error scanning flashver directory:', e.message);
-        }
+    // Log all checked paths for debugging
+    console.warn('[Flash] ✗ Flash plugin NOT found!');
+    console.warn('[Flash] Checked the following locations:');
+    for (const { path: p, exists } of checkedPaths) {
+        console.warn(`[Flash]   ${exists ? '📁' : '❌'} ${p}`);
     }
     
     return null;
@@ -182,7 +259,9 @@ app.commandLine.appendSwitch("--enable-npapi");
 app.commandLine.appendSwitch("--enable-logging");
 app.commandLine.appendSwitch("--log-level", 4);
 if (pluginName) {
-    app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, pluginName));
+    // pluginName is now the full absolute path
+    app.commandLine.appendSwitch('ppapi-flash-path', pluginName);
+    console.log(`[Flash] Registered Flash plugin at: ${pluginName}`);
 }
 app.commandLine.appendSwitch('disable-site-isolation-trials');
 app.commandLine.appendSwitch('no-sandbox');
@@ -207,6 +286,17 @@ async function initializeServices() {
     console.log('[Main] Initializing services...');
     
     try {
+        // Asset Verifier - verify all required assets are in place
+        try {
+            const { AssetVerifier } = require('./services/asset-verifier');
+            global.assetVerifier = new AssetVerifier();
+            global.assetVerifier.initialize();
+            const assetResults = await global.assetVerifier.verifyAll();
+            console.log('[Main] Asset verification complete:', assetResults.allPassed ? 'ALL PASSED' : 'SOME MISSING');
+        } catch (e) {
+            console.warn('[Main] Asset verifier error:', e.message);
+        }
+        
         // Protocol Handler
         protocolHandler = require('./services/protocol-handler');
         await protocolHandler.initialize();
@@ -1727,7 +1817,32 @@ function setupIPC() {
         return {
             found: flashFound,
             plugin: pluginName,
-            path: pluginName ? path.join(__dirname, pluginName) : null
+            path: flashPluginPath,
+            checkedPaths: checkedPaths,
+            platform: process.platform,
+            arch: process.arch
+        };
+    });
+    
+    // Get resource path for renderer process
+    ipcMain.handle('get-resource-path', (event, subPath) => {
+        return getResourcePath(subPath);
+    });
+    
+    // Get all possible resource paths (for debugging)
+    ipcMain.handle('get-all-resource-paths', (event, subPath) => {
+        return getAllResourcePaths(subPath);
+    });
+    
+    // Get app paths for debugging
+    ipcMain.handle('get-app-paths', () => {
+        return {
+            appPath: app.getAppPath(),
+            exePath: process.execPath,
+            resourcesPath: process.resourcesPath,
+            userData: app.getPath('userData'),
+            isPackaged: app.isPackaged,
+            dirname: __dirname
         };
     });
 
@@ -2826,27 +2941,56 @@ app.on('ready', async () => {
     
     // Check for Flash plugin and show warning if not found
     if (!flashFound) {
+        // Build detailed path information
+        const flashverPath = getResourcePath('flashver');
+        const checkedPathsList = checkedPaths.slice(0, 5).map(p => 
+            `${p.exists ? '✓' : '✗'} ${p.path}`
+        ).join('\n');
+        
+        const arch = process.arch;
+        const expectedDll = arch === 'x64' ? 'pepflashplayer64.dll' : 'pepflashplayer32.dll';
+        
         dialog.showMessageBox(mainWindow, {
             type: 'warning',
             title: 'Flash Player Not Found',
             message: 'Flash Player plugin was not found!',
-            detail: 'Flash content (including Evony) will not work without the Flash Player plugin.\n\n' +
-                    'To fix this:\n' +
-                    '1. Download FlashBrowser from:\n' +
-                    '   https://github.com/radubirsan/FlashBrowser/releases\n\n' +
-                    '2. Install it, then copy pepflashplayer64_32_0_0_465.dll\n' +
-                    '   from the FlashBrowser folder to the flashver/ folder\n' +
-                    '   in your Svony Browser installation.\n\n' +
-                    '3. Restart Svony Browser.\n\n' +
-                    'See flashver/README.md for detailed instructions.',
-            buttons: ['Open FlashBrowser Releases', 'Open flashver Folder', 'Continue Anyway'],
+            detail: `Flash content (including Evony) will not work without the Flash Player plugin.\n\n` +
+                    `Expected file: ${expectedDll}\n` +
+                    `Expected location: ${flashverPath}\n\n` +
+                    `Checked locations:\n${checkedPathsList}\n\n` +
+                    `To fix this:\n` +
+                    `1. Download FlashBrowser from GitHub\n` +
+                    `2. Copy ${expectedDll} to:\n   ${flashverPath}\n` +
+                    `3. Restart Svony Browser`,
+            buttons: ['Open FlashBrowser Releases', 'Open flashver Folder', 'Show All Paths', 'Continue Anyway'],
             defaultId: 0,
-            cancelId: 2
+            cancelId: 3
         }).then(result => {
             if (result.response === 0) {
                 shell.openExternal('https://github.com/radubirsan/FlashBrowser/releases');
             } else if (result.response === 1) {
-                shell.openPath(path.join(__dirname, 'flashver'));
+                // Open the flashver folder - create it if it doesn't exist
+                const flashDir = getResourcePath('flashver');
+                if (!fs.existsSync(flashDir)) {
+                    try {
+                        fs.mkdirSync(flashDir, { recursive: true });
+                    } catch (e) {
+                        console.error('[Flash] Could not create flashver directory:', e);
+                    }
+                }
+                shell.openPath(flashDir);
+            } else if (result.response === 2) {
+                // Show all checked paths in a new dialog
+                const allPaths = checkedPaths.map(p => 
+                    `${p.exists ? '✓ EXISTS' : '✗ MISSING'}: ${p.path}`
+                ).join('\n');
+                dialog.showMessageBox(mainWindow, {
+                    type: 'info',
+                    title: 'Checked Paths',
+                    message: 'All locations checked for Flash plugin:',
+                    detail: allPaths + '\n\nPlace the Flash DLL in any of the existing (✓) locations.',
+                    buttons: ['OK']
+                });
             }
         });
     }
