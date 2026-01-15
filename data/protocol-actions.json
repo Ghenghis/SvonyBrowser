@@ -1,0 +1,902 @@
+[
+  {
+    "name": "server.LoginResponse",
+    "commandId": 1001,
+    "category": "server",
+    "description": "Server response to login request with player data",
+    "request": {},
+    "response": {
+      "playerId": "int",
+      "playerName": "string",
+      "level": "int",
+      "prestige": "int",
+      "gold": "int",
+      "gems": "int",
+      "allianceId": "int",
+      "allianceName": "string",
+      "server": "string",
+      "cities": "array"
+    }
+  },
+  {
+    "name": "server.Logout",
+    "commandId": 1002,
+    "category": "server",
+    "description": "Player logout notification",
+    "request": {},
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "system.heartbeat",
+    "commandId": 1003,
+    "category": "system",
+    "description": "Keep-alive heartbeat between client and server",
+    "request": {},
+    "response": {
+      "serverTime": "long",
+      "latency": "int"
+    }
+  },
+  {
+    "name": "city.getInfo",
+    "commandId": 2001,
+    "category": "city",
+    "description": "Get detailed city information",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "cityId": "int",
+      "cityName": "string",
+      "level": "int",
+      "x": "int",
+      "y": "int",
+      "resources": "object",
+      "buildings": "array",
+      "troops": "object",
+      "population": "int",
+      "loyalty": "int"
+    }
+  },
+  {
+    "name": "city.getBuildings",
+    "commandId": 2002,
+    "category": "city",
+    "description": "Get list of buildings in city",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "cityId": "int",
+      "buildings": "array"
+    }
+  },
+  {
+    "name": "city.upgradeBuilding",
+    "commandId": 2003,
+    "category": "city",
+    "description": "Start building upgrade",
+    "request": {
+      "cityId": "int",
+      "positionId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "cityId": "int",
+      "positionId": "int",
+      "finishTime": "long",
+      "newLevel": "int"
+    }
+  },
+  {
+    "name": "city.cancelBuilding",
+    "commandId": 2004,
+    "category": "city",
+    "description": "Cancel building upgrade in progress",
+    "request": {
+      "cityId": "int",
+      "positionId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "refund": "object"
+    }
+  },
+  {
+    "name": "city.demolishBuilding",
+    "commandId": 2005,
+    "category": "city",
+    "description": "Demolish a building",
+    "request": {
+      "cityId": "int",
+      "positionId": "int"
+    },
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "city.getResources",
+    "commandId": 2006,
+    "category": "city",
+    "description": "Get current resource levels",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "cityId": "int",
+      "gold": "int",
+      "food": "int",
+      "lumber": "int",
+      "stone": "int",
+      "iron": "int",
+      "capacity": "object"
+    }
+  },
+  {
+    "name": "city.collectResource",
+    "commandId": 2007,
+    "category": "city",
+    "description": "Collect resources from production buildings",
+    "request": {
+      "cityId": "int",
+      "positionId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "resourceType": "string",
+      "amount": "int"
+    }
+  },
+  {
+    "name": "city.rename",
+    "commandId": 2008,
+    "category": "city",
+    "description": "Rename a city",
+    "request": {
+      "cityId": "int",
+      "newName": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "cityId": "int",
+      "newName": "string"
+    }
+  },
+  {
+    "name": "hero.getList",
+    "commandId": 3001,
+    "category": "hero",
+    "description": "Get list of all heroes",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "heroes": "array"
+    }
+  },
+  {
+    "name": "hero.getInfo",
+    "commandId": 3002,
+    "category": "hero",
+    "description": "Get detailed hero information",
+    "request": {
+      "heroId": "int"
+    },
+    "response": {
+      "heroId": "int",
+      "name": "string",
+      "level": "int",
+      "experience": "int",
+      "politics": "int",
+      "attack": "int",
+      "defense": "int",
+      "intelligence": "int",
+      "power": "int",
+      "status": "string",
+      "cityId": "int",
+      "equipment": "array",
+      "skills": "array"
+    }
+  },
+  {
+    "name": "hero.recruit",
+    "commandId": 3003,
+    "category": "hero",
+    "description": "Recruit a new hero from inn",
+    "request": {
+      "cityId": "int",
+      "heroId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "heroId": "int",
+      "name": "string",
+      "level": "int"
+    }
+  },
+  {
+    "name": "hero.dismiss",
+    "commandId": 3004,
+    "category": "hero",
+    "description": "Dismiss a hero",
+    "request": {
+      "heroId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "heroId": "int"
+    }
+  },
+  {
+    "name": "hero.levelUp",
+    "commandId": 3005,
+    "category": "hero",
+    "description": "Level up hero attribute",
+    "request": {
+      "heroId": "int",
+      "attribute": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "heroId": "int",
+      "attribute": "string",
+      "newValue": "int"
+    }
+  },
+  {
+    "name": "hero.equipItem",
+    "commandId": 3006,
+    "category": "hero",
+    "description": "Equip item to hero",
+    "request": {
+      "heroId": "int",
+      "itemId": "int",
+      "slot": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "heroId": "int",
+      "equipment": "array"
+    }
+  },
+  {
+    "name": "hero.unequipItem",
+    "commandId": 3007,
+    "category": "hero",
+    "description": "Unequip item from hero",
+    "request": {
+      "heroId": "int",
+      "slot": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "heroId": "int",
+      "itemId": "int"
+    }
+  },
+  {
+    "name": "hero.assignToCity",
+    "commandId": 3008,
+    "category": "hero",
+    "description": "Assign hero as city mayor",
+    "request": {
+      "heroId": "int",
+      "cityId": "int"
+    },
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "army.getTroops",
+    "commandId": 4001,
+    "category": "army",
+    "description": "Get troop counts in city",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "cityId": "int",
+      "troops": "object"
+    }
+  },
+  {
+    "name": "army.train",
+    "commandId": 4002,
+    "category": "army",
+    "description": "Start training troops",
+    "request": {
+      "cityId": "int",
+      "troopType": "string",
+      "count": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "cityId": "int",
+      "troopType": "string",
+      "count": "int",
+      "finishTime": "long"
+    }
+  },
+  {
+    "name": "army.cancelTrain",
+    "commandId": 4003,
+    "category": "army",
+    "description": "Cancel troop training",
+    "request": {
+      "cityId": "int",
+      "queueId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "refund": "object"
+    }
+  },
+  {
+    "name": "army.march",
+    "commandId": 4004,
+    "category": "army",
+    "description": "Send army march",
+    "request": {
+      "cityId": "int",
+      "heroId": "int",
+      "targetX": "int",
+      "targetY": "int",
+      "troops": "object",
+      "type": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "marchId": "int",
+      "arrivalTime": "long",
+      "returnTime": "long"
+    }
+  },
+  {
+    "name": "army.recall",
+    "commandId": 4005,
+    "category": "army",
+    "description": "Recall marching army",
+    "request": {
+      "marchId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "marchId": "int",
+      "returnTime": "long"
+    }
+  },
+  {
+    "name": "army.marchComplete",
+    "commandId": 4006,
+    "category": "army",
+    "description": "March completed notification",
+    "request": {},
+    "response": {
+      "marchId": "int",
+      "result": "object",
+      "loot": "object",
+      "losses": "object"
+    }
+  },
+  {
+    "name": "army.getMarches",
+    "commandId": 4007,
+    "category": "army",
+    "description": "Get all active marches",
+    "request": {},
+    "response": {
+      "marches": "array"
+    }
+  },
+  {
+    "name": "army.reinforce",
+    "commandId": 4008,
+    "category": "army",
+    "description": "Send reinforcements to ally",
+    "request": {
+      "cityId": "int",
+      "heroId": "int",
+      "targetPlayerId": "int",
+      "targetCityId": "int",
+      "troops": "object"
+    },
+    "response": {
+      "success": "boolean",
+      "marchId": "int",
+      "arrivalTime": "long"
+    }
+  },
+  {
+    "name": "alliance.getInfo",
+    "commandId": 5001,
+    "category": "alliance",
+    "description": "Get alliance information",
+    "request": {
+      "allianceId": "int"
+    },
+    "response": {
+      "allianceId": "int",
+      "name": "string",
+      "level": "int",
+      "memberCount": "int",
+      "honor": "int",
+      "prestige": "int",
+      "territory": "array"
+    }
+  },
+  {
+    "name": "alliance.getMembers",
+    "commandId": 5002,
+    "category": "alliance",
+    "description": "Get alliance member list",
+    "request": {
+      "allianceId": "int"
+    },
+    "response": {
+      "members": "array"
+    }
+  },
+  {
+    "name": "alliance.donate",
+    "commandId": 5003,
+    "category": "alliance",
+    "description": "Donate resources to alliance",
+    "request": {
+      "resourceType": "string",
+      "amount": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "honor": "int"
+    }
+  },
+  {
+    "name": "alliance.join",
+    "commandId": 5004,
+    "category": "alliance",
+    "description": "Join an alliance",
+    "request": {
+      "allianceId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "allianceId": "int",
+      "allianceName": "string"
+    }
+  },
+  {
+    "name": "alliance.leave",
+    "commandId": 5005,
+    "category": "alliance",
+    "description": "Leave current alliance",
+    "request": {},
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "alliance.create",
+    "commandId": 5006,
+    "category": "alliance",
+    "description": "Create a new alliance",
+    "request": {
+      "name": "string",
+      "description": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "allianceId": "int"
+    }
+  },
+  {
+    "name": "map.getRegion",
+    "commandId": 6001,
+    "category": "map",
+    "description": "Get map region data",
+    "request": {
+      "x": "int",
+      "y": "int",
+      "width": "int",
+      "height": "int"
+    },
+    "response": {
+      "tiles": "array"
+    }
+  },
+  {
+    "name": "map.scout",
+    "commandId": 6002,
+    "category": "map",
+    "description": "Scout a map location",
+    "request": {
+      "cityId": "int",
+      "x": "int",
+      "y": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "x": "int",
+      "y": "int",
+      "result": "object"
+    }
+  },
+  {
+    "name": "map.getTileInfo",
+    "commandId": 6003,
+    "category": "map",
+    "description": "Get detailed tile information",
+    "request": {
+      "x": "int",
+      "y": "int"
+    },
+    "response": {
+      "x": "int",
+      "y": "int",
+      "type": "string",
+      "level": "int",
+      "owner": "object"
+    }
+  },
+  {
+    "name": "trade.getMarket",
+    "commandId": 7001,
+    "category": "trade",
+    "description": "Get market listings",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "listings": "array"
+    }
+  },
+  {
+    "name": "trade.createListing",
+    "commandId": 7002,
+    "category": "trade",
+    "description": "Create market listing",
+    "request": {
+      "cityId": "int",
+      "sellResource": "string",
+      "sellAmount": "int",
+      "buyResource": "string",
+      "buyAmount": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "listingId": "int"
+    }
+  },
+  {
+    "name": "trade.cancelListing",
+    "commandId": 7003,
+    "category": "trade",
+    "description": "Cancel market listing",
+    "request": {
+      "listingId": "int"
+    },
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "trade.buyListing",
+    "commandId": 7004,
+    "category": "trade",
+    "description": "Buy from market listing",
+    "request": {
+      "listingId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "received": "object"
+    }
+  },
+  {
+    "name": "trade.transport",
+    "commandId": 7005,
+    "category": "trade",
+    "description": "Transport resources between cities",
+    "request": {
+      "fromCityId": "int",
+      "toCityId": "int",
+      "resources": "object"
+    },
+    "response": {
+      "success": "boolean",
+      "marchId": "int",
+      "arrivalTime": "long"
+    }
+  },
+  {
+    "name": "quest.getList",
+    "commandId": 8001,
+    "category": "quest",
+    "description": "Get available quests",
+    "request": {},
+    "response": {
+      "quests": "array"
+    }
+  },
+  {
+    "name": "quest.complete",
+    "commandId": 8002,
+    "category": "quest",
+    "description": "Complete a quest and claim rewards",
+    "request": {
+      "questId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "questId": "int",
+      "rewards": "object"
+    }
+  },
+  {
+    "name": "quest.abandon",
+    "commandId": 8003,
+    "category": "quest",
+    "description": "Abandon a quest",
+    "request": {
+      "questId": "int"
+    },
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "item.getInventory",
+    "commandId": 9001,
+    "category": "item",
+    "description": "Get player inventory",
+    "request": {},
+    "response": {
+      "items": "array"
+    }
+  },
+  {
+    "name": "item.use",
+    "commandId": 9002,
+    "category": "item",
+    "description": "Use an item",
+    "request": {
+      "itemId": "int",
+      "targetId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "itemId": "int",
+      "result": "object"
+    }
+  },
+  {
+    "name": "item.sell",
+    "commandId": 9003,
+    "category": "item",
+    "description": "Sell an item",
+    "request": {
+      "itemId": "int",
+      "count": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "gold": "int"
+    }
+  },
+  {
+    "name": "research.getList",
+    "commandId": 10001,
+    "category": "research",
+    "description": "Get research tree",
+    "request": {
+      "cityId": "int"
+    },
+    "response": {
+      "researches": "array"
+    }
+  },
+  {
+    "name": "research.start",
+    "commandId": 10002,
+    "category": "research",
+    "description": "Start researching technology",
+    "request": {
+      "cityId": "int",
+      "researchId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "researchId": "int",
+      "finishTime": "long"
+    }
+  },
+  {
+    "name": "research.cancel",
+    "commandId": 10003,
+    "category": "research",
+    "description": "Cancel research in progress",
+    "request": {
+      "cityId": "int",
+      "researchId": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "refund": "object"
+    }
+  },
+  {
+    "name": "mail.getList",
+    "commandId": 11001,
+    "category": "mail",
+    "description": "Get mail list",
+    "request": {
+      "folder": "string",
+      "page": "int"
+    },
+    "response": {
+      "mails": "array",
+      "totalCount": "int"
+    }
+  },
+  {
+    "name": "mail.read",
+    "commandId": 11002,
+    "category": "mail",
+    "description": "Read a mail message",
+    "request": {
+      "mailId": "int"
+    },
+    "response": {
+      "mailId": "int",
+      "subject": "string",
+      "body": "string",
+      "sender": "string",
+      "timestamp": "long",
+      "attachments": "array"
+    }
+  },
+  {
+    "name": "mail.send",
+    "commandId": 11003,
+    "category": "mail",
+    "description": "Send a mail message",
+    "request": {
+      "recipientId": "int",
+      "subject": "string",
+      "body": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "mailId": "int"
+    }
+  },
+  {
+    "name": "mail.delete",
+    "commandId": 11004,
+    "category": "mail",
+    "description": "Delete mail messages",
+    "request": {
+      "mailIds": "array"
+    },
+    "response": {
+      "success": "boolean"
+    }
+  },
+  {
+    "name": "report.getBattle",
+    "commandId": 12001,
+    "category": "report",
+    "description": "Get battle report",
+    "request": {
+      "reportId": "int"
+    },
+    "response": {
+      "reportId": "int",
+      "timestamp": "long",
+      "attacker": "object",
+      "defender": "object",
+      "result": "string",
+      "rounds": "array",
+      "loot": "object"
+    }
+  },
+  {
+    "name": "report.getScout",
+    "commandId": 12002,
+    "category": "report",
+    "description": "Get scout report",
+    "request": {
+      "reportId": "int"
+    },
+    "response": {
+      "reportId": "int",
+      "timestamp": "long",
+      "target": "object",
+      "troops": "object",
+      "resources": "object",
+      "buildings": "array"
+    }
+  },
+  {
+    "name": "chat.send",
+    "commandId": 13001,
+    "category": "chat",
+    "description": "Send chat message",
+    "request": {
+      "channel": "string",
+      "message": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "messageId": "int"
+    }
+  },
+  {
+    "name": "chat.receive",
+    "commandId": 13002,
+    "category": "chat",
+    "description": "Receive chat message",
+    "request": {},
+    "response": {
+      "channel": "string",
+      "sender": "string",
+      "senderId": "int",
+      "message": "string",
+      "timestamp": "long"
+    }
+  },
+  {
+    "name": "event.getActive",
+    "commandId": 14001,
+    "category": "event",
+    "description": "Get active game events",
+    "request": {},
+    "response": {
+      "events": "array"
+    }
+  },
+  {
+    "name": "event.participate",
+    "commandId": 14002,
+    "category": "event",
+    "description": "Participate in event",
+    "request": {
+      "eventId": "int",
+      "action": "string"
+    },
+    "response": {
+      "success": "boolean",
+      "rewards": "object"
+    }
+  },
+  {
+    "name": "shop.getItems",
+    "commandId": 15001,
+    "category": "shop",
+    "description": "Get shop items",
+    "request": {
+      "category": "string"
+    },
+    "response": {
+      "items": "array"
+    }
+  },
+  {
+    "name": "shop.purchase",
+    "commandId": 15002,
+    "category": "shop",
+    "description": "Purchase shop item",
+    "request": {
+      "itemId": "int",
+      "count": "int"
+    },
+    "response": {
+      "success": "boolean",
+      "itemId": "int",
+      "count": "int"
+    }
+  }
+]

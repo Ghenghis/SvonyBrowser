@@ -1,0 +1,263 @@
+{
+  "version": "1.0.0",
+  "description": "MCP Server Configuration for Svony Browser",
+  "mcpServers": {
+    "evony-knowledge": {
+      "command": "node",
+      "args": ["${MCP_PATH}/evony-knowledge/dist/index.js"],
+      "env": {
+        "EVONY_KB_PATH": "${DATA_PATH}/knowledge-base",
+        "EMBEDDING_MODEL": "text-embedding-3-small",
+        "VECTOR_STORE": "local"
+      },
+      "description": "Evony game knowledge base with RAG search",
+      "tools": [
+        {
+          "name": "evony_search",
+          "description": "Search Evony knowledge base",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Search query"
+              },
+              "k": {
+                "type": "number",
+                "description": "Number of results to return",
+                "default": 5
+              }
+            },
+            "required": ["query"]
+          }
+        },
+        {
+          "name": "evony_lookup",
+          "description": "Lookup specific Evony game data",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": ["troops", "buildings", "heroes", "research", "items"]
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the item to lookup"
+              }
+            },
+            "required": ["category", "name"]
+          }
+        }
+      ]
+    },
+    "memory": {
+      "command": "node",
+      "args": ["${MCP_PATH}/memory-server/dist/index.js"],
+      "env": {
+        "MEMORY_FILE": "${DATA_PATH}/memory.json",
+        "MAX_MEMORIES": "1000"
+      },
+      "description": "Persistent memory storage for conversation context",
+      "tools": [
+        {
+          "name": "memory_store",
+          "description": "Store a memory",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "Memory key"
+              },
+              "value": {
+                "type": "string",
+                "description": "Memory value"
+              },
+              "tags": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Tags for categorization"
+              }
+            },
+            "required": ["key", "value"]
+          }
+        },
+        {
+          "name": "memory_retrieve",
+          "description": "Retrieve memories",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Search query"
+              },
+              "tags": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Filter by tags"
+              },
+              "limit": {
+                "type": "number",
+                "default": 10
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evony-mcp": {
+      "command": "node",
+      "args": ["${MCP_PATH}/evony-mcp/dist/index.js"],
+      "env": {
+        "EVONY_DATA_PATH": "${DATA_PATH}/evony"
+      },
+      "description": "Evony game data and protocol tools",
+      "tools": [
+        {
+          "name": "protocol_lookup",
+          "description": "Lookup Evony protocol action",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "description": "Protocol action name (e.g., city.getInfo)"
+              }
+            },
+            "required": ["action"]
+          }
+        },
+        {
+          "name": "decode_amf",
+          "description": "Decode AMF3 data",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "string",
+                "description": "Base64 or hex encoded AMF data"
+              },
+              "format": {
+                "type": "string",
+                "enum": ["base64", "hex"],
+                "default": "hex"
+              }
+            },
+            "required": ["data"]
+          }
+        },
+        {
+          "name": "calculate_combat",
+          "description": "Calculate combat outcome",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "attacker": {
+                "type": "object",
+                "description": "Attacker army composition"
+              },
+              "defender": {
+                "type": "object",
+                "description": "Defender army composition"
+              },
+              "options": {
+                "type": "object",
+                "description": "Combat options (buffs, wall level, etc.)"
+              }
+            },
+            "required": ["attacker", "defender"]
+          }
+        },
+        {
+          "name": "calculate_training",
+          "description": "Calculate troop training costs",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "troopType": {
+                "type": "string",
+                "description": "Type of troop"
+              },
+              "count": {
+                "type": "number",
+                "description": "Number of troops"
+              }
+            },
+            "required": ["troopType", "count"]
+          }
+        }
+      ]
+    },
+    "filesystem": {
+      "command": "node",
+      "args": ["${MCP_PATH}/filesystem/dist/index.js"],
+      "env": {
+        "ALLOWED_PATHS": "${DATA_PATH},${SESSIONS_PATH}"
+      },
+      "description": "File system access for session data",
+      "tools": [
+        {
+          "name": "read_file",
+          "description": "Read file contents",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        {
+          "name": "write_file",
+          "description": "Write file contents",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              },
+              "content": {
+                "type": "string",
+                "description": "File content"
+              }
+            },
+            "required": ["path", "content"]
+          }
+        },
+        {
+          "name": "list_directory",
+          "description": "List directory contents",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": ["path"]
+          }
+        }
+      ]
+    }
+  },
+  "defaultServer": "evony-knowledge",
+  "connectionSettings": {
+    "timeout": 30000,
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "keepAlive": true,
+    "keepAliveInterval": 60000
+  },
+  "pathVariables": {
+    "MCP_PATH": "./mcp-servers",
+    "DATA_PATH": "./data",
+    "SESSIONS_PATH": "./sessions"
+  }
+}

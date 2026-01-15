@@ -1,0 +1,150 @@
+{
+  "version": "1.0.0",
+  "general": {
+    "language": "en",
+    "theme": "dark",
+    "startMaximized": true,
+    "restoreLastSession": true,
+    "showWelcomeScreen": true,
+    "autoUpdate": true,
+    "telemetry": false
+  },
+  "browser": {
+    "homepage": "https://www.evony.com/",
+    "autoEvonyUrl": "https://www.evony.com/autoevony/",
+    "evonyClientUrl": "https://www.evony.com/evony/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "zoomLevel": 100,
+    "enableFlash": true,
+    "enableJavaScript": true,
+    "enableCookies": true,
+    "clearCacheOnExit": false,
+    "blockAds": false,
+    "dualPanelMode": true,
+    "syncPanels": false
+  },
+  "proxy": {
+    "enabled": true,
+    "host": "127.0.0.1",
+    "port": 8888,
+    "type": "http",
+    "autoDetect": true,
+    "bypassList": [],
+    "authentication": {
+      "enabled": false,
+      "username": "",
+      "password": ""
+    }
+  },
+  "traffic": {
+    "captureEnabled": true,
+    "autoCapture": false,
+    "maxPackets": 10000,
+    "filterActions": [],
+    "highlightPatterns": [
+      "army.march",
+      "server.LoginResponse",
+      "city.getInfo"
+    ],
+    "saveRawData": false,
+    "decodeAmf": true
+  },
+  "chatbot": {
+    "enabled": true,
+    "position": "right",
+    "width": 350,
+    "autoExpand": false,
+    "showQuickActions": true,
+    "maxHistoryLength": 100,
+    "enableVoice": false,
+    "llmProvider": "openai",
+    "llmModel": "gpt-4",
+    "temperature": 0.7,
+    "maxTokens": 2000
+  },
+  "mcp": {
+    "enabled": true,
+    "autoConnect": true,
+    "servers": ["evony-knowledge", "memory"],
+    "timeout": 30000,
+    "retryOnFailure": true
+  },
+  "sessions": {
+    "autoRecord": false,
+    "maxSessionSize": 50000,
+    "autoSaveInterval": 60000,
+    "compressOnSave": false,
+    "retentionDays": 30,
+    "storageLocation": "./sessions"
+  },
+  "gameState": {
+    "trackEnabled": true,
+    "autoRefresh": true,
+    "refreshInterval": 5000,
+    "saveSnapshots": false,
+    "snapshotInterval": 60000
+  },
+  "notifications": {
+    "enabled": true,
+    "sound": true,
+    "desktop": true,
+    "marchComplete": true,
+    "buildingComplete": true,
+    "researchComplete": true,
+    "underAttack": true,
+    "allianceEvents": true
+  },
+  "keyboard": {
+    "shortcuts": {
+      "toggleChatbot": "Ctrl+Shift+C",
+      "toggleTraffic": "Ctrl+Shift+T",
+      "toggleProtocol": "Ctrl+Shift+P",
+      "startCapture": "F5",
+      "stopCapture": "F6",
+      "clearCapture": "Ctrl+Shift+X",
+      "newTab": "Ctrl+T",
+      "closeTab": "Ctrl+W",
+      "refresh": "F5",
+      "devTools": "F12",
+      "fullscreen": "F11",
+      "zoomIn": "Ctrl+Plus",
+      "zoomOut": "Ctrl+Minus",
+      "zoomReset": "Ctrl+0"
+    }
+  },
+  "appearance": {
+    "fontSize": 14,
+    "fontFamily": "Segoe UI, Arial, sans-serif",
+    "accentColor": "#4a90d9",
+    "sidebarWidth": 250,
+    "statusBarHeight": 24,
+    "tabHeight": 32,
+    "animationsEnabled": true,
+    "transparencyEnabled": false,
+    "customCss": ""
+  },
+  "advanced": {
+    "debugMode": false,
+    "verboseLogging": false,
+    "logToFile": false,
+    "logPath": "./logs",
+    "maxLogSize": 10485760,
+    "enableDevTools": true,
+    "experimentalFeatures": false,
+    "hardwareAcceleration": true,
+    "gpuRasterization": true
+  },
+  "privacy": {
+    "savePasswords": false,
+    "saveFormData": false,
+    "doNotTrack": true,
+    "clearDataOnExit": false,
+    "dataToClean": ["cache", "cookies", "history"]
+  },
+  "accounts": {
+    "multiAccountEnabled": false,
+    "maxAccounts": 5,
+    "switchDelay": 1000,
+    "separateCookies": true
+  }
+}

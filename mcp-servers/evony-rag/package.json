@@ -1,0 +1,19 @@
+{
+  "name": "evony-rag",
+  "version": "1.0.0",
+  "description": "Evony RAG (Retrieval Augmented Generation) MCP Server for knowledge base queries",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "keywords": ["evony", "mcp", "rag", "knowledge-base"],
+  "author": "Ghenghis",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.25.0",
+    "chromadb": "^1.8.1",
+    "openai": "^4.52.0"
+  }
+}

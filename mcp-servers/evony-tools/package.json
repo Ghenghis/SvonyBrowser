@@ -1,0 +1,15 @@
+{
+  "name": "evony-tools",
+  "version": "1.0.0",
+  "description": "Evony Tools MCP Server for game calculations and utilities",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "keywords": ["evony", "mcp", "tools", "calculator", "combat"],
+  "author": "Ghenghis",
+  "license": "MIT",
+  "dependencies": {}
+}

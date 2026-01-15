@@ -1,0 +1,15 @@
+{
+  "name": "evony-rte",
+  "version": "1.0.0",
+  "description": "Evony RTE (Real-Time Engine) MCP Server for protocol analysis and traffic decoding",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "keywords": ["evony", "mcp", "rte", "protocol", "amf3"],
+  "author": "Ghenghis",
+  "license": "MIT",
+  "dependencies": {}
+}

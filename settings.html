@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Svony Browser - Settings</title>
+    <style>
+        :root {
+            --background: #1a1a2e;
+            --surface: #16213e;
+            --surface-high: #0f3460;
+            --accent: #e94560;
+            --accent-hover: #ff6b6b;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: #2a2a4a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .setting-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a4a;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+        }
+        
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .secondary {
+            background: #3a3a5a;
+            color: var(--text-primary);
+        }
+        
+        .secondary:hover {
+            background: #4a4a6a;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚙ Settings</h1>
+    
+    <div class="setting-group">
+        <label>Homepage URL</label>
+        <input type="text" id="homepage" placeholder="https://search.flash.pm/">
+    </div>
+    
+    <div class="setting-group">
+        <label>Default Server</label>
+        <select id="server">
+            <option value="cc1">cc1.evony.com</option>
+            <option value="cc2">cc2.evony.com</option>
+            <option value="cc3">cc3.evony.com</option>
+            <option value="cc4">cc4.evony.com</option>
+            <option value="cc5">cc5.evony.com</option>
+        </select>
+    </div>
+    
+    <div class="setting-group checkbox-group">
+        <input type="checkbox" id="adblock" checked>
+        <label for="adblock">Enable Ad Blocker</label>
+    </div>
+    
+    <div class="setting-group checkbox-group">
+        <input type="checkbox" id="mcp-enabled" checked>
+        <label for="mcp-enabled">Enable MCP Integration</label>
+    </div>
+    
+    <div class="setting-group">
+        <label>MCP Server URL</label>
+        <input type="text" id="mcp-url" placeholder="ws://localhost:3000">
+    </div>
+    
+    <div class="buttons">
+        <button class="secondary" onclick="resetSettings()">Reset</button>
+        <button class="primary" onclick="saveSettings()">Save</button>
+    </div>
+    
+    <script>
+        const { ipcRenderer } = require('electron');
+        const Store = require('./store');
+        const store = new Store({ configName: 'svony-preferences' });
+        
+        // Load settings
+        document.getElementById('homepage').value = store.get('homepage') || '';
+        document.getElementById('server').value = store.get('defaultServer') || 'cc2';
+        document.getElementById('adblock').checked = store.get('adblock') !== false;
+        document.getElementById('mcp-enabled').checked = store.get('mcpEnabled') !== false;
+        document.getElementById('mcp-url').value = store.get('mcpUrl') || '';
+        
+        function saveSettings() {
+            store.set('homepage', document.getElementById('homepage').value);
+            store.set('defaultServer', document.getElementById('server').value);
+            store.set('adblock', document.getElementById('adblock').checked);
+            store.set('mcpEnabled', document.getElementById('mcp-enabled').checked);
+            store.set('mcpUrl', document.getElementById('mcp-url').value);
+            window.close();
+        }
+        
+        function resetSettings() {
+            document.getElementById('homepage').value = '';
+            document.getElementById('server').value = 'cc2';
+            document.getElementById('adblock').checked = true;
+            document.getElementById('mcp-enabled').checked = true;
+            document.getElementById('mcp-url').value = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+{
+  "name": "SvonyBrowser",
+  "productName": "Svony Browser",
+  "description": "Evony Analysis Suite - Flash Browser with Dual Panels, Traffic Viewer, Protocol Explorer, Combat Simulator, Session Recorder, and AI Co-Pilot",
+  "homepage": "https://github.com/Ghenghis/Svony-Browser",
+  "author": "Ghenghis",
+  "version": "2.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging",
+    "debug": "electron . --inspect=5858",
+    "build": "electron-builder --win",
+    "build:win": "electron-builder --win",
+    "build:win32": "electron-builder --win --ia32",
+    "build:win64": "electron-builder --win --x64",
+    "build:portable": "electron-builder --win portable",
+    "build:nsis": "electron-builder --win nsis",
+    "build:all": "electron-builder --win --ia32 --x64",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "publish": "electron-builder --win -p always",
+    "publish:all": "electron-builder --win --ia32 --x64 -p always",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps",
+    "setup:mcp": "cd mcp-servers/evony-rag && npm install && cd ../evony-rte && npm install && cd ../evony-tools && npm install",
+    "setup:chromadb": "node scripts/setup-chromadb.js",
+    "setup:all": "npm install && npm run setup:mcp && npm run setup:chromadb",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^9.4.4",
+    "electron-builder": "^22.14.13",
+    "electron-packager": "^15.5.2",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.12.0",
+    "@cliqz/adblocker-electron": "^1.27.0",
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "chromadb": "^1.7.0",
+    "cross-fetch": "^4.0.0",
+    "electron-context-menu": "^3.6.1",
+    "electron-dl": "^3.5.2",
+    "electron-find": "^1.0.7",
+    "electron-log": "^5.0.3",
+    "electron-navigation": "^6.6.6",
+    "electron-store": "^8.1.0",
+    "electron-version": "^2.0.1",
+    "marked": "^11.1.1",
+    "openai": "^4.24.0",
+    "resolve-dependencies": "^6.0.7",
+    "uuid": "^9.0.1",
+    "ws": "^8.16.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ghenghis/Svony-Browser.git"
+  },
+  "build": {
+    "appId": "com.svony.browser",
+    "productName": "Svony Browser",
+    "copyright": "Copyright © 2024 Ghenghis",
+    "directories": {
+      "buildResources": "resources",
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "extraResources": [
+      {
+        "from": "flashver",
+        "to": "flashver",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "data",
+        "to": "data",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "config",
+        "to": "config",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "knowledge-base",
+        "to": "knowledge-base",
+        "filter": ["**/*"]
+      }
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Ghenghis",
+        "repo": "Svony-Browser",
+        "releaseType": "release"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64", "ia32"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "ia32"]
+        }
+      ],
+      
+      "publisherName": "Ghenghis",
+      "verifyUpdateCodeSignature": false,
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      
+      
+      "uninstallDisplayName": "Svony Browser",
+      "license": "LICENSE",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Svony Browser",
+      "artifactName": "SvonyBrowser-Setup-${version}-${arch}.${ext}",
+      "include": "build/installer.nsh"
+    },
+    "portable": {
+      "artifactName": "SvonyBrowser-Portable-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      
+      "category": "public.app-category.utilities",
+      "artifactName": "SvonyBrowser-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage", "deb", "tar.gz"],
+      
+      "category": "Utility",
+      "artifactName": "SvonyBrowser-${version}-${arch}.${ext}"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
+  },
+  "keywords": [
+    "evony",
+    "flash",
+    "browser",
+    "electron",
+    "game",
+    "analysis",
+    "traffic",
+    "protocol",
+    "mcp",
+    "ai"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
