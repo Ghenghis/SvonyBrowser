@@ -387,6 +387,13 @@ function togglePanelMode(panel, mode) {
         state.leftPanelMode = mode;
         document.getElementById('left-web-toggle').classList.toggle('active', mode === 'web');
         document.getElementById('left-swf-toggle').classList.toggle('active', mode === 'swf');
+        document.getElementById('left-hybrid-toggle')?.classList.toggle('active', mode === 'hybrid');
+        
+        if (mode === 'hybrid') {
+            // Hybrid mode uses Playwright for enhanced automation
+            activateHybridMode('left');
+            return;
+        }
         
         if (mode === 'swf') {
             // SWF files should be placed in the flashver/ directory
@@ -402,6 +409,13 @@ function togglePanelMode(panel, mode) {
         state.rightPanelMode = mode;
         document.getElementById('right-web-toggle').classList.toggle('active', mode === 'web');
         document.getElementById('right-swf-toggle').classList.toggle('active', mode === 'swf');
+        document.getElementById('right-hybrid-toggle')?.classList.toggle('active', mode === 'hybrid');
+        
+        if (mode === 'hybrid') {
+            // Hybrid mode uses Playwright for enhanced automation
+            activateHybridMode('right');
+            return;
+        }
         
         if (mode === 'swf') {
             // SWF files should be placed in the flashver/ directory
@@ -416,11 +430,91 @@ function togglePanelMode(panel, mode) {
     }
 }
 
+/**
+ * Activate Hybrid mode using Playwright for enhanced automation
+ */
+async function activateHybridMode(panel) {
+    const webview = panel === 'left' ? elements.leftWebview : elements.rightWebview;
+    const currentUrl = webview.src || '';
+    
+    try {
+        // Show loading indicator
+        showNotification(`Activating Hybrid mode for ${panel} panel...`, 'info');
+        
+        // Initialize Playwright if needed
+        const status = await ipcRenderer.invoke('playwright-status');
+        if (!status.running) {
+            const startResult = await ipcRenderer.invoke('playwright-start');
+            if (startResult.error) {
+                showNotification(`Playwright error: ${startResult.error}`, 'error');
+                return;
+            }
+        }
+        
+        // Start hybrid mode for this panel
+        const panelId = panel;
+        const result = await ipcRenderer.invoke('panel-hybrid-start', panelId, currentUrl || 'about:blank');
+        
+        if (result.error) {
+            showNotification(`Hybrid mode error: ${result.error}`, 'error');
+            return;
+        }
+        
+        // Store the Playwright page ID
+        state[`${panel}PlaywrightPageId`] = pageId;
+        
+        // Show hybrid mode indicator
+        const indicator = document.createElement('div');
+        indicator.className = 'hybrid-mode-indicator';
+        indicator.innerHTML = '<span class="hybrid-icon">⚡</span> Hybrid Mode Active';
+        indicator.id = `${panel}-hybrid-indicator`;
+        
+        const panelElement = document.getElementById(`${panel}-panel`);
+        const existingIndicator = document.getElementById(`${panel}-hybrid-indicator`);
+        if (existingIndicator) existingIndicator.remove();
+        panelElement.querySelector('.panel-header')?.appendChild(indicator);
+        
+        showNotification(`Hybrid mode activated for ${panel} panel`, 'success');
+        console.log(`[Renderer] Hybrid mode activated for ${panel} panel`);
+        
+    } catch (error) {
+        console.error('[Renderer] Hybrid mode activation failed:', error);
+        showNotification(`Hybrid mode failed: ${error.message}`, 'error');
+        
+        // Track error
+        ipcRenderer.invoke('error-track', {
+            message: `Hybrid mode activation failed: ${error.message}`,
+            category: 'playwright',
+            severity: 'error',
+            context: { panel, url: currentUrl }
+        });
+    }
+}
+
+/**
+ * Deactivate Hybrid mode for a panel
+ */
+async function deactivateHybridMode(panel) {
+    try {
+        await ipcRenderer.invoke('panel-hybrid-stop', panel);
+        state[`${panel}PlaywrightPageId`] = null;
+        showNotification(`Hybrid mode deactivated for ${panel} panel`, 'info');
+    } catch (error) {
+        console.error('[Renderer] Hybrid mode deactivation failed:', error);
+    }
+    
+    // Remove indicator
+    const indicator = document.getElementById(`${panel}-hybrid-indicator`);
+    if (indicator) indicator.remove();
+}
+
 function updatePanelToggles() {
     document.getElementById('left-web-toggle').classList.toggle('active', state.leftPanelMode === 'web');
     document.getElementById('left-swf-toggle').classList.toggle('active', state.leftPanelMode === 'swf');
+    document.getElementById('left-hybrid-toggle')?.classList.toggle('active', state.leftPanelMode === 'hybrid');
     document.getElementById('right-web-toggle').classList.toggle('active', state.rightPanelMode === 'web');
     document.getElementById('right-swf-toggle').classList.toggle('active', state.rightPanelMode === 'swf');
+    document.getElementById('right-hybrid-toggle')?.classList.toggle('active', state.rightPanelMode === 'hybrid');
 }
 
 function setupPanelSplitter() {
