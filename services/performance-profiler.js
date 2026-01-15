@@ -560,6 +560,11 @@ class PerformanceProfiler extends EventEmitter {
     /**
      * Get statistics
      */
+    getMetrics() {
+        // Alias for getStats for API consistency
+        return this.getStats();
+    }
+
     getStats() {
         const currentMemory = process.memoryUsage();
         

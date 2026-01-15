@@ -44,6 +44,19 @@ let mcpClientManager = null;
 let playwrightService = null;
 let amf3Decoder = null;
 
+// v2.0.9+ Services
+let debugManager = null;
+let networkInspector = null;
+let performanceProfiler = null;
+let scriptRecorder = null;
+let scriptRunner = null;
+let automationTemplates = null;
+let agentController = null;
+let voiceService = null;
+let chatbotPlugins = null;
+let panelManager = null;
+let panelPlaywrightBridge = null;
+
 // Store for preferences
 const store = new Store({
     configName: 'svony-preferences',
@@ -512,6 +525,213 @@ async function initializeServices() {
             }
         } catch (e) {
             console.warn('[Main] Intent Router not available:', e.message);
+        }
+        
+        // v2.0.9+ Services Initialization
+        
+        // Debug Manager
+        try {
+            const { DebugManager } = require('./services/debug-manager');
+            debugManager = new DebugManager({
+                logDir: path.join(app.getPath('userData'), 'logs'),
+                maxLogFiles: 10,
+                maxLogSize: 10 * 1024 * 1024
+            });
+            global.debugManager = debugManager;
+            console.log('[Main] Debug Manager initialized');
+            
+            debugManager.on('logEntry', (entry) => {
+                sendWindow('debug-log-entry', entry);
+            });
+        } catch (e) {
+            console.warn('[Main] Debug Manager not available:', e.message);
+        }
+        
+        // Network Inspector
+        try {
+            const { NetworkInspector } = require('./services/network-inspector');
+            networkInspector = new NetworkInspector();
+            global.networkInspector = networkInspector;
+            console.log('[Main] Network Inspector initialized');
+            
+            networkInspector.on('request', (req) => {
+                sendWindow('network-request', req);
+            });
+            
+            networkInspector.on('response', (res) => {
+                sendWindow('network-response', res);
+            });
+        } catch (e) {
+            console.warn('[Main] Network Inspector not available:', e.message);
+        }
+        
+        // Performance Profiler
+        try {
+            const { PerformanceProfiler } = require('./services/performance-profiler');
+            performanceProfiler = new PerformanceProfiler();
+            global.performanceProfiler = performanceProfiler;
+            console.log('[Main] Performance Profiler initialized');
+            
+            performanceProfiler.on('metrics', (metrics) => {
+                sendWindow('performance-metrics', metrics);
+            });
+        } catch (e) {
+            console.warn('[Main] Performance Profiler not available:', e.message);
+        }
+        
+        // Script Recorder
+        try {
+            const { ScriptRecorder } = require('./services/script-recorder');
+            scriptRecorder = new ScriptRecorder({
+                outputDir: path.join(app.getPath('userData'), 'scripts')
+            });
+            global.scriptRecorder = scriptRecorder;
+            console.log('[Main] Script Recorder initialized');
+            
+            scriptRecorder.on('actionRecorded', (action) => {
+                sendWindow('script-action-recorded', action);
+            });
+            
+            scriptRecorder.on('recordingComplete', (script) => {
+                sendWindow('script-recording-complete', script);
+            });
+        } catch (e) {
+            console.warn('[Main] Script Recorder not available:', e.message);
+        }
+        
+        // Script Runner
+        try {
+            const { ScriptRunner } = require('./services/script-runner');
+            scriptRunner = new ScriptRunner({
+                maxConcurrent: 3,
+                playwrightService
+            });
+            global.scriptRunner = scriptRunner;
+            console.log('[Main] Script Runner initialized');
+            
+            scriptRunner.on('scriptStarted', (info) => {
+                sendWindow('script-started', info);
+            });
+            
+            scriptRunner.on('scriptCompleted', (result) => {
+                sendWindow('script-completed', result);
+            });
+            
+            scriptRunner.on('scriptError', (error) => {
+                sendWindow('script-error', error);
+            });
+        } catch (e) {
+            console.warn('[Main] Script Runner not available:', e.message);
+        }
+        
+        // Automation Templates
+        try {
+            const { AutomationTemplates } = require('./services/automation-templates');
+            automationTemplates = new AutomationTemplates();
+            global.automationTemplates = automationTemplates;
+            console.log('[Main] Automation Templates initialized');
+        } catch (e) {
+            console.warn('[Main] Automation Templates not available:', e.message);
+        }
+        
+        // Agent Controller
+        try {
+            const { AgentController } = require('./services/agent-controller');
+            agentController = new AgentController({
+                lmStudioClient: global.lmStudioClient,
+                gameStateTracker,
+                scriptRunner,
+                automationTemplates
+            });
+            global.agentController = agentController;
+            
+            // Connect Playwright services to Agent Controller
+            if (playwrightService) {
+                agentController.setPlaywrightService(playwrightService);
+            }
+            if (panelPlaywrightBridge) {
+                agentController.setPanelPlaywrightBridge(panelPlaywrightBridge);
+            }
+            
+            console.log('[Main] Agent Controller initialized with Playwright integration');
+            
+            agentController.on('goalSet', (goal) => {
+                sendWindow('agent-goal-set', goal);
+            });
+            
+            agentController.on('actionExecuted', (action) => {
+                sendWindow('agent-action-executed', action);
+            });
+            
+            agentController.on('decisionMade', (decision) => {
+                sendWindow('agent-decision-made', decision);
+            });
+        } catch (e) {
+            console.warn('[Main] Agent Controller not available:', e.message);
+        }
+        
+        // Voice Service
+        try {
+            const { VoiceService } = require('./services/voice-service');
+            voiceService = new VoiceService();
+            global.voiceService = voiceService;
+            console.log('[Main] Voice Service initialized');
+            
+            voiceService.on('speechRecognized', (text) => {
+                sendWindow('voice-recognized', text);
+            });
+            
+            voiceService.on('speaking', (status) => {
+                sendWindow('voice-speaking', status);
+            });
+        } catch (e) {
+            console.warn('[Main] Voice Service not available:', e.message);
+        }
+        
+        // Chatbot Plugins
+        try {
+            const { ChatbotPluginManager } = require('./services/chatbot-plugins');
+            chatbotPlugins = new ChatbotPluginManager();
+            global.chatbotPlugins = chatbotPlugins;
+            console.log('[Main] Chatbot Plugins initialized');
+            
+            // Wire to chatbot if available
+            if (chatbotService) {
+                chatbotService.pluginManager = chatbotPlugins;
+            }
+        } catch (e) {
+            console.warn('[Main] Chatbot Plugins not available:', e.message);
+        }
+        
+        // Panel Manager
+        try {
+            const { PanelManager } = require('./services/panel-manager');
+            panelManager = new PanelManager();
+            global.panelManager = panelManager;
+            console.log('[Main] Panel Manager initialized');
+            
+            panelManager.on('panelStateChanged', (state) => {
+                sendWindow('panel-state-changed', state);
+            });
+            
+            panelManager.on('panelError', (error) => {
+                sendWindow('panel-error', error);
+            });
+        } catch (e) {
+            console.warn('[Main] Panel Manager not available:', e.message);
+        }
+        
+        // Panel Playwright Bridge
+        try {
+            const { PanelPlaywrightBridge } = require('./services/panel-playwright-bridge');
+            panelPlaywrightBridge = new PanelPlaywrightBridge({
+                playwrightService,
+                panelManager
+            });
+            global.panelPlaywrightBridge = panelPlaywrightBridge;
+            console.log('[Main] Panel Playwright Bridge initialized');
+        } catch (e) {
+            console.warn('[Main] Panel Playwright Bridge not available:', e.message);
         }
         
         // Configure Game State Tracker persistence
@@ -1963,15 +2183,7 @@ function setupIPC() {
 // v2.0.9 - Debug, Automation & Agent Mode IPC Handlers
 // ========================================
 
-let debugManager = null;
-let networkInspector = null;
-let performanceProfiler = null;
-let scriptRecorder = null;
-let scriptRunner = null;
-let automationTemplates = null;
-let agentController = null;
-let voiceService = null;
-let chatbotPlugins = null;
+// Note: Service variables already declared at top of file
 
 async function initializeV209Services() {
     console.log('[Main] Initializing v2.0.9 services...');
@@ -2612,6 +2824,43 @@ app.on('ready', async () => {
 app.on('open-file', (event, path) => {
     event.preventDefault();
     console.log('[Main] Opening file:', path);
+});
+
+// Health Check IPC Handlers
+ipcMain.handle('health-check-all', async () => {
+    if (!healthCheckManager) return { error: 'Health check not initialized' };
+    try {
+        return await healthCheckManager.checkAll();
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('health-check-service', async (event, serviceName) => {
+    if (!healthCheckManager) return { error: 'Health check not initialized' };
+    try {
+        return await healthCheckManager.checkService(serviceName);
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('health-get-status', async () => {
+    if (!healthCheckManager) return { error: 'Health check not initialized' };
+    try {
+        return healthCheckManager.getOverallHealth();
+    } catch (error) {
+        return { error: error.message };
+    }
+});
+
+ipcMain.handle('health-get-history', async (event, serviceName) => {
+    if (!healthCheckManager) return { error: 'Health check not initialized' };
+    try {
+        return healthCheckManager.getHistory(serviceName);
+    } catch (error) {
+        return { error: error.message };
+    }
 });
 
 // Window lifecycle

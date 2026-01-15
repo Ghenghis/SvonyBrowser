@@ -1,0 +1,474 @@
+/**
+ * Panel Responsive CSS
+ * Fixes panel resizing issues - ensures content is always visible
+ * v2.1.0
+ */
+
+/* ============================================================================
+   Main Layout - Responsive Container
+   ============================================================================ */
+
+#main-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Critical for flex children to shrink */
+    overflow: hidden;
+}
+
+#tab-control {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tab-content {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================================
+   Browser Panels - Responsive Layout
+   ============================================================================ */
+
+#browser-panels {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    gap: 4px;
+    padding: 4px;
+}
+
+/* Individual Panel */
+.browser-panel {
+    flex: 1 1 50%;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* Panel Header - Fixed Height */
+.panel-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    min-height: 40px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Panel Toolbar - Fixed Height */
+.panel-toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 4px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    min-height: 36px;
+    flex-wrap: wrap;
+}
+
+/* Panel Content - Fills Remaining Space */
+.panel-content {
+    flex: 1 1 auto;
+    position: relative;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Webview - Absolute Fill */
+.panel-content webview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Panel Status Bar - Fixed Height */
+.panel-status-bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-secondary);
+    min-height: 24px;
+}
+
+/* ============================================================================
+   Panel View Modes
+   ============================================================================ */
+
+/* Single Panel Mode - Left Only */
+#browser-panels.left-only #left-panel {
+    flex: 1 1 100%;
+}
+
+#browser-panels.left-only #right-panel {
+    display: none;
+}
+
+/* Single Panel Mode - Right Only */
+#browser-panels.right-only #right-panel {
+    flex: 1 1 100%;
+}
+
+#browser-panels.right-only #left-panel {
+    display: none;
+}
+
+/* Both Panels Mode */
+#browser-panels.both-panels #left-panel,
+#browser-panels.both-panels #right-panel {
+    flex: 1 1 50%;
+}
+
+/* Hidden Panel */
+.browser-panel.hidden {
+    display: none !important;
+}
+
+/* ============================================================================
+   Responsive Breakpoints
+   ============================================================================ */
+
+/* Small screens - stack panels vertically */
+@media (max-width: 800px) {
+    #browser-panels {
+        flex-direction: column;
+    }
+    
+    .browser-panel {
+        flex: 1 1 50%;
+        min-height: 200px;
+    }
+    
+    #browser-panels.both-panels #left-panel,
+    #browser-panels.both-panels #right-panel {
+        flex: 1 1 50%;
+    }
+}
+
+/* Very small screens - single panel recommended */
+@media (max-width: 600px) {
+    .panel-toolbar {
+        flex-wrap: wrap;
+        padding: 4px;
+    }
+    
+    .panel-toolbar .panel-url-bar {
+        flex: 1 1 100%;
+        order: 10;
+    }
+    
+    .panel-header {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+}
+
+/* Large screens - more space */
+@media (min-width: 1400px) {
+    #browser-panels {
+        gap: 8px;
+        padding: 8px;
+    }
+}
+
+/* ============================================================================
+   Panel Resizer (Splitter)
+   ============================================================================ */
+
+.panel-resizer {
+    flex: 0 0 6px;
+    background: var(--border);
+    cursor: col-resize;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.panel-resizer:hover,
+.panel-resizer.dragging {
+    background: var(--primary);
+}
+
+.panel-resizer::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 30px;
+    background: var(--text-secondary);
+    border-radius: 1px;
+    opacity: 0.5;
+}
+
+.panel-resizer:hover::after {
+    opacity: 1;
+    background: white;
+}
+
+/* Vertical resizer for stacked mode */
+@media (max-width: 800px) {
+    .panel-resizer {
+        flex: 0 0 6px;
+        cursor: row-resize;
+    }
+    
+    .panel-resizer::after {
+        width: 30px;
+        height: 2px;
+    }
+}
+
+/* ============================================================================
+   Panel Loading States
+   ============================================================================ */
+
+.panel-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-dark);
+    z-index: 10;
+}
+
+.panel-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.panel-loading-text {
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* ============================================================================
+   Panel Error States
+   ============================================================================ */
+
+.panel-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-dark);
+    z-index: 10;
+    padding: 20px;
+    text-align: center;
+}
+
+.panel-error-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.panel-error-message {
+    color: var(--error);
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.panel-error-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.panel-error-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.panel-error-btn.primary {
+    background: var(--primary);
+    color: white;
+}
+
+.panel-error-btn.primary:hover {
+    background: var(--accent);
+}
+
+.panel-error-btn.secondary {
+    background: var(--surface-high);
+    color: var(--text-primary);
+}
+
+.panel-error-btn.secondary:hover {
+    background: var(--border);
+}
+
+/* ============================================================================
+   Ensure Full Height Chain
+   ============================================================================ */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#topspacer {
+    flex: 0 0 28px;
+}
+
+#main-toolbar {
+    flex: 0 0 auto;
+}
+
+#main-content {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#status-bar {
+    flex: 0 0 auto;
+}
+
+/* ============================================================================
+   Side Panel (Chatbot) Responsive
+   ============================================================================ */
+
+#side-panel {
+    flex: 0 0 320px;
+    min-width: 280px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    transition: width 0.3s ease;
+}
+
+#side-panel.collapsed {
+    flex: 0 0 0;
+    min-width: 0;
+    width: 0;
+    overflow: hidden;
+    border-left: none;
+}
+
+@media (max-width: 1000px) {
+    #side-panel {
+        flex: 0 0 280px;
+        min-width: 250px;
+    }
+}
+
+@media (max-width: 800px) {
+    #side-panel {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    #side-panel.collapsed {
+        transform: translateX(100%);
+    }
+}
+
+/* ============================================================================
+   Tab Content Areas - Responsive
+   ============================================================================ */
+
+#tab-browser {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#tab-traffic,
+#tab-protocol,
+#tab-tools,
+#tab-debug,
+#tab-automation {
+    overflow: auto;
+    padding: 16px;
+}
+
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+
+.flex-fill {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+}
+
+.flex-none {
+    flex: 0 0 auto;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-auto {
+    overflow: auto;
+}

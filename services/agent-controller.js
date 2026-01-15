@@ -388,6 +388,8 @@ class AgentController extends EventEmitter {
         this.mcpManager = null;
         this.scriptRunner = null;
         this.gameState = null;
+        this.playwrightService = null;
+        this.panelPlaywrightBridge = null;
 
         // Decision loop
         this.decisionLoop = null;
@@ -428,6 +430,20 @@ class AgentController extends EventEmitter {
      */
     setGameState(state) {
         this.gameState = state;
+    }
+
+    /**
+     * Set Playwright service reference
+     */
+    setPlaywrightService(service) {
+        this.playwrightService = service;
+    }
+
+    /**
+     * Set Panel Playwright Bridge reference
+     */
+    setPanelPlaywrightBridge(bridge) {
+        this.panelPlaywrightBridge = bridge;
     }
 
     /**
@@ -696,16 +712,86 @@ class AgentController extends EventEmitter {
     async _performAction(action) {
         switch (action.type) {
             case 'navigate':
-                // Would integrate with panel manager
-                return { navigated: true };
+                // Use Panel Manager for navigation
+                if (this.panelPlaywrightBridge && action.parameters.panelId) {
+                    try {
+                        const url = action.parameters.url;
+                        const panelId = action.parameters.panelId;
+                        await this.panelPlaywrightBridge.navigate(panelId, url);
+                        return { navigated: true, url };
+                    } catch (e) {
+                        return { navigated: false, error: e.message };
+                    }
+                } else if (this.playwrightService && this.playwrightService.isInitialized) {
+                    try {
+                        const page = await this.playwrightService.getPage();
+                        if (page) {
+                            await page.goto(action.parameters.url);
+                            return { navigated: true };
+                        }
+                    } catch (e) {
+                        return { navigated: false, error: e.message };
+                    }
+                }
+                return { navigated: false, error: 'No navigation service available' };
                 
             case 'click':
-                // Would integrate with Playwright
-                return { clicked: true };
+                // Use Playwright for click actions
+                if (this.panelPlaywrightBridge && action.parameters.panelId) {
+                    try {
+                        const selector = action.parameters.selector;
+                        const panelId = action.parameters.panelId;
+                        await this.panelPlaywrightBridge.executeScript(panelId, `
+                            const el = document.querySelector('${selector}');
+                            if (el) el.click();
+                        `);
+                        return { clicked: true, selector };
+                    } catch (e) {
+                        return { clicked: false, error: e.message };
+                    }
+                } else if (this.playwrightService && this.playwrightService.isInitialized) {
+                    try {
+                        const page = await this.playwrightService.getPage();
+                        if (page) {
+                            await page.click(action.parameters.selector);
+                            return { clicked: true };
+                        }
+                    } catch (e) {
+                        return { clicked: false, error: e.message };
+                    }
+                }
+                return { clicked: false, error: 'No Playwright service available' };
                 
             case 'input':
-                // Would integrate with Playwright
-                return { inputted: true };
+                // Use Playwright for input actions
+                if (this.panelPlaywrightBridge && action.parameters.panelId) {
+                    try {
+                        const selector = action.parameters.selector;
+                        const value = action.parameters.value;
+                        const panelId = action.parameters.panelId;
+                        await this.panelPlaywrightBridge.executeScript(panelId, `
+                            const el = document.querySelector('${selector}');
+                            if (el) {
+                                el.value = '${value}';
+                                el.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        `);
+                        return { inputted: true, selector, value };
+                    } catch (e) {
+                        return { inputted: false, error: e.message };
+                    }
+                } else if (this.playwrightService && this.playwrightService.isInitialized) {
+                    try {
+                        const page = await this.playwrightService.getPage();
+                        if (page) {
+                            await page.fill(action.parameters.selector, action.parameters.value);
+                            return { inputted: true };
+                        }
+                    } catch (e) {
+                        return { inputted: false, error: e.message };
+                    }
+                }
+                return { inputted: false, error: 'No Playwright service available' };
                 
             case 'wait':
                 await new Promise(resolve => setTimeout(resolve, action.parameters.duration || 1000));

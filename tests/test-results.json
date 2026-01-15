@@ -1,0 +1,1960 @@
+{
+  "passed": 299,
+  "failed": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "name": "Service: AMF3 Decoder",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: decode",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: encode",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Agent Controller",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: start",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: stop",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStatus",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Automation Templates",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getTemplate",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getCategories",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Chatbot Plugins",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 2
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Chatbot Service",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: initialize",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: processMessage",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getHistory",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Combat Simulator",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: simulate",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Conversation Memory",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: addMessage",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: clear",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Debug Manager",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: log",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getLogs",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Fiddler Bridge",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 2
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: connect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: disconnect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStatus",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Game State Tracker",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getState",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: reset",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Health Check",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: registerService",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: checkAll",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getOverallHealth",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Intent Router",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: route",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: LM Studio Client",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 5
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: connect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStatus",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: MCP Client Manager",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 2
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: callTool",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStatus",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Network Inspector",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getRequests",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: clear",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Panel Manager",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: navigate",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: goBack",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: goForward",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Panel Playwright Bridge",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 2
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: initialize",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Performance Profiler",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getMetrics",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Playwright Service",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: initialize",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Protocol Handler",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 2
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: lookupAction",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: searchActions",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getCategories",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Script Recorder",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Script Runner",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStatus",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Session Recorder",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: startRecording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: stopRecording",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Traffic Processor",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStats",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: getStatus",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Service: Voice Service",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "loads without error",
+          "status": "passed",
+          "duration": 1
+        },
+        {
+          "name": "exports expected structure",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has method: speak",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC Handlers Summary",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has ipcMain.handle handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has ipcMain.on handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "total handlers >= 150",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Settings",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 3 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: get-settings",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: set-setting",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: get-setting",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: reset-settings",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: lm-studio-update-settings",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: settings-updated",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Protocol",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 4 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-lookup",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-search",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-get-categories",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-get-by-category",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-decode",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-encode",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: protocol-get-stats",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Traffic",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 5 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-get-traffic",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-clear-traffic",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: start-traffic-capture",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: stop-traffic-capture",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: export-traffic",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Chatbot",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 4 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: chatbot-send-message",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: chatbot-get-history",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: chatbot-clear-history",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: chatbot-get-quick-actions",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: chatbot-execute-action",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Combat Simulator",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 2 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-simulate",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-get-troop-types",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-get-troop",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-calculate-march-time",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-calculate-training-cost",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-calculate-load",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: combat-get-counter",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Session Recorder",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 4 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-start-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-stop-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-pause-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-resume-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-get-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-get-list",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-load",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-delete",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-export",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-get-stats",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: session-add-marker",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Game State",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 5 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-get-summary",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-get-full",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-get-city",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-get-hero",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-get-marches",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-get-events",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-export",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: game-state-reset",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: MCP Manager",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 4 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-connect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-disconnect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-call-tool",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-get-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-list-tools",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-connect-all",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-disconnect-all",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-get-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-call-tool",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-list-tools",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-get-all-tools",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: mcp-manager-route-query",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: reconnect-mcp",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Playwright",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 5 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-start",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-stop",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-scrape",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-scrape-wiki",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-scrape-forum",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-screenshot",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: playwright-execute",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: LM Studio",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 4 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: lm-studio-connect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: lm-studio-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: lm-studio-chat",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: lm-studio-models",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Panel Manager",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 5 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-get-state",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-navigate",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-go-back",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-go-forward",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-refresh",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-set-mode",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-add-bookmark",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-remove-bookmark",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-get-bookmarks",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-get-history",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-screenshot",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-set-sync-mode",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-get-sync-mode",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-failsafe-recover",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-get-health",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-start",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-stop",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-login",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-fill-form",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-execute",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-intercept",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: panel-hybrid-network-log",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Debug Manager",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 3 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: show-save-dialog",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: show-open-dialog",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: debug-get-logs",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: debug-clear-logs",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: debug-export-logs",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: debug-log",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Automation",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 5 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-start-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-stop-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-pause-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-resume-recording",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-get-actions",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-save",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: script-get-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: runner-run-script",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: runner-stop-script",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: runner-schedule-script",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: templates-get-all",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: templates-get-by-id",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: templates-run",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Agent Controller",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 3 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-start",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-stop",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-pause",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-resume",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-add-goal",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-remove-goal",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-get-goals",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-get-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: agent-get-history",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Fiddler Bridge",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 3 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-connect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-disconnect",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-status",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-inject-request",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-set-breakpoint",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: fiddler-get-breakpoints",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: open-fiddler",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "IPC: Voice Service",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "has at least 2 handlers",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: voice-start-listening",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: voice-stop-listening",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: voice-speak",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: voice-stop-speaking",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "handler: voice-get-status",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: AMF3 Decoder",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "can create instance or access module",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has encode method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has decode method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Chatbot + Intent Router",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "chatbot service loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "intent router loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "chatbot has processMessage",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "intent router has route method",
+          "status": "passed",
+          "duration": 1
+        }
+      ]
+    },
+    {
+      "name": "Integration: LM Studio Client",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "client loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has connect method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getStatus method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "getStatus returns valid structure",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: MCP Client Manager",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "manager loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getStatus method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has callTool method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Game State Tracker",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "tracker loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getState method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has reset method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Playwright Service",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "service loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has initialize method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Debug Manager",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "manager loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has log method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getLogs method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Script Runner + Templates",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "script runner loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "automation templates loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "templates has getTemplate",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Agent Controller",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "controller loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has start method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has stop method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getStatus method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Panel Manager",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "manager loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has navigate method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has goBack method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has goForward method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Health Check",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "manager loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has registerService method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has checkAll method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getOverallHealth method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Voice Service",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "service loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has speak method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Fiddler Bridge",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "bridge loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has connect method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getStatus method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Traffic Processor",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "processor loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getStatus method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has getStats method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "name": "Integration: Conversation Memory",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "tests": [
+        {
+          "name": "memory loads",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has addMessage method",
+          "status": "passed",
+          "duration": 0
+        },
+        {
+          "name": "has clear method",
+          "status": "passed",
+          "duration": 0
+        }
+      ]
+    }
+  ],
+  "startTime": "2026-01-15T10:15:32.677Z",
+  "endTime": "2026-01-15T10:15:32.723Z"
+}

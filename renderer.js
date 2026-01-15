@@ -181,26 +181,31 @@ function setupLMStudioListeners() {
 
 // Setup event listeners
 function setupEventListeners() {
+    // Helper for safe event listener attachment
+    const safeAddListener = (element, event, handler) => {
+        if (element) element.addEventListener(event, handler);
+    };
+    
     // View controls
-    elements.btnLeftOnly.addEventListener('click', () => setPanelView('left'));
-    elements.btnBothPanels.addEventListener('click', () => setPanelView('both'));
-    elements.btnRightOnly.addEventListener('click', () => setPanelView('right'));
-    elements.btnSwapPanels.addEventListener('click', swapPanels);
+    safeAddListener(elements.btnLeftOnly, 'click', () => setPanelView('left'));
+    safeAddListener(elements.btnBothPanels, 'click', () => setPanelView('both'));
+    safeAddListener(elements.btnRightOnly, 'click', () => setPanelView('right'));
+    safeAddListener(elements.btnSwapPanels, 'click', swapPanels);
     
     // Reload buttons
-    elements.btnReloadLeft.addEventListener('click', () => elements.leftWebview.reload());
-    elements.btnReloadRight.addEventListener('click', () => elements.rightWebview.reload());
+    safeAddListener(elements.btnReloadLeft, 'click', () => elements.leftWebview?.reload());
+    safeAddListener(elements.btnReloadRight, 'click', () => elements.rightWebview?.reload());
     
     // Clear cache
-    elements.btnClearCache.addEventListener('click', () => {
+    safeAddListener(elements.btnClearCache, 'click', () => {
         ipcRenderer.send('clear-cache');
     });
     
     // Settings
-    elements.btnSettings.addEventListener('click', showSettings);
-    elements.closeSettings.addEventListener('click', hideSettings);
-    elements.settingsSave.addEventListener('click', saveSettings);
-    elements.settingsReset.addEventListener('click', resetSettings);
+    safeAddListener(elements.btnSettings, 'click', showSettings);
+    safeAddListener(elements.closeSettings, 'click', hideSettings);
+    safeAddListener(elements.settingsSave, 'click', saveSettings);
+    safeAddListener(elements.settingsReset, 'click', resetSettings);
     
     // Settings navigation
     elements.settingsNavBtns.forEach(btn => {
@@ -229,12 +234,12 @@ function setupEventListeners() {
     });
     
     // Traffic controls
-    elements.trafficStart.addEventListener('click', startTrafficCapture);
-    elements.trafficStop.addEventListener('click', stopTrafficCapture);
-    elements.trafficClear.addEventListener('click', clearTraffic);
-    elements.trafficExport.addEventListener('click', exportTraffic);
-    elements.trafficFilter.addEventListener('input', filterTraffic);
-    elements.trafficDirection.addEventListener('change', filterTraffic);
+    safeAddListener(elements.trafficStart, 'click', startTrafficCapture);
+    safeAddListener(elements.trafficStop, 'click', stopTrafficCapture);
+    safeAddListener(elements.trafficClear, 'click', clearTraffic);
+    safeAddListener(elements.trafficExport, 'click', exportTraffic);
+    safeAddListener(elements.trafficFilter, 'input', filterTraffic);
+    safeAddListener(elements.trafficDirection, 'change', filterTraffic);
     
     // Details tabs
     document.querySelectorAll('.details-tab').forEach(tab => {
@@ -245,8 +250,8 @@ function setupEventListeners() {
     });
     
     // Chatbot
-    elements.chatbotSend.addEventListener('click', sendChatMessage);
-    elements.chatbotInput.addEventListener('keydown', (e) => {
+    safeAddListener(elements.chatbotSend, 'click', sendChatMessage);
+    safeAddListener(elements.chatbotInput, 'keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendChatMessage();
@@ -676,19 +681,55 @@ function testProtocolInChat() {
     elements.chatbotInput.focus();
 }
 
-// Chatbot
-function sendChatMessage() {
+// Chatbot - Uses real LM Studio connection
+async function sendChatMessage() {
     const message = elements.chatbotInput.value.trim();
     if (!message) return;
     
     addChatMessage('user', message);
     elements.chatbotInput.value = '';
     
-    // Simulate response (would connect to LLM in production)
-    setTimeout(() => {
-        const response = generateChatResponse(message);
-        addChatMessage('assistant', response);
-    }, 500);
+    // Show typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message assistant typing';
+    typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+    elements.chatbotMessages.appendChild(typingDiv);
+    elements.chatbotMessages.scrollTop = elements.chatbotMessages.scrollHeight;
+    
+    try {
+        // Get game context for better responses
+        let gameContext = null;
+        try {
+            gameContext = await ipcRenderer.invoke('game-state-get-summary');
+        } catch (e) {
+            console.warn('Could not get game context:', e.message);
+        }
+        
+        // Send to LM Studio via chatbot service
+        const response = await ipcRenderer.invoke('chatbot-send-message', message, {
+            gameState: gameContext,
+            selectedProtocol: state.selectedProtocolAction
+        });
+        
+        // Remove typing indicator
+        typingDiv.remove();
+        
+        if (response && response.content) {
+            addChatMessage('assistant', response.content);
+        } else if (response && response.error) {
+            addChatMessage('assistant', `Error: ${response.error}`);
+        } else {
+            // Fallback to local response if LM Studio not available
+            const localResponse = generateChatResponse(message);
+            addChatMessage('assistant', localResponse);
+        }
+    } catch (error) {
+        typingDiv.remove();
+        console.error('Chatbot error:', error);
+        // Fallback to local response
+        const localResponse = generateChatResponse(message);
+        addChatMessage('assistant', localResponse + '\n\n(Note: LM Studio not connected - using local responses)');
+    }
 }
 
 function addChatMessage(role, content) {
@@ -3820,3 +3861,419 @@ document.addEventListener('DOMContentLoaded', () => {
 // Export for global access
 window.debugState = debugState;
 window.automationState = automationState;
+
+
+// ============================================================================
+// Window Resize Handler - v2.1.0
+// Ensures panels resize properly with window
+// ============================================================================
+
+/**
+ * Handle window resize events
+ * Ensures panels maintain proper proportions and content is always visible
+ */
+function setupWindowResizeHandler() {
+    let resizeTimeout = null;
+    let lastPanelRatio = 0.5; // Default 50/50 split
+    
+    // Store panel ratio when manually resized
+    function storePanelRatio() {
+        const container = document.getElementById('browser-panels');
+        const leftPanel = document.getElementById('left-panel');
+        if (container && leftPanel && leftPanel.style.width) {
+            const leftWidth = leftPanel.offsetWidth;
+            const containerWidth = container.offsetWidth;
+            if (containerWidth > 0) {
+                lastPanelRatio = leftWidth / containerWidth;
+            }
+        }
+    }
+    
+    // Restore panel ratio after resize
+    function restorePanelRatio() {
+        const container = document.getElementById('browser-panels');
+        const leftPanel = document.getElementById('left-panel');
+        const rightPanel = document.getElementById('right-panel');
+        
+        if (!container || !leftPanel || !rightPanel) return;
+        
+        const containerWidth = container.offsetWidth;
+        const minWidth = 200;
+        const splitterWidth = 6;
+        
+        // Check if we're in single panel mode
+        if (leftPanel.classList.contains('hidden') || rightPanel.classList.contains('hidden')) {
+            return; // Don't adjust in single panel mode
+        }
+        
+        // Calculate new widths based on stored ratio
+        let newLeftWidth = Math.floor(containerWidth * lastPanelRatio);
+        
+        // Enforce minimum widths
+        newLeftWidth = Math.max(minWidth, Math.min(newLeftWidth, containerWidth - minWidth - splitterWidth));
+        
+        // Apply widths
+        if (leftPanel.style.width) {
+            leftPanel.style.width = `${newLeftWidth}px`;
+        }
+    }
+    
+    // Debounced resize handler
+    function handleResize() {
+        if (resizeTimeout) {
+            clearTimeout(resizeTimeout);
+        }
+        
+        resizeTimeout = setTimeout(() => {
+            restorePanelRatio();
+            
+            // Force webview resize
+            const webviews = document.querySelectorAll('webview');
+            webviews.forEach(wv => {
+                // Trigger a reflow
+                wv.style.display = 'none';
+                wv.offsetHeight; // Force reflow
+                wv.style.display = '';
+            });
+            
+            // Emit resize event for any listeners
+            window.dispatchEvent(new CustomEvent('panels-resized'));
+        }, 100);
+    }
+    
+    // Listen for window resize
+    window.addEventListener('resize', handleResize);
+    
+    // Listen for panel splitter drag end to store ratio
+    document.addEventListener('mouseup', () => {
+        storePanelRatio();
+    });
+    
+    // Initial setup
+    setTimeout(() => {
+        storePanelRatio();
+    }, 500);
+    
+    console.log('[Renderer] Window resize handler initialized');
+}
+
+/**
+ * Force all panels to recalculate their sizes
+ */
+function forcePanelResize() {
+    const container = document.getElementById('browser-panels');
+    if (!container) return;
+    
+    // Trigger reflow
+    container.style.display = 'none';
+    container.offsetHeight;
+    container.style.display = '';
+    
+    // Force webview resize
+    const webviews = document.querySelectorAll('webview');
+    webviews.forEach(wv => {
+        if (wv.style.display !== 'none') {
+            wv.style.display = 'none';
+            wv.offsetHeight;
+            wv.style.display = '';
+        }
+    });
+}
+
+/**
+ * Set panel view mode
+ * @param {string} mode - 'both', 'left', 'right'
+ */
+function setPanelViewMode(mode) {
+    const container = document.getElementById('browser-panels');
+    const leftPanel = document.getElementById('left-panel');
+    const rightPanel = document.getElementById('right-panel');
+    const splitter = document.getElementById('panel-splitter');
+    
+    if (!container || !leftPanel || !rightPanel) return;
+    
+    // Remove all mode classes
+    container.classList.remove('left-only', 'right-only', 'both-panels');
+    leftPanel.classList.remove('hidden');
+    rightPanel.classList.remove('hidden');
+    
+    // Reset flex styles
+    leftPanel.style.flex = '';
+    leftPanel.style.width = '';
+    rightPanel.style.flex = '';
+    rightPanel.style.width = '';
+    
+    switch (mode) {
+        case 'left':
+            container.classList.add('left-only');
+            rightPanel.classList.add('hidden');
+            if (splitter) splitter.style.display = 'none';
+            break;
+            
+        case 'right':
+            container.classList.add('right-only');
+            leftPanel.classList.add('hidden');
+            if (splitter) splitter.style.display = 'none';
+            break;
+            
+        case 'both':
+        default:
+            container.classList.add('both-panels');
+            if (splitter) splitter.style.display = '';
+            break;
+    }
+    
+    // Force resize after mode change
+    setTimeout(forcePanelResize, 50);
+    
+    console.log(`[Renderer] Panel view mode set to: ${mode}`);
+}
+
+// Initialize window resize handler when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupWindowResizeHandler);
+} else {
+    setupWindowResizeHandler();
+}
+
+
+// ============================================================================
+// Global Error Handler - v2.1.0
+// Catches and handles all uncaught errors in renderer process
+// ============================================================================
+
+/**
+ * Error notification system
+ */
+const ErrorNotification = {
+    container: null,
+    
+    init() {
+        // Create notification container if not exists
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.id = 'error-notifications';
+            this.container.style.cssText = `
+                position: fixed;
+                top: 40px;
+                right: 16px;
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                max-width: 400px;
+                pointer-events: none;
+            `;
+            document.body.appendChild(this.container);
+        }
+    },
+    
+    show(message, type = 'error', duration = 5000) {
+        this.init();
+        
+        const notification = document.createElement('div');
+        notification.className = `error-notification ${type}`;
+        notification.style.cssText = `
+            background: ${type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#10B981'};
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 13px;
+            pointer-events: auto;
+            cursor: pointer;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        `;
+        
+        const icon = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅';
+        notification.innerHTML = `
+            <span style="flex-shrink: 0;">${icon}</span>
+            <span style="flex: 1; word-break: break-word;">${message}</span>
+            <span style="flex-shrink: 0; opacity: 0.7; cursor: pointer;" onclick="this.parentElement.remove()">✕</span>
+        `;
+        
+        this.container.appendChild(notification);
+        
+        // Auto-remove after duration
+        if (duration > 0) {
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, duration);
+        }
+        
+        // Click to dismiss
+        notification.addEventListener('click', () => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        });
+        
+        return notification;
+    },
+    
+    error(message, duration) {
+        return this.show(message, 'error', duration);
+    },
+    
+    warning(message, duration) {
+        return this.show(message, 'warning', duration);
+    },
+    
+    success(message, duration) {
+        return this.show(message, 'success', duration);
+    }
+};
+
+/**
+ * Global error handler
+ */
+function setupGlobalErrorHandler() {
+    // Add CSS for animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Handle uncaught errors
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error('[GlobalError]', message, source, lineno, colno, error);
+        
+        // Don't show notification for known non-critical errors
+        const ignoredPatterns = [
+            'ResizeObserver loop',
+            'Script error',
+            'Loading chunk'
+        ];
+        
+        if (ignoredPatterns.some(pattern => message.includes(pattern))) {
+            return true;
+        }
+        
+        ErrorNotification.error(`Error: ${message}`);
+        
+        // Report to main process
+        if (typeof ipcRenderer !== 'undefined') {
+            ipcRenderer.send('renderer-error', {
+                message,
+                source,
+                lineno,
+                colno,
+                stack: error?.stack
+            });
+        }
+        
+        return true; // Prevent default handling
+    };
+    
+    // Handle unhandled promise rejections
+    window.onunhandledrejection = function(event) {
+        console.error('[UnhandledRejection]', event.reason);
+        
+        const message = event.reason?.message || String(event.reason);
+        
+        // Don't show for common non-critical rejections
+        const ignoredPatterns = [
+            'AbortError',
+            'NetworkError',
+            'Failed to fetch'
+        ];
+        
+        if (ignoredPatterns.some(pattern => message.includes(pattern))) {
+            return;
+        }
+        
+        ErrorNotification.error(`Unhandled: ${message}`);
+        
+        // Report to main process
+        if (typeof ipcRenderer !== 'undefined') {
+            ipcRenderer.send('renderer-error', {
+                type: 'unhandledRejection',
+                message,
+                stack: event.reason?.stack
+            });
+        }
+    };
+    
+    // Handle IPC errors
+    if (typeof ipcRenderer !== 'undefined') {
+        ipcRenderer.on('main-error', (event, error) => {
+            console.error('[MainProcessError]', error);
+            ErrorNotification.error(`System Error: ${error.message}`);
+        });
+        
+        ipcRenderer.on('service-error', (event, { service, error }) => {
+            console.error(`[ServiceError:${service}]`, error);
+            ErrorNotification.warning(`${service}: ${error.message}`);
+        });
+    }
+    
+    console.log('[Renderer] Global error handler initialized');
+}
+
+/**
+ * Safe IPC call wrapper
+ * Wraps IPC calls with error handling
+ */
+async function safeIpcCall(channel, ...args) {
+    try {
+        const result = await ipcRenderer.invoke(channel, ...args);
+        
+        if (result && result.error) {
+            console.warn(`[IPC:${channel}] Error response:`, result.error);
+            return result;
+        }
+        
+        return result;
+    } catch (error) {
+        console.error(`[IPC:${channel}] Call failed:`, error);
+        ErrorNotification.error(`IPC Error: ${error.message}`);
+        return { error: error.message };
+    }
+}
+
+/**
+ * Retry wrapper for unreliable operations
+ */
+async function withRetry(fn, maxRetries = 3, delay = 1000) {
+    let lastError;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            lastError = error;
+            console.warn(`[Retry] Attempt ${attempt}/${maxRetries} failed:`, error.message);
+            
+            if (attempt < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, delay * attempt));
+            }
+        }
+    }
+    
+    throw lastError;
+}
+
+// Initialize global error handler when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupGlobalErrorHandler);
+} else {
+    setupGlobalErrorHandler();
+}
+
+// Export for use in other modules
+window.ErrorNotification = ErrorNotification;
+window.safeIpcCall = safeIpcCall;
+window.withRetry = withRetry;
