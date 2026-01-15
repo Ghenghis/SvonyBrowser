@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 2.0.0)'
+        required: true
+        default: '2.0.0'
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-all-platforms:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        
+      - name: Build all Windows variants
+        run: npm run build:all
+        
+      - name: List build artifacts
+        run: Get-ChildItem -Path dist -Recurse | Format-Table Name, Length
+        shell: pwsh
+        
+      - name: Upload all Windows builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-All
+          path: |
+            dist/*.exe
+            dist/*.msi
+          if-no-files-found: warn
+          retention-days: 30
+
+  create-github-release:
+    needs: build-all-platforms
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Svony-Browser-Windows-All
+          path: release-files
+          
+      - name: List release files
+        run: ls -la release-files/
+          
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Svony Browser v${{ steps.version.outputs.version }}
+          body: |
+            ## Svony Browser v${{ steps.version.outputs.version }}
+            
+            This is the Electron-based version of Svony Browser, rebuilt using FlashBrowser as the base for better Flash compatibility.
+            
+            ### Downloads
+            
+            | Platform | Type | Description |
+            |----------|------|-------------|
+            | Windows x64 | Portable | No installation required |
+            | Windows x64 | Installer | Standard NSIS installer |
+            | Windows x64 | MSI | Enterprise deployment |
+            | Windows x86 | Portable | For 32-bit systems |
+            | Windows ARM64 | Portable | For ARM devices |
+            
+            ### System Requirements
+            
+            - Windows 10 or later
+            - Flash Player plugin (Pepper Flash)
+            - 4GB RAM minimum
+            - 500MB disk space
+            
+            ### Optional Components
+            
+            - **LM Studio**: For AI Co-Pilot features
+            - **Fiddler**: For advanced traffic capture
+            - **ChromaDB**: For RAG knowledge base
+            
+            ### Features
+            
+            - 🎮 Dual-panel browser (AutoEvony + Evony Client)
+            - 📊 Traffic viewer with AMF3 protocol decoding
+            - 🤖 AI Co-Pilot with LM Studio integration
+            - ⚔️ Combat simulator and calculators
+            - 📹 Session recording and playback
+            - 🔌 MCP server integration
+            
+            ### MCP Servers Included
+            
+            - **evony-rag**: Knowledge base with RAG
+            - **evony-rte**: Real-time protocol engine
+            - **evony-tools**: Game calculators and utilities
+            
+            ### Documentation
+            
+            See `docs/mcp-setup/` for configuration guides:
+            - Claude Desktop
+            - Claude Code (VS Code)
+            - Windsurf IDE
+            - LM Studio
+            
+            ---
+            
+            **Full Changelog**: https://github.com/Ghenghis/Svony-Browser/compare/v1.0.0...v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: release-files/*

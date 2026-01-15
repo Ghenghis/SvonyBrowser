@@ -1,0 +1,183 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 2.0.0)'
+        required: false
+        default: ''
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-windows-x64:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        
+      - name: Check JavaScript syntax
+        run: |
+          node --check index.js
+          node --check renderer.js
+          node --check preload.js
+          node --check store.js
+        shell: bash
+        
+      - name: Build Windows x64 Portable
+        run: npm run build:win-portable
+        
+      - name: Build Windows x64 Installer
+        run: npm run build:win-installer
+        
+      - name: List build output
+        run: dir dist
+        shell: cmd
+        
+      - name: Upload Windows x64 Portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-x64-Portable
+          path: dist/*portable*.exe
+          if-no-files-found: warn
+          
+      - name: Upload Windows x64 Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-x64-Installer
+          path: dist/*Setup*.exe
+          if-no-files-found: warn
+
+  build-windows-x86:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        
+      - name: Build Windows x86 (32-bit)
+        run: npm run build:win32
+        
+      - name: Upload Windows x86
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-x86
+          path: dist/*ia32*.exe
+          if-no-files-found: warn
+
+  build-windows-arm64:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        
+      - name: Build Windows ARM64
+        run: npm run build:win-arm64
+        
+      - name: Upload Windows ARM64
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-ARM64
+          path: dist/*arm64*.exe
+          if-no-files-found: warn
+
+  create-release:
+    needs: [build-windows-x64, build-windows-x86, build-windows-arm64]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          
+      - name: List artifacts
+        run: find release-artifacts -type f -name "*.exe" -o -name "*.msi" | head -20
+          
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Svony Browser v${{ steps.version.outputs.version }}
+          body: |
+            ## Svony Browser v${{ steps.version.outputs.version }}
+            
+            ### Downloads
+            
+            **Windows x64 (64-bit):**
+            - Portable: No installation required, run directly
+            - Installer: Standard Windows installer
+            
+            **Windows x86 (32-bit):**
+            - For older 32-bit Windows systems
+            
+            **Windows ARM64:**
+            - For ARM-based Windows devices (Surface Pro X, etc.)
+            
+            ### Requirements
+            - Windows 10 or later
+            - Flash Player plugin (place in flashver/ directory)
+            - LM Studio (optional, for AI features)
+            
+            ### Features
+            - Dual-panel browser for AutoEvony and Evony Client
+            - Traffic viewer with AMF3 protocol decoding
+            - AI Co-Pilot with MCP integration
+            - Combat simulator and game calculators
+            - Session recording and playback
+            
+            ### MCP Server Integration
+            Configure with Claude Desktop, Claude Code, or Windsurf IDE.
+            See `docs/mcp-setup/` for configuration guides.
+          draft: false
+          prerelease: false
+          files: |
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.msi

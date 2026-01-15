@@ -1,0 +1,172 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build Windows x64 (Portable)
+        run: npm run build:win-portable
+        
+      - name: Build Windows x64 (Installer)
+        run: npm run build:win-installer
+        
+      - name: Build Windows x64 (MSI)
+        run: npm run build:win-msi
+        
+      - name: Upload Windows Portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-Portable
+          path: dist/*-portable.exe
+          
+      - name: Upload Windows Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-Installer
+          path: dist/*Setup*.exe
+          
+      - name: Upload Windows MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-MSI
+          path: dist/*.msi
+
+  build-windows-32bit:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build Windows x86 (32-bit)
+        run: npm run build:win32
+        
+      - name: Upload Windows 32-bit
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-x86
+          path: dist/*-ia32*.exe
+
+  build-windows-arm:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build Windows ARM64
+        run: npm run build:win-arm64
+        
+      - name: Upload Windows ARM64
+        uses: actions/upload-artifact@v4
+        with:
+          name: Svony-Browser-Windows-ARM64
+          path: dist/*-arm64*.exe
+
+  create-release:
+    needs: [build-windows, build-windows-32bit, build-windows-arm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Svony Browser v${{ steps.version.outputs.version }}
+          body: |
+            ## Svony Browser v${{ steps.version.outputs.version }}
+            
+            ### Downloads
+            
+            **Windows x64 (64-bit):**
+            - Portable: `Svony-Browser-*-portable.exe` - No installation required
+            - Installer: `Svony-Browser-*-Setup.exe` - Standard installer
+            - MSI: `Svony-Browser-*.msi` - Enterprise deployment
+            
+            **Windows x86 (32-bit):**
+            - For older 32-bit Windows systems
+            
+            **Windows ARM64:**
+            - For ARM-based Windows devices (Surface Pro X, etc.)
+            
+            ### Requirements
+            - Windows 10 or later
+            - Adobe Flash Player (included via Pepper Flash)
+            - LM Studio (optional, for AI features)
+            
+            ### Features
+            - Dual-panel browser for AutoEvony and Evony Client
+            - Traffic viewer with AMF3 protocol decoding
+            - AI Co-Pilot with MCP integration
+            - Combat simulator and game calculators
+            - Session recording and playback
+            
+            ### MCP Server Integration
+            Configure with Claude Desktop, Claude Code, or Windsurf IDE.
+            See `docs/mcp-setup/` for configuration guides.
+          draft: false
+          prerelease: false
+          files: |
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.msi
