@@ -58,6 +58,13 @@ const store = new Store({
             enabled: true,
             position: 'right'
         },
+        lmStudio: {
+            enabled: true,
+            url: 'http://localhost:1234',
+            model: 'local-model',
+            temperature: 0.7,
+            maxTokens: 2048
+        },
         traffic: {
             captureEnabled: true,
             maxPackets: 10000
@@ -214,10 +221,47 @@ async function initializeServices() {
             console.warn('[Main] Proxy Monitor not available:', e.message);
         }
         
+        // LM Studio Client
+        let lmStudioClient = null;
+        try {
+            const { LMStudioClient } = require('./services/lm-studio-client');
+            const lmSettings = store.get('lmStudio') || {};
+            lmStudioClient = new LMStudioClient({
+                baseUrl: lmSettings.url || 'http://localhost:1234',
+                model: lmSettings.model || 'local-model',
+                temperature: lmSettings.temperature || 0.7,
+                maxTokens: lmSettings.maxTokens || 2048
+            });
+            
+            // Check connection
+            const connected = await lmStudioClient.checkConnection();
+            console.log('[Main] LM Studio Client initialized, connected:', connected);
+            
+            // Notify renderer of connection status
+            if (mainWindow) {
+                sendWindow('lm-studio-status', { 
+                    connected, 
+                    models: lmStudioClient.availableModels,
+                    url: lmStudioClient.config.baseUrl
+                });
+            }
+            
+            // Store reference globally for IPC handlers
+            global.lmStudioClient = lmStudioClient;
+        } catch (e) {
+            console.warn('[Main] LM Studio Client not available:', e.message);
+        }
+        
         // Chatbot Service
         try {
             chatbotService = require('./services/chatbot-service');
             await chatbotService.initialize();
+            
+            // Pass LM Studio client to chatbot if available
+            if (global.lmStudioClient) {
+                chatbotService.lmStudioClient = global.lmStudioClient;
+            }
+            
             console.log('[Main] Chatbot Service initialized');
             
             chatbotService.on('messageAdded', (message) => {
@@ -803,6 +847,84 @@ function setupIPC() {
     ipcMain.handle('chatbot-execute-action', async (event, actionId, params) => {
         if (!chatbotService) return { error: 'Chatbot not available' };
         return chatbotService.executeQuickAction(actionId, params);
+    });
+
+    // ========================================================================
+    // LM Studio
+    // ========================================================================
+    ipcMain.handle('lm-studio-connect', async (event, url) => {
+        try {
+            const { LMStudioClient } = require('./services/lm-studio-client');
+            const lmSettings = store.get('lmStudio') || {};
+            
+            // Update URL if provided
+            if (url) {
+                lmSettings.url = url;
+                store.set('lmStudio', lmSettings);
+            }
+            
+            global.lmStudioClient = new LMStudioClient({
+                baseUrl: url || lmSettings.url || 'http://localhost:1234',
+                model: lmSettings.model || 'local-model'
+            });
+            
+            const connected = await global.lmStudioClient.checkConnection();
+            
+            // Update chatbot service reference
+            if (chatbotService && global.lmStudioClient) {
+                chatbotService.lmStudioClient = global.lmStudioClient;
+            }
+            
+            return {
+                connected,
+                models: global.lmStudioClient.availableModels,
+                url: global.lmStudioClient.config.baseUrl
+            };
+        } catch (error) {
+            return { connected: false, error: error.message };
+        }
+    });
+
+    ipcMain.handle('lm-studio-status', async () => {
+        if (!global.lmStudioClient) {
+            return { connected: false, models: [], url: '' };
+        }
+        return global.lmStudioClient.getStatus();
+    });
+
+    ipcMain.handle('lm-studio-chat', async (event, messages, options) => {
+        if (!global.lmStudioClient) {
+            return { error: 'LM Studio not connected' };
+        }
+        try {
+            return await global.lmStudioClient.chatCompletion(messages, options);
+        } catch (error) {
+            return { error: error.message };
+        }
+    });
+
+    ipcMain.handle('lm-studio-models', async () => {
+        if (!global.lmStudioClient) {
+            return [];
+        }
+        try {
+            return await global.lmStudioClient.listModels();
+        } catch (error) {
+            return [];
+        }
+    });
+
+    ipcMain.handle('lm-studio-update-settings', async (event, settings) => {
+        const current = store.get('lmStudio') || {};
+        const updated = { ...current, ...settings };
+        store.set('lmStudio', updated);
+        
+        // Reconnect with new settings
+        if (global.lmStudioClient) {
+            global.lmStudioClient.updateConfig(settings);
+        }
+        
+        return updated;
     });
 
     // ========================================================================

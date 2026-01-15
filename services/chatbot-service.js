@@ -499,9 +499,35 @@ Always be helpful, accurate, and provide specific game-related advice when possi
     }
 
     /**
-     * Handle general queries with built-in knowledge
+     * Handle general queries with built-in knowledge or LM Studio
      */
     async handleGeneralQuery(message) {
+        // Try LM Studio first if available
+        if (this.lmStudioClient && this.lmStudioClient.isConnected) {
+            try {
+                const systemPrompt = this.systemPrompts.general;
+                const messages = [
+                    { role: 'system', content: systemPrompt },
+                    ...this.conversationHistory.slice(-10).map(m => ({
+                        role: m.role,
+                        content: m.content
+                    })),
+                    { role: 'user', content: message }
+                ];
+                
+                const response = await this.lmStudioClient.chatCompletion(messages);
+                
+                if (response && response.message && response.message.content) {
+                    return {
+                        text: response.message.content,
+                        data: { source: 'lm-studio', model: response.model }
+                    };
+                }
+            } catch (error) {
+                console.warn('[ChatbotService] LM Studio error, falling back to built-in:', error.message);
+            }
+        }
+        
         // Built-in knowledge base for common questions
         const knowledge = {
             'hero': `**Heroes in Evony**\n\nHeroes are essential for leading armies and managing cities. Key aspects:\n\n• **Attributes:** Politics, Attack, Defense, Intelligence\n• **Skills:** Each hero has unique skills that affect combat and city management\n• **Levels:** Heroes gain experience from battles and can be leveled up\n• **Equipment:** Equip gear to boost hero stats\n\nTop heroes for combat: Roland, Elektra, Hannibal Barca\nTop heroes for development: Queen Jindeok, Cleopatra`,

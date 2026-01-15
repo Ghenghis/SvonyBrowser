@@ -66,6 +66,7 @@
         
         <!-- Status Indicators -->
         <div class="toolbar-section status-section">
+            <div id="lm-studio-status" class="status-indicator warning" title="LM Studio: Connecting..."></div>
             <div id="mcp-status" class="status-indicator warning" title="MCP Status: Connecting..."></div>
             <div id="proxy-status" class="status-indicator inactive" title="Proxy Status: Inactive"></div>
         </div>
@@ -618,28 +619,38 @@
                         </div>
                     </div>
                     
-                    <!-- LLM Settings -->
+                    <!-- LM Studio Settings -->
                     <div id="settings-llm" class="settings-section">
-                        <h3>🤖 LLM Integration</h3>
+                        <h3>🤖 LM Studio Integration</h3>
                         <div class="setting-group">
-                            <label>LLM Provider</label>
-                            <select id="setting-llm-provider">
-                                <option value="openai">OpenAI</option>
-                                <option value="anthropic">Anthropic</option>
-                                <option value="local">Local (Ollama)</option>
-                            </select>
+                            <label>Enable LM Studio</label>
+                            <input type="checkbox" id="setting-lm-enabled" checked>
                         </div>
                         <div class="setting-group">
-                            <label>API Key</label>
-                            <input type="password" id="setting-llm-key" placeholder="sk-...">
+                            <label>LM Studio URL</label>
+                            <input type="text" id="setting-lm-url" placeholder="http://localhost:1234" value="http://localhost:1234">
+                            <small>Enter your LM Studio server URL (e.g., http://192.168.0.3:1234)</small>
                         </div>
                         <div class="setting-group">
                             <label>Model</label>
-                            <select id="setting-llm-model">
-                                <option value="gpt-4">GPT-4</option>
-                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                                <option value="claude-3">Claude 3</option>
+                            <select id="setting-lm-model">
+                                <option value="local-model">Auto-detect (local-model)</option>
                             </select>
+                            <button id="refresh-models-btn" class="secondary-btn" style="margin-left:8px;">Refresh Models</button>
+                        </div>
+                        <div class="setting-group">
+                            <label>Temperature</label>
+                            <input type="range" id="setting-lm-temperature" min="0" max="2" step="0.1" value="0.7">
+                            <span id="temperature-value">0.7</span>
+                        </div>
+                        <div class="setting-group">
+                            <label>Max Tokens</label>
+                            <input type="number" id="setting-lm-max-tokens" min="256" max="8192" value="2048">
+                        </div>
+                        <div class="setting-group">
+                            <label>Connection Status</label>
+                            <span id="lm-connection-status" class="status-badge disconnected">Disconnected</span>
+                            <button id="test-lm-connection-btn" class="secondary-btn" style="margin-left:8px;">Test Connection</button>
                         </div>
                     </div>
                     

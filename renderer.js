@@ -90,6 +90,12 @@ function init() {
     initializeProtocolExplorer();
     updateStatusBar();
     
+    // Initialize LM Studio connection
+    initLMStudioConnection();
+    
+    // Setup LM Studio settings event listeners
+    setupLMStudioListeners();
+    
     // Check platform for window controls
     if (process.platform === 'win32') {
         document.getElementById('window-controls').style.display = 'grid';
@@ -97,6 +103,30 @@ function init() {
     
     // Start memory monitoring
     setInterval(updateMemoryUsage, 5000);
+}
+
+// Setup LM Studio settings event listeners
+function setupLMStudioListeners() {
+    // Test connection button
+    const testBtn = document.getElementById('test-lm-connection-btn');
+    if (testBtn) {
+        testBtn.addEventListener('click', testLMStudioConnection);
+    }
+    
+    // Refresh models button
+    const refreshBtn = document.getElementById('refresh-models-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshLMStudioModels);
+    }
+    
+    // Temperature slider
+    const tempSlider = document.getElementById('setting-lm-temperature');
+    if (tempSlider) {
+        tempSlider.addEventListener('input', (e) => {
+            const tempValue = document.getElementById('temperature-value');
+            if (tempValue) tempValue.textContent = e.target.value;
+        });
+    }
 }
 
 // Setup event listeners
@@ -743,7 +773,7 @@ function loadSettings() {
     document.getElementById('setting-debug').checked = settings.debug || false;
 }
 
-function saveSettings() {
+async function saveSettings() {
     const settings = {
         theme: document.getElementById('setting-theme').value,
         defaultServer: elements.serverSelector.value,
@@ -751,9 +781,6 @@ function saveSettings() {
         autoevonySwfPath: document.getElementById('setting-autoevony-swf').value,
         evonySwfPath: document.getElementById('setting-evony-swf').value,
         mcpUrl: document.getElementById('setting-mcp-url').value,
-        llmProvider: document.getElementById('setting-llm-provider').value,
-        llmKey: document.getElementById('setting-llm-key').value,
-        llmModel: document.getElementById('setting-llm-model').value,
         autostart: document.getElementById('setting-autostart').checked,
         checkUpdates: document.getElementById('setting-updates').checked,
         adblock: document.getElementById('setting-adblock').checked,
@@ -766,8 +793,30 @@ function saveSettings() {
         proxy: document.getElementById('setting-proxy').value
     };
     
+    // Save LM Studio settings separately
+    const lmStudioSettings = {
+        enabled: document.getElementById('setting-lm-enabled')?.checked ?? true,
+        url: document.getElementById('setting-lm-url')?.value || 'http://localhost:1234',
+        model: document.getElementById('setting-lm-model')?.value || 'local-model',
+        temperature: parseFloat(document.getElementById('setting-lm-temperature')?.value || 0.7),
+        maxTokens: parseInt(document.getElementById('setting-lm-max-tokens')?.value || 2048)
+    };
+    
     for (const [key, value] of Object.entries(settings)) {
         store.set(key, value);
+    }
+    
+    // Update LM Studio settings via IPC
+    try {
+        await ipcRenderer.invoke('lm-studio-update-settings', lmStudioSettings);
+        
+        // Reconnect with new URL if changed
+        if (lmStudioSettings.enabled) {
+            const result = await ipcRenderer.invoke('lm-studio-connect', lmStudioSettings.url);
+            updateLMStudioStatus(result);
+        }
+    } catch (error) {
+        console.error('Failed to update LM Studio settings:', error);
     }
     
     hideSettings();
@@ -921,6 +970,128 @@ ipcRenderer.on('mcp-status', (event, status) => {
     indicator.className = `status-indicator ${status.connected ? 'success' : 'warning'}`;
     indicator.title = `MCP Status: ${status.connected ? 'Connected' : 'Disconnected'}`;
 });
+
+// LM Studio status handler
+ipcRenderer.on('lm-studio-status', (event, status) => {
+    state.lmStudioConnected = status.connected;
+    updateLMStudioStatus(status);
+});
+
+// Update LM Studio connection status in UI
+function updateLMStudioStatus(status) {
+    const indicator = document.getElementById('lm-studio-status');
+    const statusBar = document.getElementById('connection-indicator');
+    const statusText = document.getElementById('connection-status');
+    const settingsStatus = document.getElementById('lm-connection-status');
+    
+    if (indicator) {
+        indicator.className = `status-indicator ${status.connected ? 'success' : 'error'}`;
+        indicator.title = `LM Studio: ${status.connected ? 'Connected' : 'Disconnected'}${status.url ? ' (' + status.url + ')' : ''}`;
+    }
+    
+    if (statusBar && statusText) {
+        statusBar.className = `indicator ${status.connected ? 'connected' : 'disconnected'}`;
+        statusText.textContent = status.connected ? 'Connected' : 'Disconnected';
+    }
+    
+    if (settingsStatus) {
+        settingsStatus.className = `status-badge ${status.connected ? 'connected' : 'disconnected'}`;
+        settingsStatus.textContent = status.connected ? 'Connected' : 'Disconnected';
+    }
+    
+    // Update model dropdown if models available
+    if (status.models && status.models.length > 0) {
+        const modelSelect = document.getElementById('setting-lm-model');
+        if (modelSelect) {
+            modelSelect.innerHTML = '';
+            status.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+        }
+    }
+}
+
+// Initialize LM Studio connection on startup
+async function initLMStudioConnection() {
+    try {
+        const settings = await ipcRenderer.invoke('get-settings');
+        const lmSettings = settings.lmStudio || {};
+        
+        // Set UI values from settings
+        const urlInput = document.getElementById('setting-lm-url');
+        const enabledCheckbox = document.getElementById('setting-lm-enabled');
+        const temperatureSlider = document.getElementById('setting-lm-temperature');
+        const maxTokensInput = document.getElementById('setting-lm-max-tokens');
+        
+        if (urlInput) urlInput.value = lmSettings.url || 'http://localhost:1234';
+        if (enabledCheckbox) enabledCheckbox.checked = lmSettings.enabled !== false;
+        if (temperatureSlider) {
+            temperatureSlider.value = lmSettings.temperature || 0.7;
+            const tempValue = document.getElementById('temperature-value');
+            if (tempValue) tempValue.textContent = temperatureSlider.value;
+        }
+        if (maxTokensInput) maxTokensInput.value = lmSettings.maxTokens || 2048;
+        
+        // Check connection status
+        const status = await ipcRenderer.invoke('lm-studio-status');
+        updateLMStudioStatus(status);
+        
+        // If not connected and enabled, try to connect
+        if (!status.connected && lmSettings.enabled !== false) {
+            const connectResult = await ipcRenderer.invoke('lm-studio-connect', lmSettings.url);
+            updateLMStudioStatus(connectResult);
+        }
+    } catch (error) {
+        console.error('Failed to initialize LM Studio connection:', error);
+    }
+}
+
+// Test LM Studio connection button handler
+async function testLMStudioConnection() {
+    const urlInput = document.getElementById('setting-lm-url');
+    const url = urlInput ? urlInput.value : 'http://localhost:1234';
+    
+    updateStatus('Testing LM Studio connection...');
+    
+    try {
+        const result = await ipcRenderer.invoke('lm-studio-connect', url);
+        updateLMStudioStatus(result);
+        
+        if (result.connected) {
+            updateStatus(`Connected to LM Studio! Models: ${result.models.join(', ')}`);
+        } else {
+            updateStatus(`Failed to connect: ${result.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        updateStatus(`Connection error: ${error.message}`);
+    }
+}
+
+// Refresh models button handler
+async function refreshLMStudioModels() {
+    try {
+        const models = await ipcRenderer.invoke('lm-studio-models');
+        const modelSelect = document.getElementById('setting-lm-model');
+        
+        if (modelSelect && models.length > 0) {
+            modelSelect.innerHTML = '';
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.id;
+                modelSelect.appendChild(option);
+            });
+            updateStatus(`Found ${models.length} models`);
+        } else {
+            updateStatus('No models found - is LM Studio running?');
+        }
+    } catch (error) {
+        updateStatus(`Error fetching models: ${error.message}`);
+    }
+}
 
 ipcRenderer.on('window-maximized', () => {
     document.body.classList.add('maximized');
