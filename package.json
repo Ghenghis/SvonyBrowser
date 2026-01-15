@@ -68,8 +68,8 @@
     "appId": "com.svony.browser",
     "productName": "Svony Browser",
     "copyright": "Copyright © 2024 Ghenghis",
+    "asar": true,
     "directories": {
-      "buildResources": "resources",
       "output": "dist"
     },
     "files": [
@@ -87,26 +87,9 @@
       "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
     ],
     "extraResources": [
-      {
-        "from": "flashver",
-        "to": "flashver",
-        "filter": ["**/*"]
-      },
-      {
-        "from": "data",
-        "to": "data",
-        "filter": ["**/*"]
-      },
-      {
-        "from": "config",
-        "to": "config",
-        "filter": ["**/*"]
-      },
-      {
-        "from": "knowledge-base",
-        "to": "knowledge-base",
-        "filter": ["**/*"]
-      }
+      "data/**/*",
+      "config/**/*",
+      "knowledge-base/**/*"
     ],
     "publish": [
       {
@@ -147,8 +130,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Svony Browser",
-      "artifactName": "SvonyBrowser-Setup-${version}-${arch}.${ext}",
-      "include": "build/installer.nsh"
+      "artifactName": "SvonyBrowser-Setup-${version}-${arch}.${ext}"
     },
     "portable": {
       "artifactName": "SvonyBrowser-Portable-${version}-${arch}.${ext}"
