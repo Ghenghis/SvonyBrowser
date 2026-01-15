@@ -47,7 +47,7 @@ const store = new Store({
         defaultServer: 'cc2',
         adblock: true,
         mcpEnabled: false,
-        homepage: 'https://www.evony.com/',
+        homepage: 'http://www.evony.com',
         favorites: [],
         proxy: {
             enabled: false,

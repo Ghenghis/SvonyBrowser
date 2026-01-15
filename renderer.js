@@ -4,6 +4,8 @@
  */
 
 const { ipcRenderer, remote } = require('electron');
+const path = require('path');
+const fs = require('fs');
 const Store = require('./store');
 
 // Initialize store
@@ -279,7 +281,13 @@ function togglePanelMode(panel, mode) {
         document.getElementById('left-swf-toggle').classList.toggle('active', mode === 'swf');
         
         if (mode === 'swf') {
-            const swfPath = store.get('autoevonySwfPath') || './AutoEvony.swf';
+            // SWF files should be placed in the flashver/ directory
+            const swfPath = store.get('autoevonySwfPath') || path.join(__dirname, 'flashver', 'AutoEvony.swf');
+            // If file doesn't exist, show message
+            if (!fs.existsSync(swfPath)) {
+                elements.leftWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>Place AutoEvony.swf in the flashver/ directory</p></div></body></html>';
+                return;
+            }
             elements.leftWebview.src = `file://${swfPath}`;
         }
     } else {
@@ -288,7 +296,13 @@ function togglePanelMode(panel, mode) {
         document.getElementById('right-swf-toggle').classList.toggle('active', mode === 'swf');
         
         if (mode === 'swf') {
-            const swfPath = store.get('evonySwfPath') || './EvonyClient1921.swf';
+            // SWF files should be placed in the flashver/ directory
+            const swfPath = store.get('evonySwfPath') || path.join(__dirname, 'flashver', 'EvonyClient.swf');
+            // If file doesn't exist, show message
+            if (!fs.existsSync(swfPath)) {
+                elements.rightWebview.src = 'data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div><h2>SWF File Not Found</h2><p>Place EvonyClient.swf in the flashver/ directory</p></div></body></html>';
+                return;
+            }
             elements.rightWebview.src = `file://${swfPath}`;
         }
     }
@@ -800,13 +814,18 @@ function setupWebviewEvents(webview, panel) {
 }
 
 // Initialize panels with default URLs
+// Note: Use http://www.evony.com for login - site will redirect to game server after login
 function initializePanels() {
     const server = store.get('defaultServer') || 'cc2';
-    const autoevonyUrl = store.get('autoevonyUrl') || 'about:blank';
-    const evonyUrl = `https://${server}.evony.com`;
     
-    elements.leftWebview.src = autoevonyUrl;
-    elements.rightWebview.src = evonyUrl;
+    // Left panel: Web login page (HTTP required for Flash)
+    const leftUrl = store.get('leftPanelUrl') || 'http://www.evony.com';
+    
+    // Right panel: Game server (HTTP required for Flash)
+    const rightUrl = store.get('rightPanelUrl') || `http://${server}.evony.com`;
+    
+    elements.leftWebview.src = leftUrl;
+    elements.rightWebview.src = rightUrl;
 }
 
 // Keyboard shortcuts
