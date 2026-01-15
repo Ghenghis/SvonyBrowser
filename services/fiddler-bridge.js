@@ -87,10 +87,10 @@ class FiddlerBridge extends EventEmitter {
         }
         
         return new Promise((resolve, reject) => {
-            this.fiddlerProcess = spawn(this.fiddlerPath, [], {
+            this.fiddlerProcess = spawn(this.fiddlerPath, [], { windowsHide: true, 
                 detached: true,
                 stdio: 'ignore'
-            });
+             });
             
             this.fiddlerProcess.unref();
             
@@ -516,3 +516,4 @@ module.exports = {
     FiddlerBridge,
     getFiddlerBridge
 };
+

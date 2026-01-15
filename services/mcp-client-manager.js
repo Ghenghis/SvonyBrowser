@@ -108,7 +108,7 @@ class MCPServerConnection extends EventEmitter {
             try {
                 console.log(`[MCP:${this.name}] Starting server from ${this.serverPath}`);
                 
-                this.process = spawn('node', [this.serverPath], {
+                this.process = spawn('node', [this.serverPath], { windowsHide: true, 
                     stdio: ['pipe', 'pipe', 'pipe'],
                     cwd: path.dirname(this.serverPath)
                 });
@@ -733,3 +733,4 @@ class MCPClientManager extends EventEmitter {
 }
 
 module.exports = { MCPClientManager, MCPServerConnection, RequestQueue };
+

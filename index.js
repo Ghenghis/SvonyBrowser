@@ -255,10 +255,11 @@ function findSwfFile(swfName) {
  * @returns {string|null} - Full path to SWF file
  */
 function getSwfPathForPanel(panelId) {
+    console.log('[SWF] getSwfPathForPanel called for:', panelId);
     // Define default SWF names for each panel
     const defaultSwfNames = {
         left: 'AutoEvony.swf',
-        right: 'EvonyClient.swf'
+        right: 'AutoEvony.swf'
     };
 
     // First check if user has set a custom path in store
@@ -271,7 +272,9 @@ function getSwfPathForPanel(panelId) {
 
     // Fall back to finding the default SWF
     const defaultSwf = defaultSwfNames[panelId];
-    return findSwfFile(defaultSwf);
+    const result = findSwfFile(defaultSwf);
+    console.log('[SWF] Returning path for', panelId, ':', result);
+    return result;
 }
 
 switch (process.platform) {
@@ -286,8 +289,10 @@ if (process.platform !== "darwin") {
     app.commandLine.appendSwitch('high-dpi-support', "1");
 }
 app.commandLine.appendSwitch("--enable-npapi");
-app.commandLine.appendSwitch("--enable-logging");
-app.commandLine.appendSwitch("--log-level", 4);
+// DISABLED: --enable-logging causes CLI window spam
+// app.commandLine.appendSwitch("--enable-logging");
+// DISABLED: --log-level requires --enable-logging
+// app.commandLine.appendSwitch("--log-level", 4);
 if (pluginName) {
     app.commandLine.appendSwitch('ppapi-flash-path', pluginName);
 }
@@ -507,24 +512,27 @@ async function initializeServices() {
         // Fiddler Bridge
         try {
             const { FiddlerBridge } = require('./services/fiddler-bridge');
-            fiddlerBridge = new FiddlerBridge();
-            console.log('[Main] Fiddler Bridge initialized');
+            // DISABLED: FiddlerBridge spawns CLI windows
+            // fiddlerBridge = new FiddlerBridge();
+            console.log('[Main] FiddlerBridge DISABLED - enable on demand');
             
-            fiddlerBridge.on('connected', () => {
-                sendWindow('fiddler-connected');
-            });
-            
-            fiddlerBridge.on('disconnected', () => {
-                sendWindow('fiddler-disconnected');
-            });
-            
-            fiddlerBridge.on('traffic', (entry) => {
-                sendWindow('fiddler-traffic', entry);
-                // Feed to packet analysis
-                if (packetAnalysis && entry.body) {
-                    packetAnalysis.processPacket(entry);
-                }
-            });
+            // Event handlers only if service is enabled
+            if (fiddlerBridge) {
+                fiddlerBridge.on('connected', () => {
+                    sendWindow('fiddler-connected');
+                });
+                
+                fiddlerBridge.on('disconnected', () => {
+                    sendWindow('fiddler-disconnected');
+                });
+                
+                fiddlerBridge.on('traffic', (entry) => {
+                    sendWindow('fiddler-traffic', entry);
+                    if (packetAnalysis && entry.body) {
+                        packetAnalysis.processPacket(entry);
+                    }
+                });
+            }
         } catch (e) {
             console.warn('[Main] Fiddler Bridge not available:', e.message);
         }
@@ -549,20 +557,24 @@ async function initializeServices() {
         // MCP Client Manager
         try {
             const { MCPClientManager } = require('./services/mcp-client-manager');
-            mcpClientManager = new MCPClientManager();
-            console.log('[Main] MCP Client Manager initialized');
+            // DISABLED: MCPClientManager spawns CLI windows - enable only when needed
+            // mcpClientManager = new MCPClientManager();
+            console.log('[Main] MCP Client Manager DISABLED - enable on demand');
             
-            mcpClientManager.on('serverConnected', (serverName) => {
-                sendWindow('mcp-server-connected', serverName);
-            });
-            
-            mcpClientManager.on('serverDisconnected', (serverName) => {
-                sendWindow('mcp-server-disconnected', serverName);
-            });
-            
-            mcpClientManager.on('toolResult', (result) => {
-                sendWindow('mcp-tool-result', result);
-            });
+            // Event handlers only if service is enabled
+            if (mcpClientManager) {
+                mcpClientManager.on('serverConnected', (serverName) => {
+                    sendWindow('mcp-server-connected', serverName);
+                });
+                
+                mcpClientManager.on('serverDisconnected', (serverName) => {
+                    sendWindow('mcp-server-disconnected', serverName);
+                });
+                
+                mcpClientManager.on('toolResult', (result) => {
+                    sendWindow('mcp-tool-result', result);
+                });
+            }
         } catch (e) {
             console.warn('[Main] MCP Client Manager not available:', e.message);
         }
@@ -570,7 +582,9 @@ async function initializeServices() {
         // Playwright Service (lazy load - only when needed)
         try {
             const { PlaywrightService } = require('./services/playwright-service');
-            playwrightService = new PlaywrightService();
+            // DISABLED: PlaywrightService spawns browser processes
+            // playwrightService = new PlaywrightService();
+            console.log('[Main] PlaywrightService DISABLED - enable on demand');
             console.log('[Main] Playwright Service loaded (not started)');
         } catch (e) {
             console.warn('[Main] Playwright Service not available:', e.message);
@@ -1852,7 +1866,7 @@ function setupIPC() {
         let fiddlerFound = false;
         for (const fiddlerPath of fiddlerPaths) {
             if (fs.existsSync(fiddlerPath)) {
-                require('child_process').spawn(fiddlerPath, [], { detached: true });
+                require('child_process').spawn(fiddlerPath, [], { detached: true, windowsHide: true });
                 fiddlerFound = true;
                 break;
             }
@@ -2285,7 +2299,9 @@ function setupIPC() {
     let panelPlaywrightBridge = null;
     try {
         const { PanelPlaywrightBridge } = require('./services/panel-playwright-bridge');
-        panelPlaywrightBridge = new PanelPlaywrightBridge();
+        // DISABLED: PanelPlaywrightBridge may spawn processes
+            // panelPlaywrightBridge = new PanelPlaywrightBridge();
+            console.log('[Main] PanelPlaywrightBridge DISABLED');
     } catch (error) {
         console.error('Failed to initialize PanelPlaywrightBridge:', error);
     }
@@ -2839,9 +2855,10 @@ function createWindow() {
     });
 
     // Open DevTools in development
-    if (process.argv.includes('--enable-logging')) {
-        mainWindow.webContents.openDevTools();
-    }
+    // DevTools disabled - use Ctrl+Shift+I manually
+    // if (process.argv.includes('--enable-logging')) {
+    //     mainWindow.webContents.openDevTools();
+    // }
 
     // Window events
     mainWindow.on('closed', () => {
@@ -3275,6 +3292,15 @@ process.on('unhandledRejection', (reason, promise) => {
         });
     }
 });
+
+
+
+
+
+
+
+
+
 
 
 

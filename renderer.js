@@ -483,6 +483,8 @@ async function togglePanelMode(panel, mode) {
         return;
     }
     state[lockKey] = true;
+    // Safety timeout to release lock after 3 seconds
+    setTimeout(() => { state[lockKey] = false; }, 3000);
 
     try {
         const isLeft = panel === 'left';
@@ -518,10 +520,12 @@ async function togglePanelMode(panel, mode) {
             // Restore web mode - load the appropriate URL
             if (isLeft) {
                 const autoevonyUrl = store.get('autoevonyUrl') || 'https://autoevony.com';
+                try { webview.stop(); } catch(e) {}
                 webview.src = autoevonyUrl;
             } else {
                 const serverUrl = store.get('defaultServer') || 'cc2';
                 const evonyUrl = `https://${serverUrl}.evony.com/`;
+                try { webview.stop(); } catch(e) {}
                 webview.src = evonyUrl;
             }
             updatePanelStatus(panel, 'Web mode active');
@@ -530,10 +534,11 @@ async function togglePanelMode(panel, mode) {
             try {
                 const swfPath = await ipcRenderer.invoke('get-swf-path', panel);
                 if (swfPath) {
+                    try { webview.stop(); } catch(e) {}
                     webview.src = `file://${swfPath}`;
                     updatePanelStatus(panel, 'Loading SWF...');
                 } else {
-                    const swfName = isLeft ? 'AutoEvony.swf' : 'EvonyClient.swf';
+                    const swfName = isLeft ? 'AutoEvony.swf' : 'AutoEvony.swf';
                     webview.src = `data:text/html,<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><div style="text-align:center"><h2>⚠️ SWF File Not Found</h2><p>${swfName} not found in swf/ directory</p><p style="color:#888;font-size:12px">Place the SWF file in the swf/ folder and restart the application</p></div></body></html>`;
                     updatePanelStatus(panel, 'SWF not found');
                 }
@@ -4791,3 +4796,6 @@ if (document.readyState === 'loading') {
 window.ErrorNotification = ErrorNotification;
 window.safeIpcCall = safeIpcCall;
 window.withRetry = withRetry;
+
+
+

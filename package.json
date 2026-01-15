@@ -4,7 +4,7 @@
   "description": "Evony Analysis Suite - Flash Browser with Dual Panels, Traffic Viewer, Protocol Explorer, Combat Simulator, Session Recorder, and AI Co-Pilot",
   "homepage": "https://github.com/Ghenghis/Svony-Browser",
   "author": "Ghenghis",
-  "version": "2.2.7",
+  "version": "2.2.11",
   "main": "index.js",
   "scripts": {
     "start": "electron .",
@@ -31,7 +31,13 @@
     "setup:chromadb": "node scripts/setup-chromadb.js",
     "setup:all": "npm install && npm run setup:mcp && npm run setup:chromadb",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest",
+    "version:bump": "node scripts/version-bump.js --auto",
+    "version:patch": "node scripts/version-bump.js patch",
+    "version:minor": "node scripts/version-bump.js minor",
+    "version:major-release": "node scripts/version-bump.js major",
+    "release": "npm run version:bump && git add -A && git commit -m \"chore: bump version\" && git push",
+    "release:tag": "git tag -a v$(node -p \"require('./package.json').version\") -m \"Release\" && git push --tags"
   },
   "license": "ISC",
   "devDependencies": {
@@ -94,22 +100,30 @@
       {
         "from": "flashver",
         "to": "flashver",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "swf",
         "to": "swf",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "themes",
         "to": "themes",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "mcp-servers",
         "to": "mcp-servers",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "scripts/setup-flash.bat",
@@ -118,12 +132,17 @@
       {
         "from": "docs",
         "to": "docs",
-        "filter": ["**/*.md", "**/*.png"]
+        "filter": [
+          "**/*.md",
+          "**/*.png"
+        ]
       },
       {
         "from": "icons",
         "to": "icons",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "publish": null,
@@ -132,25 +151,31 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "ia32"]
+          "arch": [
+            "x64",
+            "ia32"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64", "ia32"]
+          "arch": [
+            "x64",
+            "ia32"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64", "ia32"]
+          "arch": [
+            "x64",
+            "ia32"
+          ]
         }
       ],
-      
       "publisherName": "Ghenghis",
       "verifyUpdateCodeSignature": false,
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
-      
-      
       "uninstallDisplayName": "Svony Browser",
       "license": "LICENSE",
       "oneClick": false,
@@ -165,14 +190,19 @@
       "artifactName": "SvonyBrowser-Portable-${version}-${arch}.${ext}"
     },
     "mac": {
-      "target": ["dmg", "zip"],
-      
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "category": "public.app-category.utilities",
       "artifactName": "SvonyBrowser-${version}-${arch}.${ext}"
     },
     "linux": {
-      "target": ["AppImage", "deb", "tar.gz"],
-      
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
       "category": "Utility",
       "artifactName": "SvonyBrowser-${version}-${arch}.${ext}"
     },
@@ -207,4 +237,3 @@
     "node": ">=14.0.0"
   }
 }
-

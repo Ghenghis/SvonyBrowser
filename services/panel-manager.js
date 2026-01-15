@@ -788,7 +788,7 @@ class PanelManager extends EventEmitter {
     getSWFPath(panelId) {
         const defaultPaths = {
             left: path.join(__dirname, '..', 'swf', 'AutoEvony.swf'),
-            right: path.join(__dirname, '..', 'swf', 'EvonyClient.swf')
+            right: path.join(__dirname, '..', 'swf', 'AutoEvony.swf')
         };
         
         if (this.store) {
@@ -1104,4 +1104,5 @@ module.exports = {
     PanelStatus,
     FailsafeLevel
 };
+
 

@@ -1,0 +1,90 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.github/**'
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    # Don't run on version bump commits to prevent infinite loop
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'chore: bump version')"
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      
+      - name: Get current version
+        id: current
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+      
+      - name: Bump version
+        id: bump
+        run: |
+          node scripts/version-bump.js --auto
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+      
+      - name: Update version in index.js
+        run: |
+          NEW_VERSION=${{ steps.bump.outputs.version }}
+          # Update any hardcoded version strings in index.js if they exist
+          sed -i "s/version: '[0-9]*\.[0-9]*\.[0-9]*'/version: '$NEW_VERSION'/g" index.js || true
+      
+      - name: Commit version bump
+        run: |
+          git add package.json index.js
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }} [skip ci]" || echo "No changes to commit"
+          git push
+      
+      - name: Create version tag
+        run: |
+          git tag -a "v${{ steps.bump.outputs.version }}" -m "Release v${{ steps.bump.outputs.version }}"
+          git push origin "v${{ steps.bump.outputs.version }}"
+      
+      - name: Summary
+        run: |
+          echo "## Version Bump Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Previous | ${{ steps.current.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| New | ${{ steps.bump.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+
+  # Block 3.0.0 releases without manual approval
+  check-major-release:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, '3.0.0')
+    steps:
+      - name: Block unauthorized 3.0.0 release
+        run: |
+          echo "::error::Version 3.0.0 is RESERVED for Enterprise Release"
+          echo "::error::Requires 42 Fagan Audits and manual approval"
+          exit 1
