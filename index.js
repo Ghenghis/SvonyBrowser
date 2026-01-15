@@ -86,7 +86,14 @@ const store = new Store({
         traffic: {
             captureEnabled: true,
             maxPackets: 10000
-        }
+        },
+        // SWF paths - will be resolved dynamically
+        autoevonyUrl: 'https://autoevony.com',
+        autoevonySwfPath: null,  // Resolved at runtime
+        evonySwfPath: null,      // Resolved at runtime
+        // Panel modes
+        leftPanelMode: 'web',
+        rightPanelMode: 'web'
     }
 });
 
@@ -189,6 +196,60 @@ flashFound = pluginName !== null;
 if (!flashFound) {
     console.warn('[Flash] Flash plugin NOT found in flashver/ directory!');
     console.warn('[Flash] Please see flashver/README.md for instructions on obtaining Flash Player files.');
+}
+
+/**
+ * Find SWF file in multiple possible locations (packaged vs development)
+ * @param {string} swfName - Name of the SWF file (e.g., 'AutoEvony.swf')
+ * @returns {string|null} - Full path to SWF file or null if not found
+ */
+function findSwfFile(swfName) {
+    // Check multiple possible locations for packaged vs development
+    const possibleDirs = [
+        path.join(__dirname, 'swf'),
+        path.join(process.resourcesPath || __dirname, 'swf'),
+        path.join(app.getAppPath(), 'swf'),
+        path.join(path.dirname(process.execPath), 'resources', 'swf'),
+        path.join(path.dirname(process.execPath), 'swf')
+    ];
+
+    for (const dir of possibleDirs) {
+        try {
+            const fullPath = path.join(dir, swfName);
+            if (fs.existsSync(fullPath)) {
+                console.log(`[SWF] Found ${swfName} at: ${fullPath}`);
+                return fullPath;
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    console.warn(`[SWF] ${swfName} not found in any location`);
+    return null;
+}
+
+/**
+ * Get SWF path for a panel, checking store then filesystem
+ * @param {string} panelId - 'left' or 'right'
+ * @returns {string|null} - Full path to SWF file
+ */
+function getSwfPathForPanel(panelId) {
+    // Define default SWF names for each panel
+    const defaultSwfNames = {
+        left: 'AutoEvony.swf',
+        right: 'EvonyClient.swf'
+    };
+
+    // First check if user has set a custom path in store
+    const storeKey = panelId === 'left' ? 'autoevonySwfPath' : 'evonySwfPath';
+    const customPath = store.get(storeKey);
+
+    if (customPath && fs.existsSync(customPath)) {
+        return customPath;
+    }
+
+    // Fall back to finding the default SWF
+    const defaultSwf = defaultSwfNames[panelId];
+    return findSwfFile(defaultSwf);
 }
 
 switch (process.platform) {
@@ -2119,11 +2180,7 @@ function setupIPC() {
     
     // Get SWF path for panel
     ipcMain.handle('get-swf-path', async (event, panelId) => {
-        const paths = {
-            left: store.get('autoEvonySWF'),
-            right: store.get('evonySWF')
-        };
-        return paths[panelId] || null;
+        return getSwfPathForPanel(panelId);
     });
     
     // Add bookmark
