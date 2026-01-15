@@ -1959,6 +1959,456 @@ function setupIPC() {
     });
 }
 
+// ========================================
+// v2.0.9 - Debug, Automation & Agent Mode IPC Handlers
+// ========================================
+
+let debugManager = null;
+let networkInspector = null;
+let performanceProfiler = null;
+let scriptRecorder = null;
+let scriptRunner = null;
+let automationTemplates = null;
+let agentController = null;
+let voiceService = null;
+let chatbotPlugins = null;
+
+async function initializeV209Services() {
+    console.log('[Main] Initializing v2.0.9 services...');
+    
+    // Debug Manager
+    try {
+        const { DebugManager } = require('./services/debug-manager');
+        debugManager = new DebugManager({
+            logDir: path.join(app.getPath('userData'), 'logs'),
+            maxLogSize: 10 * 1024 * 1024,
+            maxLogFiles: 10
+        });
+        await debugManager.initialize();
+        console.log('[Main] Debug Manager initialized');
+    } catch (e) {
+        console.error('[Main] Debug Manager failed:', e.message);
+    }
+    
+    // Network Inspector
+    try {
+        const { NetworkInspector } = require('./services/network-inspector');
+        networkInspector = new NetworkInspector();
+        console.log('[Main] Network Inspector initialized');
+    } catch (e) {
+        console.error('[Main] Network Inspector failed:', e.message);
+    }
+    
+    // Performance Profiler
+    try {
+        const { PerformanceProfiler } = require('./services/performance-profiler');
+        performanceProfiler = new PerformanceProfiler();
+        console.log('[Main] Performance Profiler initialized');
+    } catch (e) {
+        console.error('[Main] Performance Profiler failed:', e.message);
+    }
+    
+    // Script Recorder
+    try {
+        const { ScriptRecorder } = require('./services/script-recorder');
+        scriptRecorder = new ScriptRecorder({
+            outputDir: path.join(app.getPath('userData'), 'scripts')
+        });
+        console.log('[Main] Script Recorder initialized');
+    } catch (e) {
+        console.error('[Main] Script Recorder failed:', e.message);
+    }
+    
+    // Script Runner
+    try {
+        const { ScriptRunner } = require('./services/script-runner');
+        scriptRunner = new ScriptRunner({
+            playwrightService,
+            maxConcurrent: 3
+        });
+        console.log('[Main] Script Runner initialized');
+    } catch (e) {
+        console.error('[Main] Script Runner failed:', e.message);
+    }
+    
+    // Automation Templates
+    try {
+        const { AutomationTemplates } = require('./services/automation-templates');
+        automationTemplates = new AutomationTemplates();
+        console.log('[Main] Automation Templates initialized');
+    } catch (e) {
+        console.error('[Main] Automation Templates failed:', e.message);
+    }
+    
+    // Agent Controller
+    try {
+        const { AgentController } = require('./services/agent-controller');
+        agentController = new AgentController({
+            lmStudioClient: global.lmStudioClient,
+            mcpManager: mcpClientManager,
+            playwrightService,
+            gameStateTracker
+        });
+        console.log('[Main] Agent Controller initialized');
+    } catch (e) {
+        console.error('[Main] Agent Controller failed:', e.message);
+    }
+    
+    // Voice Service
+    try {
+        const { VoiceService } = require('./services/voice-service');
+        voiceService = new VoiceService();
+        console.log('[Main] Voice Service initialized');
+    } catch (e) {
+        console.error('[Main] Voice Service failed:', e.message);
+    }
+    
+    // Chatbot Plugins
+    try {
+        const { ChatbotPluginManager } = require('./services/chatbot-plugins');
+        chatbotPlugins = new ChatbotPluginManager();
+        chatbotPlugins.setServices({
+            gameState: gameStateTracker,
+            lmStudio: global.lmStudioClient,
+            mcpManager: mcpClientManager,
+            debugManager,
+            performanceProfiler,
+            automationTemplates,
+            pluginManager: chatbotPlugins
+        });
+        console.log('[Main] Chatbot Plugins initialized');
+    } catch (e) {
+        console.error('[Main] Chatbot Plugins failed:', e.message);
+    }
+    
+    console.log('[Main] v2.0.9 services initialization complete');
+}
+
+function setupV209IPCHandlers() {
+    // ========== DEBUG HANDLERS ==========
+    
+    // Get logs
+    ipcMain.handle('debug-get-logs', async (event, options) => {
+        if (!debugManager) return { error: 'Debug Manager not initialized' };
+        return debugManager.getLogs(options);
+    });
+    
+    // Clear logs
+    ipcMain.handle('debug-clear-logs', async () => {
+        if (!debugManager) return { error: 'Debug Manager not initialized' };
+        return debugManager.clearLogs();
+    });
+    
+    // Export logs
+    ipcMain.handle('debug-export-logs', async (event, format) => {
+        if (!debugManager) return { error: 'Debug Manager not initialized' };
+        return debugManager.exportLogs(format);
+    });
+    
+    // Add log entry
+    ipcMain.handle('debug-log', async (event, level, message, data) => {
+        if (!debugManager) return;
+        debugManager.log(level, message, data);
+    });
+    
+    // ========== NETWORK INSPECTOR HANDLERS ==========
+    
+    // Start capture
+    ipcMain.handle('network-start-capture', async () => {
+        if (!networkInspector) return { error: 'Network Inspector not initialized' };
+        return networkInspector.startCapture();
+    });
+    
+    // Stop capture
+    ipcMain.handle('network-stop-capture', async () => {
+        if (!networkInspector) return { error: 'Network Inspector not initialized' };
+        return networkInspector.stopCapture();
+    });
+    
+    // Get requests
+    ipcMain.handle('network-get-requests', async (event, options) => {
+        if (!networkInspector) return { error: 'Network Inspector not initialized' };
+        return networkInspector.getRequests(options);
+    });
+    
+    // Clear requests
+    ipcMain.handle('network-clear-requests', async () => {
+        if (!networkInspector) return { error: 'Network Inspector not initialized' };
+        return networkInspector.clearRequests();
+    });
+    
+    // Get stats
+    ipcMain.handle('network-get-stats', async () => {
+        if (!networkInspector) return { error: 'Network Inspector not initialized' };
+        return networkInspector.getStats();
+    });
+    
+    // ========== PERFORMANCE PROFILER HANDLERS ==========
+    
+    // Start profiling
+    ipcMain.handle('perf-start-profiling', async () => {
+        if (!performanceProfiler) return { error: 'Performance Profiler not initialized' };
+        return performanceProfiler.startProfiling();
+    });
+    
+    // Stop profiling
+    ipcMain.handle('perf-stop-profiling', async () => {
+        if (!performanceProfiler) return { error: 'Performance Profiler not initialized' };
+        return performanceProfiler.stopProfiling();
+    });
+    
+    // Get metrics
+    ipcMain.handle('perf-get-metrics', async () => {
+        if (!performanceProfiler) return { error: 'Performance Profiler not initialized' };
+        return performanceProfiler.getMetrics();
+    });
+    
+    // Take snapshot
+    ipcMain.handle('perf-take-snapshot', async () => {
+        if (!performanceProfiler) return { error: 'Performance Profiler not initialized' };
+        return performanceProfiler.takeSnapshot();
+    });
+    
+    // ========== SCRIPT RECORDER HANDLERS ==========
+    
+    // Start recording
+    ipcMain.handle('script-start-recording', async (event, options) => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.startRecording(options);
+    });
+    
+    // Stop recording
+    ipcMain.handle('script-stop-recording', async () => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.stopRecording();
+    });
+    
+    // Pause recording
+    ipcMain.handle('script-pause-recording', async () => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.pauseRecording();
+    });
+    
+    // Resume recording
+    ipcMain.handle('script-resume-recording', async () => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.resumeRecording();
+    });
+    
+    // Get recorded actions
+    ipcMain.handle('script-get-actions', async () => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.getActions();
+    });
+    
+    // Save script
+    ipcMain.handle('script-save', async (event, name) => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.saveScript(name);
+    });
+    
+    // Get recording status
+    ipcMain.handle('script-get-status', async () => {
+        if (!scriptRecorder) return { error: 'Script Recorder not initialized' };
+        return scriptRecorder.getStatus();
+    });
+    
+    // ========== SCRIPT RUNNER HANDLERS ==========
+    
+    // Run script
+    ipcMain.handle('runner-run-script', async (event, scriptId, options) => {
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        return scriptRunner.runScript(scriptId, options);
+    });
+    
+    // Stop script
+    ipcMain.handle('runner-stop-script', async (event, executionId) => {
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        return scriptRunner.stopScript(executionId);
+    });
+    
+    // Stop all scripts
+    ipcMain.handle('runner-stop-all', async () => {
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        return scriptRunner.stopAll();
+    });
+    
+    // Get queue
+    ipcMain.handle('runner-get-queue', async () => {
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        return scriptRunner.getQueue();
+    });
+    
+    // Get status
+    ipcMain.handle('runner-get-status', async () => {
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        return scriptRunner.getStatus();
+    });
+    
+    // Schedule script
+    ipcMain.handle('runner-schedule-script', async (event, scriptId, schedule) => {
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        return scriptRunner.scheduleScript(scriptId, schedule);
+    });
+    
+    // ========== AUTOMATION TEMPLATES HANDLERS ==========
+    
+    // Get templates
+    ipcMain.handle('templates-get-all', async (event, category) => {
+        if (!automationTemplates) return { error: 'Automation Templates not initialized' };
+        return automationTemplates.getTemplates(category);
+    });
+    
+    // Get template by ID
+    ipcMain.handle('templates-get-by-id', async (event, templateId) => {
+        if (!automationTemplates) return { error: 'Automation Templates not initialized' };
+        return automationTemplates.getTemplate(templateId);
+    });
+    
+    // Run template
+    ipcMain.handle('templates-run', async (event, templateId, params) => {
+        if (!automationTemplates) return { error: 'Automation Templates not initialized' };
+        if (!scriptRunner) return { error: 'Script Runner not initialized' };
+        
+        const template = automationTemplates.getTemplate(templateId);
+        if (!template) return { error: 'Template not found' };
+        
+        return scriptRunner.runScript(template.script, {
+            ...template.defaultParams,
+            ...params
+        });
+    });
+    
+    // ========== AGENT CONTROLLER HANDLERS ==========
+    
+    // Start agent
+    ipcMain.handle('agent-start', async (event, options) => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.start(options);
+    });
+    
+    // Stop agent
+    ipcMain.handle('agent-stop', async () => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.stop();
+    });
+    
+    // Pause agent
+    ipcMain.handle('agent-pause', async () => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.pause();
+    });
+    
+    // Resume agent
+    ipcMain.handle('agent-resume', async () => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.resume();
+    });
+    
+    // Add goal
+    ipcMain.handle('agent-add-goal', async (event, goal) => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.addGoal(goal);
+    });
+    
+    // Remove goal
+    ipcMain.handle('agent-remove-goal', async (event, goalId) => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.removeGoal(goalId);
+    });
+    
+    // Get goals
+    ipcMain.handle('agent-get-goals', async () => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.getGoals();
+    });
+    
+    // Get status
+    ipcMain.handle('agent-get-status', async () => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.getStatus();
+    });
+    
+    // Get history
+    ipcMain.handle('agent-get-history', async (event, limit) => {
+        if (!agentController) return { error: 'Agent Controller not initialized' };
+        return agentController.getHistory(limit);
+    });
+    
+    // ========== VOICE SERVICE HANDLERS ==========
+    
+    // Start listening
+    ipcMain.handle('voice-start-listening', async () => {
+        if (!voiceService) return { error: 'Voice Service not initialized' };
+        return voiceService.startListening();
+    });
+    
+    // Stop listening
+    ipcMain.handle('voice-stop-listening', async () => {
+        if (!voiceService) return { error: 'Voice Service not initialized' };
+        return voiceService.stopListening();
+    });
+    
+    // Speak text
+    ipcMain.handle('voice-speak', async (event, text, options) => {
+        if (!voiceService) return { error: 'Voice Service not initialized' };
+        return voiceService.speak(text, options);
+    });
+    
+    // Stop speaking
+    ipcMain.handle('voice-stop-speaking', async () => {
+        if (!voiceService) return { error: 'Voice Service not initialized' };
+        return voiceService.stopSpeaking();
+    });
+    
+    // Get status
+    ipcMain.handle('voice-get-status', async () => {
+        if (!voiceService) return { error: 'Voice Service not initialized' };
+        return voiceService.getStatus();
+    });
+    
+    // ========== CHATBOT PLUGINS HANDLERS ==========
+    
+    // Get plugins
+    ipcMain.handle('plugins-get-all', async () => {
+        if (!chatbotPlugins) return { error: 'Chatbot Plugins not initialized' };
+        return chatbotPlugins.getPlugins();
+    });
+    
+    // Toggle plugin
+    ipcMain.handle('plugins-toggle', async (event, pluginId, enabled) => {
+        if (!chatbotPlugins) return { error: 'Chatbot Plugins not initialized' };
+        return chatbotPlugins.togglePlugin(pluginId, enabled);
+    });
+    
+    // Process message through plugins
+    ipcMain.handle('plugins-process-message', async (event, message, context) => {
+        if (!chatbotPlugins) return { error: 'Chatbot Plugins not initialized' };
+        return chatbotPlugins.processMessage(message, context);
+    });
+    
+    // Get plugin status
+    ipcMain.handle('plugins-get-status', async () => {
+        if (!chatbotPlugins) return { error: 'Chatbot Plugins not initialized' };
+        return chatbotPlugins.getStatus();
+    });
+    
+    // ========== CONSOLE EXECUTION HANDLER ==========
+    
+    // Execute JavaScript in console
+    ipcMain.handle('console-execute', async (event, code) => {
+        try {
+            // Execute in main process context (limited)
+            const result = eval(code);
+            return { success: true, result: String(result) };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    });
+    
+    console.log('[Main] v2.0.9 IPC handlers registered');
+}
+
 // Create main window
 function createWindow() {
     let { width, height, isMax } = store.get('windowBounds');
@@ -2137,6 +2587,14 @@ app.on('ready', async () => {
         await initializeServices();
     } catch (error) {
         console.error('[Main] Service initialization error:', error);
+    }
+    
+    // Initialize v2.0.9 services
+    try {
+        await initializeV209Services();
+        setupV209IPCHandlers();
+    } catch (error) {
+        console.error('[Main] v2.0.9 service initialization error:', error);
     }
     
     // Setup traffic capture after window is ready

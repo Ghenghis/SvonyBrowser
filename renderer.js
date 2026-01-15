@@ -3165,3 +3165,658 @@ window.updateMCPStatus = updateMCPStatus;
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(initializeTrafficEnhancements, 150);
 });
+
+
+// ============================================================================
+// v2.0.9 - DEBUG, AUTOMATION & AGENT MODE
+// ============================================================================
+
+// Debug Tab State
+const debugState = {
+    logs: [],
+    networkCapturing: false,
+    profiling: false,
+    networkRequests: [],
+    networkStats: { requests: 0, dataIn: 0, dataOut: 0, errors: 0 }
+};
+
+// Automation Tab State
+const automationState = {
+    recording: false,
+    recordedActions: [],
+    runningScripts: [],
+    scheduledTasks: [],
+    agentActive: false,
+    agentGoals: []
+};
+
+// ========== DEBUG TAB FUNCTIONS ==========
+
+async function initializeDebugTab() {
+    console.log('[Renderer] Initializing Debug tab...');
+    
+    // Log level filter
+    const logLevelFilter = document.getElementById('log-level-filter');
+    if (logLevelFilter) {
+        logLevelFilter.addEventListener('change', () => filterLogs());
+    }
+    
+    // Log source filter
+    const logSourceFilter = document.getElementById('log-source-filter');
+    if (logSourceFilter) {
+        logSourceFilter.addEventListener('change', () => filterLogs());
+    }
+    
+    // Clear logs button
+    const clearLogsBtn = document.getElementById('clear-logs');
+    if (clearLogsBtn) {
+        clearLogsBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('debug-clear-logs');
+            debugState.logs = [];
+            renderLogs();
+        });
+    }
+    
+    // Export logs button
+    const exportLogsBtn = document.getElementById('export-logs');
+    if (exportLogsBtn) {
+        exportLogsBtn.addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('debug-export-logs', 'json');
+            if (result.path) {
+                alert(`Logs exported to: ${result.path}`);
+            }
+        });
+    }
+    
+    // Network capture buttons
+    const networkStartBtn = document.getElementById('network-start');
+    const networkStopBtn = document.getElementById('network-stop');
+    const networkClearBtn = document.getElementById('network-clear');
+    
+    if (networkStartBtn) {
+        networkStartBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('network-start-capture');
+            debugState.networkCapturing = true;
+            networkStartBtn.disabled = true;
+            if (networkStopBtn) networkStopBtn.disabled = false;
+        });
+    }
+    
+    if (networkStopBtn) {
+        networkStopBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('network-stop-capture');
+            debugState.networkCapturing = false;
+            networkStopBtn.disabled = true;
+            if (networkStartBtn) networkStartBtn.disabled = false;
+        });
+    }
+    
+    if (networkClearBtn) {
+        networkClearBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('network-clear-requests');
+            debugState.networkRequests = [];
+            debugState.networkStats = { requests: 0, dataIn: 0, dataOut: 0, errors: 0 };
+            renderNetworkRequests();
+            updateNetworkStats();
+        });
+    }
+    
+    // Performance profiler buttons
+    const perfStartBtn = document.getElementById('perf-start');
+    const perfStopBtn = document.getElementById('perf-stop');
+    const perfSnapshotBtn = document.getElementById('perf-snapshot');
+    
+    if (perfStartBtn) {
+        perfStartBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('perf-start-profiling');
+            debugState.profiling = true;
+            perfStartBtn.disabled = true;
+            if (perfStopBtn) perfStopBtn.disabled = false;
+            startPerfMetricsUpdate();
+        });
+    }
+    
+    if (perfStopBtn) {
+        perfStopBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('perf-stop-profiling');
+            debugState.profiling = false;
+            perfStopBtn.disabled = true;
+            if (perfStartBtn) perfStartBtn.disabled = false;
+            stopPerfMetricsUpdate();
+        });
+    }
+    
+    if (perfSnapshotBtn) {
+        perfSnapshotBtn.addEventListener('click', async () => {
+            const snapshot = await ipcRenderer.invoke('perf-take-snapshot');
+            console.log('[Debug] Performance snapshot:', snapshot);
+            alert('Snapshot taken. Check console for details.');
+        });
+    }
+    
+    // Console execution
+    const consoleInput = document.getElementById('console-input');
+    const consoleExecuteBtn = document.getElementById('console-execute');
+    const consoleClearBtn = document.getElementById('console-clear');
+    
+    if (consoleInput && consoleExecuteBtn) {
+        consoleExecuteBtn.addEventListener('click', () => executeConsoleCommand());
+        consoleInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') executeConsoleCommand();
+        });
+    }
+    
+    if (consoleClearBtn) {
+        consoleClearBtn.addEventListener('click', () => {
+            const debugConsole = document.getElementById('debug-console');
+            if (debugConsole) debugConsole.innerHTML = '';
+        });
+    }
+    
+    // Load initial logs
+    await loadLogs();
+}
+
+async function loadLogs() {
+    try {
+        const logs = await ipcRenderer.invoke('debug-get-logs', { limit: 100 });
+        debugState.logs = logs || [];
+        renderLogs();
+    } catch (error) {
+        console.error('[Debug] Failed to load logs:', error);
+    }
+}
+
+function renderLogs() {
+    const logViewer = document.getElementById('log-viewer');
+    if (!logViewer) return;
+    
+    if (debugState.logs.length === 0) {
+        logViewer.innerHTML = '<div class="log-placeholder">No logs captured yet...</div>';
+        return;
+    }
+    
+    const levelFilter = document.getElementById('log-level-filter')?.value || 'all';
+    const sourceFilter = document.getElementById('log-source-filter')?.value || 'all';
+    
+    const filteredLogs = debugState.logs.filter(log => {
+        if (levelFilter !== 'all' && log.level !== levelFilter) return false;
+        if (sourceFilter !== 'all' && log.source !== sourceFilter) return false;
+        return true;
+    });
+    
+    logViewer.innerHTML = filteredLogs.map(log => `
+        <div class="log-entry ${log.level}">
+            <span class="log-timestamp">${formatTime(log.timestamp)}</span>
+            <span class="log-level">${log.level}</span>
+            <span class="log-message">${escapeHtml(log.message)}</span>
+        </div>
+    `).join('');
+    
+    logViewer.scrollTop = logViewer.scrollHeight;
+}
+
+function filterLogs() {
+    renderLogs();
+}
+
+function renderNetworkRequests() {
+    const networkList = document.getElementById('network-list');
+    if (!networkList) return;
+    
+    networkList.innerHTML = debugState.networkRequests.map(req => `
+        <div class="network-entry">
+            <span class="network-method ${req.method}">${req.method}</span>
+            <span class="network-url" title="${req.url}">${req.url}</span>
+            <span class="network-status ${req.status >= 400 ? 'error' : 'success'}">${req.status || '-'}</span>
+            <span class="network-time">${req.duration || '-'}ms</span>
+        </div>
+    `).join('');
+}
+
+function updateNetworkStats() {
+    const stats = debugState.networkStats;
+    const requestsEl = document.getElementById('network-requests');
+    const dataInEl = document.getElementById('network-data-in');
+    const dataOutEl = document.getElementById('network-data-out');
+    const errorsEl = document.getElementById('network-errors');
+    
+    if (requestsEl) requestsEl.textContent = stats.requests;
+    if (dataInEl) dataInEl.textContent = formatBytes(stats.dataIn);
+    if (dataOutEl) dataOutEl.textContent = formatBytes(stats.dataOut);
+    if (errorsEl) errorsEl.textContent = stats.errors;
+}
+
+let perfMetricsInterval = null;
+
+function startPerfMetricsUpdate() {
+    if (perfMetricsInterval) return;
+    
+    perfMetricsInterval = setInterval(async () => {
+        try {
+            const metrics = await ipcRenderer.invoke('perf-get-metrics');
+            updatePerfMetrics(metrics);
+        } catch (error) {
+            console.error('[Debug] Failed to get metrics:', error);
+        }
+    }, 1000);
+}
+
+function stopPerfMetricsUpdate() {
+    if (perfMetricsInterval) {
+        clearInterval(perfMetricsInterval);
+        perfMetricsInterval = null;
+    }
+}
+
+function updatePerfMetrics(metrics) {
+    if (!metrics) return;
+    
+    const cpuEl = document.getElementById('perf-cpu');
+    const memoryEl = document.getElementById('perf-memory');
+    const fpsEl = document.getElementById('perf-fps');
+    const latencyEl = document.getElementById('perf-latency');
+    
+    const cpuBar = document.getElementById('perf-cpu-bar');
+    const memoryBar = document.getElementById('perf-memory-bar');
+    const fpsBar = document.getElementById('perf-fps-bar');
+    const latencyBar = document.getElementById('perf-latency-bar');
+    
+    if (cpuEl) cpuEl.textContent = `${(metrics.cpu || 0).toFixed(1)}%`;
+    if (memoryEl) memoryEl.textContent = `${(metrics.memory || 0).toFixed(0)} MB`;
+    if (fpsEl) fpsEl.textContent = metrics.fps || 60;
+    if (latencyEl) latencyEl.textContent = `${metrics.latency || 0} ms`;
+    
+    if (cpuBar) cpuBar.style.width = `${Math.min(metrics.cpu || 0, 100)}%`;
+    if (memoryBar) memoryBar.style.width = `${Math.min((metrics.memory || 0) / 1024 * 100, 100)}%`;
+    if (fpsBar) fpsBar.style.width = `${Math.min((metrics.fps || 60) / 60 * 100, 100)}%`;
+    if (latencyBar) latencyBar.style.width = `${Math.min((metrics.latency || 0) / 500 * 100, 100)}%`;
+}
+
+async function executeConsoleCommand() {
+    const input = document.getElementById('console-input');
+    const debugConsole = document.getElementById('debug-console');
+    
+    if (!input || !debugConsole) return;
+    
+    const code = input.value.trim();
+    if (!code) return;
+    
+    // Add command to console
+    debugConsole.innerHTML += `<div class="console-command">> ${escapeHtml(code)}</div>`;
+    
+    try {
+        const result = await ipcRenderer.invoke('console-execute', code);
+        if (result.success) {
+            debugConsole.innerHTML += `<div class="console-result">${escapeHtml(result.result)}</div>`;
+        } else {
+            debugConsole.innerHTML += `<div class="console-error">${escapeHtml(result.error)}</div>`;
+        }
+    } catch (error) {
+        debugConsole.innerHTML += `<div class="console-error">${escapeHtml(error.message)}</div>`;
+    }
+    
+    input.value = '';
+    debugConsole.scrollTop = debugConsole.scrollHeight;
+}
+
+// ========== AUTOMATION TAB FUNCTIONS ==========
+
+async function initializeAutomationTab() {
+    console.log('[Renderer] Initializing Automation tab...');
+    
+    // Script recorder buttons
+    const recordBtn = document.getElementById('script-record');
+    const stopBtn = document.getElementById('script-stop');
+    const pauseBtn = document.getElementById('script-pause');
+    
+    if (recordBtn) {
+        recordBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('script-start-recording');
+            automationState.recording = true;
+            updateRecorderUI();
+        });
+    }
+    
+    if (stopBtn) {
+        stopBtn.addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('script-stop-recording');
+            automationState.recording = false;
+            automationState.recordedActions = result?.actions || [];
+            updateRecorderUI();
+            renderRecordedActions();
+        });
+    }
+    
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', async () => {
+            if (automationState.recording) {
+                await ipcRenderer.invoke('script-pause-recording');
+            } else {
+                await ipcRenderer.invoke('script-resume-recording');
+            }
+        });
+    }
+    
+    // Template buttons
+    document.querySelectorAll('.run-template-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const card = btn.closest('.template-card');
+            const templateId = card?.dataset.template;
+            if (templateId) {
+                await runTemplate(templateId);
+            }
+        });
+    });
+    
+    // Template category filter
+    const categoryFilter = document.getElementById('template-category');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', () => filterTemplates());
+    }
+    
+    // Runner buttons
+    const runnerRunBtn = document.getElementById('runner-run');
+    const runnerStopBtn = document.getElementById('runner-stop');
+    const runnerScheduleBtn = document.getElementById('runner-schedule');
+    
+    if (runnerStopBtn) {
+        runnerStopBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('runner-stop-all');
+            updateRunnerStatus();
+        });
+    }
+    
+    // Agent mode buttons
+    const agentStartBtn = document.getElementById('agent-start');
+    const agentStopBtn = document.getElementById('agent-stop');
+    const agentPauseBtn = document.getElementById('agent-pause');
+    const agentAddGoalBtn = document.getElementById('agent-add-goal');
+    
+    if (agentStartBtn) {
+        agentStartBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('agent-start');
+            automationState.agentActive = true;
+            updateAgentUI();
+        });
+    }
+    
+    if (agentStopBtn) {
+        agentStopBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('agent-stop');
+            automationState.agentActive = false;
+            updateAgentUI();
+        });
+    }
+    
+    if (agentPauseBtn) {
+        agentPauseBtn.addEventListener('click', async () => {
+            if (automationState.agentActive) {
+                await ipcRenderer.invoke('agent-pause');
+            } else {
+                await ipcRenderer.invoke('agent-resume');
+            }
+        });
+    }
+    
+    if (agentAddGoalBtn) {
+        agentAddGoalBtn.addEventListener('click', () => addAgentGoal());
+    }
+    
+    const goalInput = document.getElementById('agent-goal-input');
+    if (goalInput) {
+        goalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addAgentGoal();
+        });
+    }
+    
+    // Load initial data
+    await loadTemplates();
+    await updateRunnerStatus();
+    await loadAgentGoals();
+}
+
+function updateRecorderUI() {
+    const recordBtn = document.getElementById('script-record');
+    const stopBtn = document.getElementById('script-stop');
+    const pauseBtn = document.getElementById('script-pause');
+    const statusDot = document.getElementById('recorder-dot');
+    const statusText = document.getElementById('recorder-status-text');
+    
+    if (automationState.recording) {
+        if (recordBtn) recordBtn.disabled = true;
+        if (stopBtn) stopBtn.disabled = false;
+        if (pauseBtn) pauseBtn.disabled = false;
+        if (statusDot) statusDot.classList.add('recording');
+        if (statusText) statusText.textContent = 'Recording...';
+    } else {
+        if (recordBtn) recordBtn.disabled = false;
+        if (stopBtn) stopBtn.disabled = true;
+        if (pauseBtn) pauseBtn.disabled = true;
+        if (statusDot) statusDot.classList.remove('recording');
+        if (statusText) statusText.textContent = 'Ready to record';
+    }
+}
+
+function renderRecordedActions() {
+    const container = document.getElementById('recorded-actions');
+    if (!container) return;
+    
+    if (automationState.recordedActions.length === 0) {
+        container.innerHTML = '<div class="actions-placeholder">Recorded actions will appear here...</div>';
+        return;
+    }
+    
+    container.innerHTML = automationState.recordedActions.map(action => `
+        <div class="action-entry">
+            <span class="action-type">${action.type}</span>
+            <span class="action-target">${action.selector || ''}</span>
+            <span class="action-value">${action.value || ''}</span>
+        </div>
+    `).join('');
+    
+    const actionsCount = document.getElementById('recorder-actions');
+    if (actionsCount) actionsCount.textContent = `${automationState.recordedActions.length} actions`;
+}
+
+async function loadTemplates() {
+    try {
+        const templates = await ipcRenderer.invoke('templates-get-all');
+        // Templates are already rendered in HTML, just update if needed
+    } catch (error) {
+        console.error('[Automation] Failed to load templates:', error);
+    }
+}
+
+function filterTemplates() {
+    const category = document.getElementById('template-category')?.value || 'all';
+    document.querySelectorAll('.template-card').forEach(card => {
+        const cardCategory = card.dataset.category || 'all';
+        card.style.display = (category === 'all' || cardCategory === category) ? 'flex' : 'none';
+    });
+}
+
+async function runTemplate(templateId) {
+    try {
+        const result = await ipcRenderer.invoke('templates-run', templateId);
+        if (result.error) {
+            alert(`Failed to run template: ${result.error}`);
+        } else {
+            updateRunnerStatus();
+        }
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+async function updateRunnerStatus() {
+    try {
+        const status = await ipcRenderer.invoke('runner-get-status');
+        
+        const runningEl = document.getElementById('runner-running');
+        const queuedEl = document.getElementById('runner-queued');
+        const completedEl = document.getElementById('runner-completed');
+        const failedEl = document.getElementById('runner-failed');
+        
+        if (runningEl) runningEl.textContent = status?.running || 0;
+        if (queuedEl) queuedEl.textContent = status?.queued || 0;
+        if (completedEl) completedEl.textContent = status?.completed || 0;
+        if (failedEl) failedEl.textContent = status?.failed || 0;
+    } catch (error) {
+        console.error('[Automation] Failed to get runner status:', error);
+    }
+}
+
+function updateAgentUI() {
+    const startBtn = document.getElementById('agent-start');
+    const stopBtn = document.getElementById('agent-stop');
+    const pauseBtn = document.getElementById('agent-pause');
+    const modeDot = document.getElementById('agent-mode-dot');
+    const modeText = document.getElementById('agent-mode-text');
+    
+    if (automationState.agentActive) {
+        if (startBtn) startBtn.disabled = true;
+        if (stopBtn) stopBtn.disabled = false;
+        if (pauseBtn) pauseBtn.disabled = false;
+        if (modeDot) modeDot.classList.add('active');
+        if (modeText) modeText.textContent = 'Active';
+    } else {
+        if (startBtn) startBtn.disabled = false;
+        if (stopBtn) stopBtn.disabled = true;
+        if (pauseBtn) pauseBtn.disabled = true;
+        if (modeDot) modeDot.classList.remove('active');
+        if (modeText) modeText.textContent = 'Idle';
+    }
+}
+
+async function addAgentGoal() {
+    const input = document.getElementById('agent-goal-input');
+    if (!input) return;
+    
+    const goalText = input.value.trim();
+    if (!goalText) return;
+    
+    try {
+        await ipcRenderer.invoke('agent-add-goal', { text: goalText, priority: 50 });
+        input.value = '';
+        await loadAgentGoals();
+    } catch (error) {
+        alert(`Failed to add goal: ${error.message}`);
+    }
+}
+
+async function loadAgentGoals() {
+    try {
+        const goals = await ipcRenderer.invoke('agent-get-goals');
+        automationState.agentGoals = goals || [];
+        renderAgentGoals();
+    } catch (error) {
+        console.error('[Automation] Failed to load goals:', error);
+    }
+}
+
+function renderAgentGoals() {
+    const container = document.getElementById('agent-goals-list');
+    if (!container) return;
+    
+    if (automationState.agentGoals.length === 0) {
+        container.innerHTML = '<div class="goal-placeholder">No goals set. Add a goal to get started.</div>';
+        return;
+    }
+    
+    container.innerHTML = automationState.agentGoals.map((goal, index) => `
+        <div class="goal-item">
+            <span class="goal-priority">${index + 1}</span>
+            <span class="goal-text">${escapeHtml(goal.text)}</span>
+            <span class="goal-status ${goal.status}">${goal.status}</span>
+        </div>
+    `).join('');
+    
+    const goalsCount = document.getElementById('agent-goals');
+    if (goalsCount) goalsCount.textContent = automationState.agentGoals.length;
+}
+
+// ========== UTILITY FUNCTIONS ==========
+
+function formatTime(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('en-US', { hour12: false });
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ========== IPC EVENT LISTENERS ==========
+
+// Log events
+ipcRenderer.on('debug-log', (event, log) => {
+    debugState.logs.push(log);
+    if (debugState.logs.length > 1000) {
+        debugState.logs = debugState.logs.slice(-500);
+    }
+    renderLogs();
+});
+
+// Network events
+ipcRenderer.on('network-request', (event, request) => {
+    debugState.networkRequests.push(request);
+    debugState.networkStats.requests++;
+    debugState.networkStats.dataIn += request.responseSize || 0;
+    debugState.networkStats.dataOut += request.requestSize || 0;
+    if (request.status >= 400) debugState.networkStats.errors++;
+    
+    renderNetworkRequests();
+    updateNetworkStats();
+});
+
+// Agent events
+ipcRenderer.on('agent-status-update', (event, status) => {
+    automationState.agentActive = status.active;
+    updateAgentUI();
+    
+    const actionsEl = document.getElementById('agent-actions');
+    const decisionsEl = document.getElementById('agent-decisions');
+    
+    if (actionsEl) actionsEl.textContent = status.actions || 0;
+    if (decisionsEl) decisionsEl.textContent = status.decisions || 0;
+});
+
+ipcRenderer.on('agent-goal-update', (event, goals) => {
+    automationState.agentGoals = goals;
+    renderAgentGoals();
+});
+
+// Script recorder events
+ipcRenderer.on('script-action-recorded', (event, action) => {
+    automationState.recordedActions.push(action);
+    renderRecordedActions();
+});
+
+// ========== INITIALIZATION ==========
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Debug and Automation tabs after a short delay
+    setTimeout(async () => {
+        await initializeDebugTab();
+        await initializeAutomationTab();
+        console.log('[Renderer] v2.0.9 features initialized');
+    }, 200);
+});
+
+// Export for global access
+window.debugState = debugState;
+window.automationState = automationState;

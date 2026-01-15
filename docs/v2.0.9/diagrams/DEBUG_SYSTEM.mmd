@@ -1,0 +1,72 @@
+flowchart TB
+    subgraph UI["Debug Console UI"]
+        ConsoleTab["📋 Console Tab"]
+        NetworkTab["🌐 Network Tab"]
+        SourcesTab["📄 Sources Tab"]
+        ProfilerTab["📊 Profiler Tab"]
+        MemoryTab["💾 Memory Tab"]
+    end
+
+    subgraph DebugManager["Debug Manager"]
+        LogAggregator["Log Aggregator"]
+        BreakpointManager["Breakpoint Manager"]
+        WatchManager["Watch Manager"]
+        MetricsCollector["Metrics Collector"]
+    end
+
+    subgraph LogSystem["Log System"]
+        LogStorage["IndexedDB Storage"]
+        LogFilter["Log Filter"]
+        LogSearch["Log Search"]
+        LogExport["Log Export"]
+    end
+
+    subgraph NetworkInspector["Network Inspector"]
+        RequestCapture["Request Capture"]
+        ResponseCapture["Response Capture"]
+        WebSocketCapture["WebSocket Capture"]
+        AMF3Decoder["AMF3 Auto-Decoder"]
+        RequestReplay["Request Replay"]
+    end
+
+    subgraph Profiler["Performance Profiler"]
+        CPUProfiler["CPU Profiler"]
+        MemoryProfiler["Memory Profiler"]
+        NetworkProfiler["Network Profiler"]
+        RenderProfiler["Render Profiler"]
+        CustomMarkers["Custom Markers"]
+    end
+
+    subgraph Services["All Services"]
+        MainProcess["Main Process"]
+        Renderer["Renderer Process"]
+        AllServices["22 Service Files"]
+    end
+
+    ConsoleTab --> LogAggregator
+    NetworkTab --> NetworkInspector
+    SourcesTab --> BreakpointManager
+    ProfilerTab --> Profiler
+    MemoryTab --> MemoryProfiler
+
+    LogAggregator --> LogStorage
+    LogAggregator --> LogFilter
+    LogFilter --> LogSearch
+    LogStorage --> LogExport
+
+    NetworkInspector --> RequestCapture
+    NetworkInspector --> ResponseCapture
+    NetworkInspector --> WebSocketCapture
+    RequestCapture --> AMF3Decoder
+    NetworkInspector --> RequestReplay
+
+    Profiler --> CPUProfiler
+    Profiler --> MemoryProfiler
+    Profiler --> NetworkProfiler
+    Profiler --> RenderProfiler
+    Profiler --> CustomMarkers
+
+    MainProcess --> LogAggregator
+    Renderer --> LogAggregator
+    AllServices --> LogAggregator
+    AllServices --> MetricsCollector

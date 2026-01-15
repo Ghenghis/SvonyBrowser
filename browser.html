@@ -81,6 +81,8 @@
                 <button class="tab-btn" data-tab="traffic">📡 Traffic</button>
                 <button class="tab-btn" data-tab="protocol">📋 Protocol</button>
                 <button class="tab-btn" data-tab="tools">🔧 Tools</button>
+                <button class="tab-btn" data-tab="debug">🐛 Debug</button>
+                <button class="tab-btn" data-tab="automation">🤖 Automation</button>
             </div>
             
             <!-- Browser Tab -->
@@ -666,6 +668,271 @@
                         </div>
                         <button id="refresh-game-state" class="secondary-btn">🔄 Refresh</button>
                         <button id="export-game-state" class="secondary-btn">💾 Export</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Debug Tab -->
+            <div id="tab-debug" class="tab-content">
+                <div class="debug-container">
+                    <!-- Log Viewer -->
+                    <div class="debug-section">
+                        <div class="debug-header">
+                            <h3>📝 Log Viewer</h3>
+                            <div class="debug-controls">
+                                <select id="log-level-filter">
+                                    <option value="all">All Levels</option>
+                                    <option value="error">Errors</option>
+                                    <option value="warn">Warnings</option>
+                                    <option value="info">Info</option>
+                                    <option value="debug">Debug</option>
+                                </select>
+                                <select id="log-source-filter">
+                                    <option value="all">All Sources</option>
+                                    <option value="main">Main Process</option>
+                                    <option value="renderer">Renderer</option>
+                                    <option value="network">Network</option>
+                                    <option value="game">Game</option>
+                                </select>
+                                <button id="clear-logs" class="secondary-btn">Clear</button>
+                                <button id="export-logs" class="secondary-btn">Export</button>
+                            </div>
+                        </div>
+                        <div id="log-viewer" class="log-viewer">
+                            <div class="log-placeholder">No logs captured yet...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Network Inspector -->
+                    <div class="debug-section">
+                        <div class="debug-header">
+                            <h3>🌐 Network Inspector</h3>
+                            <div class="debug-controls">
+                                <button id="network-start" class="primary-btn">Start Capture</button>
+                                <button id="network-stop" class="secondary-btn" disabled>Stop</button>
+                                <button id="network-clear" class="secondary-btn">Clear</button>
+                            </div>
+                        </div>
+                        <div class="network-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Requests:</span>
+                                <span id="network-requests">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Data In:</span>
+                                <span id="network-data-in">0 KB</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Data Out:</span>
+                                <span id="network-data-out">0 KB</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Errors:</span>
+                                <span id="network-errors">0</span>
+                            </div>
+                        </div>
+                        <div id="network-list" class="network-list"></div>
+                    </div>
+                    
+                    <!-- Performance Monitor -->
+                    <div class="debug-section">
+                        <div class="debug-header">
+                            <h3>📊 Performance Monitor</h3>
+                            <div class="debug-controls">
+                                <button id="perf-start" class="primary-btn">Start Profiling</button>
+                                <button id="perf-stop" class="secondary-btn" disabled>Stop</button>
+                                <button id="perf-snapshot" class="secondary-btn">Snapshot</button>
+                            </div>
+                        </div>
+                        <div class="perf-metrics">
+                            <div class="metric-card">
+                                <div class="metric-label">CPU</div>
+                                <div class="metric-value" id="perf-cpu">0%</div>
+                                <div class="metric-bar"><div class="metric-fill cpu" id="perf-cpu-bar"></div></div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Memory</div>
+                                <div class="metric-value" id="perf-memory">0 MB</div>
+                                <div class="metric-bar"><div class="metric-fill memory" id="perf-memory-bar"></div></div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">FPS</div>
+                                <div class="metric-value" id="perf-fps">60</div>
+                                <div class="metric-bar"><div class="metric-fill fps" id="perf-fps-bar"></div></div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Latency</div>
+                                <div class="metric-value" id="perf-latency">0 ms</div>
+                                <div class="metric-bar"><div class="metric-fill latency" id="perf-latency-bar"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Console -->
+                    <div class="debug-section">
+                        <div class="debug-header">
+                            <h3>💻 Console</h3>
+                            <div class="debug-controls">
+                                <button id="console-clear" class="secondary-btn">Clear</button>
+                            </div>
+                        </div>
+                        <div id="debug-console" class="debug-console"></div>
+                        <div class="console-input-row">
+                            <input type="text" id="console-input" placeholder="Enter JavaScript to execute...">
+                            <button id="console-execute" class="primary-btn">Run</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Automation Tab -->
+            <div id="tab-automation" class="tab-content">
+                <div class="automation-container">
+                    <!-- Script Recorder -->
+                    <div class="automation-section">
+                        <div class="automation-header">
+                            <h3>🎥 Script Recorder</h3>
+                            <div class="automation-controls">
+                                <button id="script-record" class="primary-btn">⏺ Record</button>
+                                <button id="script-stop" class="secondary-btn" disabled>⏹ Stop</button>
+                                <button id="script-pause" class="secondary-btn" disabled>⏸ Pause</button>
+                            </div>
+                        </div>
+                        <div class="recorder-status-bar">
+                            <span class="status-dot" id="recorder-dot"></span>
+                            <span id="recorder-status-text">Ready to record</span>
+                            <span id="recorder-time">00:00</span>
+                            <span id="recorder-actions">0 actions</span>
+                        </div>
+                        <div id="recorded-actions" class="recorded-actions">
+                            <div class="actions-placeholder">Recorded actions will appear here...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Automation Templates -->
+                    <div class="automation-section">
+                        <div class="automation-header">
+                            <h3>📚 Templates</h3>
+                            <div class="automation-controls">
+                                <select id="template-category">
+                                    <option value="all">All Categories</option>
+                                    <option value="resource">Resources</option>
+                                    <option value="combat">Combat</option>
+                                    <option value="building">Building</option>
+                                    <option value="daily">Daily Tasks</option>
+                                </select>
+                                <button id="template-refresh" class="secondary-btn">🔄</button>
+                            </div>
+                        </div>
+                        <div id="template-list" class="template-list">
+                            <div class="template-card" data-template="collect-resources">
+                                <div class="template-icon">📦</div>
+                                <div class="template-info">
+                                    <div class="template-name">Collect Resources</div>
+                                    <div class="template-desc">Auto-collect from all buildings</div>
+                                </div>
+                                <button class="run-template-btn">▶</button>
+                            </div>
+                            <div class="template-card" data-template="daily-rewards">
+                                <div class="template-icon">🎁</div>
+                                <div class="template-info">
+                                    <div class="template-name">Daily Rewards</div>
+                                    <div class="template-desc">Claim all daily login rewards</div>
+                                </div>
+                                <button class="run-template-btn">▶</button>
+                            </div>
+                            <div class="template-card" data-template="hunt-monsters">
+                                <div class="template-icon">🐲</div>
+                                <div class="template-info">
+                                    <div class="template-name">Hunt Monsters</div>
+                                    <div class="template-desc">Auto-hunt monsters on map</div>
+                                </div>
+                                <button class="run-template-btn">▶</button>
+                            </div>
+                            <div class="template-card" data-template="alliance-help">
+                                <div class="template-icon">🤝</div>
+                                <div class="template-info">
+                                    <div class="template-name">Alliance Help</div>
+                                    <div class="template-desc">Help all alliance members</div>
+                                </div>
+                                <button class="run-template-btn">▶</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Script Runner -->
+                    <div class="automation-section">
+                        <div class="automation-header">
+                            <h3>🚀 Script Runner</h3>
+                            <div class="automation-controls">
+                                <button id="runner-run" class="primary-btn">▶ Run</button>
+                                <button id="runner-stop" class="secondary-btn" disabled>⏹ Stop</button>
+                                <button id="runner-schedule" class="secondary-btn">📅 Schedule</button>
+                            </div>
+                        </div>
+                        <div class="runner-status">
+                            <div class="runner-stat">
+                                <span class="stat-label">Running:</span>
+                                <span id="runner-running">0</span>
+                            </div>
+                            <div class="runner-stat">
+                                <span class="stat-label">Queued:</span>
+                                <span id="runner-queued">0</span>
+                            </div>
+                            <div class="runner-stat">
+                                <span class="stat-label">Completed:</span>
+                                <span id="runner-completed">0</span>
+                            </div>
+                            <div class="runner-stat">
+                                <span class="stat-label">Failed:</span>
+                                <span id="runner-failed">0</span>
+                            </div>
+                        </div>
+                        <div id="runner-queue" class="runner-queue"></div>
+                    </div>
+                    
+                    <!-- Scheduled Tasks -->
+                    <div class="automation-section">
+                        <div class="automation-header">
+                            <h3>⏰ Scheduled Tasks</h3>
+                            <div class="automation-controls">
+                                <button id="schedule-add" class="primary-btn">+ Add Task</button>
+                            </div>
+                        </div>
+                        <div id="scheduled-tasks" class="scheduled-tasks">
+                            <div class="task-placeholder">No scheduled tasks. Click "+ Add Task" to create one.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Agent Mode -->
+                    <div class="automation-section agent-section">
+                        <div class="automation-header">
+                            <h3>🧠 Agent Mode</h3>
+                            <div class="automation-controls">
+                                <button id="agent-start" class="primary-btn agent-btn">🤖 Start Agent</button>
+                                <button id="agent-stop" class="secondary-btn" disabled>⏹ Stop</button>
+                                <button id="agent-pause" class="secondary-btn" disabled>⏸ Pause</button>
+                            </div>
+                        </div>
+                        <div class="agent-status">
+                            <div class="agent-mode-indicator">
+                                <span class="mode-dot" id="agent-mode-dot"></span>
+                                <span id="agent-mode-text">Idle</span>
+                            </div>
+                            <div class="agent-stats">
+                                <span>Goals: <span id="agent-goals">0</span></span>
+                                <span>Actions: <span id="agent-actions">0</span></span>
+                                <span>Decisions: <span id="agent-decisions">0</span></span>
+                            </div>
+                        </div>
+                        <div class="agent-goals-panel">
+                            <h4>Active Goals</h4>
+                            <div id="agent-goals-list" class="goals-list"></div>
+                            <div class="add-goal-row">
+                                <input type="text" id="agent-goal-input" placeholder="Enter a goal...">
+                                <button id="agent-add-goal" class="primary-btn">Add</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

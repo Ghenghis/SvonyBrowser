@@ -1,0 +1,84 @@
+flowchart TB
+    subgraph UI["User Interface"]
+        RecorderUI["🎬 Script Recorder UI"]
+        EditorUI["📝 Script Editor UI"]
+        RunnerUI["▶️ Script Runner UI"]
+        SchedulerUI["📅 Scheduler UI"]
+        TemplatesUI["📋 Templates UI"]
+    end
+
+    subgraph Automation["Automation Engine"]
+        ScriptRecorder["Script Recorder Service"]
+        ScriptEditor["Script Editor Service"]
+        ScriptRunner["Script Runner Service"]
+        ScriptScheduler["Script Scheduler Service"]
+        TemplateManager["Template Manager"]
+    end
+
+    subgraph Recording["Recording System"]
+        ClickRecorder["Click Recorder"]
+        InputRecorder["Input Recorder"]
+        NavRecorder["Navigation Recorder"]
+        WaitRecorder["Wait Recorder"]
+        AssertRecorder["Assertion Recorder"]
+        ScreenRecorder["Screenshot Recorder"]
+    end
+
+    subgraph Execution["Execution Engine"]
+        ActionExecutor["Action Executor"]
+        WaitHandler["Wait Handler"]
+        ErrorHandler["Error Handler"]
+        RetryLogic["Retry Logic"]
+        ResultCollector["Result Collector"]
+    end
+
+    subgraph Scripts["Pre-built Scripts"]
+        AutoLogin["🔐 Auto-Login"]
+        ResourceCollector["💰 Resource Collector"]
+        TroopTrainer["⚔️ Troop Trainer"]
+        BuildingUpgrader["🏗️ Building Upgrader"]
+        AllianceHelper["🤝 Alliance Helper"]
+        EventParticipant["🎉 Event Participant"]
+        DataExporter["📊 Data Exporter"]
+        ScreenshotReporter["📸 Screenshot Reporter"]
+    end
+
+    subgraph Integration["Integration Layer"]
+        PlaywrightService["Playwright Service"]
+        PanelBridge["Panel Playwright Bridge"]
+        ChatbotBridge["Chatbot Integration"]
+        DebugBridge["Debug Integration"]
+    end
+
+    RecorderUI --> ScriptRecorder
+    EditorUI --> ScriptEditor
+    RunnerUI --> ScriptRunner
+    SchedulerUI --> ScriptScheduler
+    TemplatesUI --> TemplateManager
+
+    ScriptRecorder --> ClickRecorder
+    ScriptRecorder --> InputRecorder
+    ScriptRecorder --> NavRecorder
+    ScriptRecorder --> WaitRecorder
+    ScriptRecorder --> AssertRecorder
+    ScriptRecorder --> ScreenRecorder
+
+    ScriptRunner --> ActionExecutor
+    ActionExecutor --> WaitHandler
+    ActionExecutor --> ErrorHandler
+    ErrorHandler --> RetryLogic
+    ActionExecutor --> ResultCollector
+
+    TemplateManager --> AutoLogin
+    TemplateManager --> ResourceCollector
+    TemplateManager --> TroopTrainer
+    TemplateManager --> BuildingUpgrader
+    TemplateManager --> AllianceHelper
+    TemplateManager --> EventParticipant
+    TemplateManager --> DataExporter
+    TemplateManager --> ScreenshotReporter
+
+    ScriptRunner --> PlaywrightService
+    PlaywrightService --> PanelBridge
+    ScriptRunner --> ChatbotBridge
+    ScriptRunner --> DebugBridge
