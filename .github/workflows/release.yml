@@ -32,7 +32,9 @@ jobs:
         run: npm install --legacy-peer-deps
         
       - name: Build all Windows variants
-        run: npm run build:all
+        run: npx electron-builder --win --ia32 --x64
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: List build artifacts
         run: Get-ChildItem -Path dist -Recurse | Format-Table Name, Length
