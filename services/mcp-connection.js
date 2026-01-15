@@ -113,7 +113,10 @@ class McpConnectionManager extends EventEmitter {
             const proc = spawn(serverConfig.command, serverConfig.args || [], {
                 env: { ...process.env, ...(serverConfig.env || {}) },
                 stdio: ['pipe', 'pipe', 'pipe'],
-                cwd: path.join(__dirname, '..')
+                cwd: path.join(__dirname, '..'),
+                windowsHide: true,
+                detached: false,
+                shell: false
             });
 
             const connection = {

@@ -46,7 +46,7 @@ const store = new Store({
         windowBounds: { width: 1600, height: 1000, isMax: false },
         defaultServer: 'cc2',
         adblock: true,
-        mcpEnabled: true,
+        mcpEnabled: false,
         homepage: 'https://www.evony.com/',
         favorites: [],
         proxy: {
@@ -127,12 +127,18 @@ async function initializeServices() {
         await protocolHandler.initialize();
         console.log('[Main] Protocol Handler initialized');
         
-        // MCP Connection Manager
-        try {
-            mcpConnection = require('./services/mcp-connection');
-            console.log('[Main] MCP Connection loaded');
-        } catch (e) {
-            console.warn('[Main] MCP Connection not available:', e.message);
+        // MCP Connection Manager - disabled by default to prevent console windows
+        // Users can enable via settings if they have MCP servers configured
+        if (store.get('mcpEnabled') === true) {
+            try {
+                mcpConnection = require('./services/mcp-connection');
+                // Don't auto-initialize - let user trigger manually
+                console.log('[Main] MCP Connection loaded (not auto-started)');
+            } catch (e) {
+                console.warn('[Main] MCP Connection not available:', e.message);
+            }
+        } else {
+            console.log('[Main] MCP Connection disabled in settings');
         }
         
         // Proxy Monitor
@@ -1043,11 +1049,10 @@ function createWindow() {
         height: height,
         minWidth: 1200,
         minHeight: 700,
-        titleBarStyle: 'hidden',
         frame: true,
-        show: true,
+        show: false,
         backgroundColor: '#0F0F1A',
-        icon: path.join(__dirname, 'icon.ico'),
+        autoHideMenuBar: false,
         webPreferences: {
             nodeIntegration: true,
             webviewTag: true,
@@ -1061,6 +1066,24 @@ function createWindow() {
     });
 
     mainWindow.loadURL(`file://${__dirname}/browser.html`);
+
+    // Handle load errors
+    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+        console.error('[Main] Failed to load:', errorCode, errorDescription);
+    });
+
+    mainWindow.webContents.on('did-finish-load', () => {
+        console.log('[Main] Page loaded successfully');
+    });
+
+    mainWindow.webContents.on('crashed', () => {
+        console.error('[Main] Renderer crashed');
+    });
+
+    // Open DevTools in development
+    if (process.argv.includes('--enable-logging')) {
+        mainWindow.webContents.openDevTools();
+    }
 
     // Window events
     mainWindow.on('closed', () => {
@@ -1140,15 +1163,28 @@ function setupShortcuts() {
 
 // App ready
 app.on('ready', async () => {
-    // Initialize services first
-    await initializeServices();
-    
+    // Create window first so user sees something immediately
     createWindow();
     createMenu();
     setupIPC();
     setupShortcuts();
+    
+    // Initialize services in background (non-blocking)
+    try {
+        await initializeServices();
+    } catch (error) {
+        console.error('[Main] Service initialization error:', error);
+    }
+    
+    // Setup traffic capture after window is ready
     setupTrafficCapture();
-    await setupAdBlocker();
+    
+    // Setup ad blocker (optional)
+    try {
+        await setupAdBlocker();
+    } catch (error) {
+        console.warn('[Main] Ad blocker setup failed:', error.message);
+    }
 });
 
 // Handle file opening
