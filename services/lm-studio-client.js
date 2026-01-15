@@ -1,41 +1,127 @@
 /**
  * LM Studio Client - OpenAI-compatible API Client
  * Connects to LM Studio for local LLM inference
- * Used by Chatbot Service and MCP servers
+ * v2.0.7 - Added streaming support, token counting, caching
  */
 
 const http = require('http');
 const https = require('https');
 const { EventEmitter } = require('events');
 
+/**
+ * Simple token estimator
+ */
+class TokenEstimator {
+    static estimate(text) {
+        if (!text) return 0;
+        // Rough estimate: ~4 characters per token for English
+        return Math.ceil(text.length / 4);
+    }
+    
+    static estimateMessages(messages) {
+        let total = 0;
+        for (const msg of messages) {
+            total += 4; // Role overhead
+            total += this.estimate(msg.content);
+        }
+        return total;
+    }
+}
+
+/**
+ * Response cache with TTL
+ */
+class ResponseCache {
+    constructor(maxSize = 100, ttlMs = 300000) { // 5 min TTL
+        this.cache = new Map();
+        this.maxSize = maxSize;
+        this.ttlMs = ttlMs;
+    }
+    
+    generateKey(messages, options) {
+        const content = messages.map(m => `${m.role}:${m.content}`).join('|');
+        const opts = `${options.temperature}:${options.maxTokens}`;
+        return `${content}::${opts}`;
+    }
+    
+    get(messages, options) {
+        const key = this.generateKey(messages, options);
+        const entry = this.cache.get(key);
+        
+        if (!entry) return null;
+        
+        if (Date.now() - entry.timestamp > this.ttlMs) {
+            this.cache.delete(key);
+            return null;
+        }
+        
+        return entry.response;
+    }
+    
+    set(messages, options, response) {
+        const key = this.generateKey(messages, options);
+        
+        // Trim cache if needed
+        if (this.cache.size >= this.maxSize) {
+            const oldest = this.cache.keys().next().value;
+            this.cache.delete(oldest);
+        }
+        
+        this.cache.set(key, {
+            response,
+            timestamp: Date.now()
+        });
+    }
+    
+    clear() {
+        this.cache.clear();
+    }
+}
+
+/**
+ * LM Studio Client with streaming support
+ */
 class LMStudioClient extends EventEmitter {
     constructor(config = {}) {
         super();
         
         this.config = {
-            // LM Studio default endpoint
             baseUrl: config.baseUrl || process.env.LM_STUDIO_URL || 'http://localhost:1234',
-            
-            // Model to use (leave as 'local-model' for LM Studio default)
             model: config.model || process.env.LM_STUDIO_MODEL || 'local-model',
-            
-            // Generation parameters
             temperature: config.temperature || 0.7,
             maxTokens: config.maxTokens || 2048,
             topP: config.topP || 0.95,
             frequencyPenalty: config.frequencyPenalty || 0,
             presencePenalty: config.presencePenalty || 0,
-            
-            // Request timeout
-            timeout: config.timeout || 60000,
-            
-            // Retry settings
+            timeout: config.timeout || 120000, // Increased for streaming
             maxRetries: config.maxRetries || 3,
-            retryDelay: config.retryDelay || 1000
+            retryDelay: config.retryDelay || 1000,
+            enableCache: config.enableCache !== false,
+            cacheSize: config.cacheSize || 100,
+            cacheTTL: config.cacheTTL || 300000
         };
         
         this.isConnected = false;
         this.availableModels = [];
+        this.reconnectInterval = null;
+        
+        // Initialize cache
+        this.cache = this.config.enableCache 
+            ? new ResponseCache(this.config.cacheSize, this.config.cacheTTL)
+            : null;
+        
+        // Statistics
+        this.stats = {
+            totalRequests: 0,
+            successfulRequests: 0,
+            failedRequests: 0,
+            cacheHits: 0,
+            totalTokensIn: 0,
+            totalTokensOut: 0,
+            startTime: Date.now()
+        };
+        
+        console.log('[LMStudioClient] Initialized');
     }
     
     /**
@@ -47,8 +133,12 @@ class LMStudioClient extends EventEmitter {
             
             if (response && response.data) {
                 this.isConnected = true;
-                this.availableModels = response.data.map(m => m.id);
-                console.log('[LMStudioClient] Connected. Models:', this.availableModels);
+                this.availableModels = response.data.map(m => ({
+                    id: m.id,
+                    object: m.object,
+                    owned_by: m.owned_by
+                }));
+                console.log('[LMStudioClient] Connected. Models:', this.availableModels.map(m => m.id));
                 this.emit('connected', { models: this.availableModels });
                 return true;
             }
@@ -61,69 +151,284 @@ class LMStudioClient extends EventEmitter {
     }
     
     /**
-     * Send chat completion request
+     * Validate model exists
+     */
+    validateModel(modelId) {
+        if (this.availableModels.length === 0) return true; // Can't validate
+        return this.availableModels.some(m => m.id === modelId);
+    }
+    
+    /**
+     * Send chat completion request (non-streaming)
      */
     async chatCompletion(messages, options = {}) {
-        const payload = {
+        this.stats.totalRequests++;
+        
+        const opts = {
             model: options.model || this.config.model,
-            messages: messages,
-            temperature: options.temperature || this.config.temperature,
-            max_tokens: options.maxTokens || this.config.maxTokens,
-            top_p: options.topP || this.config.topP,
-            frequency_penalty: options.frequencyPenalty || this.config.frequencyPenalty,
-            presence_penalty: options.presencePenalty || this.config.presencePenalty,
-            stream: options.stream || false
+            temperature: options.temperature ?? this.config.temperature,
+            maxTokens: options.maxTokens || this.config.maxTokens,
+            topP: options.topP || this.config.topP,
+            frequencyPenalty: options.frequencyPenalty || this.config.frequencyPenalty,
+            presencePenalty: options.presencePenalty || this.config.presencePenalty
         };
         
-        // Add tools if provided (for function calling)
+        // Check cache
+        if (this.cache && !options.noCache) {
+            const cached = this.cache.get(messages, opts);
+            if (cached) {
+                this.stats.cacheHits++;
+                return cached;
+            }
+        }
+        
+        // Estimate input tokens
+        const inputTokens = TokenEstimator.estimateMessages(messages);
+        this.stats.totalTokensIn += inputTokens;
+        
+        const payload = {
+            model: opts.model,
+            messages: messages,
+            temperature: opts.temperature,
+            max_tokens: opts.maxTokens,
+            top_p: opts.topP,
+            frequency_penalty: opts.frequencyPenalty,
+            presence_penalty: opts.presencePenalty,
+            stream: false
+        };
+        
+        // Add tools if provided
         if (options.tools && options.tools.length > 0) {
             payload.tools = options.tools;
             payload.tool_choice = options.toolChoice || 'auto';
         }
         
-        // Add stop sequences if provided
         if (options.stop) {
             payload.stop = options.stop;
         }
         
-        const response = await this.request('/v1/chat/completions', 'POST', payload);
+        try {
+            const response = await this.requestWithRetry('/v1/chat/completions', 'POST', payload);
+            
+            if (!response || !response.choices || response.choices.length === 0) {
+                throw new Error('Invalid response from LM Studio');
+            }
+            
+            const result = {
+                message: response.choices[0].message,
+                finishReason: response.choices[0].finish_reason,
+                usage: response.usage || {
+                    prompt_tokens: inputTokens,
+                    completion_tokens: TokenEstimator.estimate(response.choices[0].message?.content),
+                    total_tokens: inputTokens + TokenEstimator.estimate(response.choices[0].message?.content)
+                },
+                model: response.model
+            };
+            
+            // Update stats
+            this.stats.successfulRequests++;
+            this.stats.totalTokensOut += result.usage.completion_tokens || 0;
+            
+            // Cache result
+            if (this.cache && !options.noCache) {
+                this.cache.set(messages, opts, result);
+            }
+            
+            return result;
+        } catch (error) {
+            this.stats.failedRequests++;
+            throw error;
+        }
+    }
+    
+    /**
+     * Send streaming chat completion request
+     */
+    async chatCompletionStream(messages, options = {}, onChunk) {
+        this.stats.totalRequests++;
         
-        if (!response || !response.choices || response.choices.length === 0) {
-            throw new Error('Invalid response from LM Studio');
+        const inputTokens = TokenEstimator.estimateMessages(messages);
+        this.stats.totalTokensIn += inputTokens;
+        
+        const payload = {
+            model: options.model || this.config.model,
+            messages: messages,
+            temperature: options.temperature ?? this.config.temperature,
+            max_tokens: options.maxTokens || this.config.maxTokens,
+            top_p: options.topP || this.config.topP,
+            frequency_penalty: options.frequencyPenalty || this.config.frequencyPenalty,
+            presence_penalty: options.presencePenalty || this.config.presencePenalty,
+            stream: true
+        };
+        
+        if (options.tools && options.tools.length > 0) {
+            payload.tools = options.tools;
+            payload.tool_choice = options.toolChoice || 'auto';
         }
         
-        return {
-            message: response.choices[0].message,
-            finishReason: response.choices[0].finish_reason,
-            usage: response.usage,
-            model: response.model
-        };
+        if (options.stop) {
+            payload.stop = options.stop;
+        }
+        
+        return new Promise((resolve, reject) => {
+            const url = new URL(this.config.baseUrl);
+            const isHttps = url.protocol === 'https:';
+            const client = isHttps ? https : http;
+            
+            const reqOptions = {
+                hostname: url.hostname,
+                port: url.port || (isHttps ? 443 : 80),
+                path: '/v1/chat/completions',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/event-stream'
+                },
+                timeout: this.config.timeout
+            };
+            
+            let fullContent = '';
+            let finishReason = null;
+            let buffer = '';
+            
+            const req = client.request(reqOptions, (res) => {
+                if (res.statusCode >= 400) {
+                    let errorData = '';
+                    res.on('data', chunk => errorData += chunk);
+                    res.on('end', () => {
+                        this.stats.failedRequests++;
+                        reject(new Error(`HTTP ${res.statusCode}: ${errorData}`));
+                    });
+                    return;
+                }
+                
+                res.on('data', (chunk) => {
+                    buffer += chunk.toString();
+                    
+                    // Process complete SSE messages
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6).trim();
+                            
+                            if (data === '[DONE]') {
+                                continue;
+                            }
+                            
+                            try {
+                                const parsed = JSON.parse(data);
+                                const delta = parsed.choices?.[0]?.delta;
+                                
+                                if (delta?.content) {
+                                    fullContent += delta.content;
+                                    
+                                    if (onChunk) {
+                                        onChunk({
+                                            content: delta.content,
+                                            fullContent,
+                                            done: false
+                                        });
+                                    }
+                                    
+                                    this.emit('stream-chunk', {
+                                        content: delta.content,
+                                        fullContent
+                                    });
+                                }
+                                
+                                if (parsed.choices?.[0]?.finish_reason) {
+                                    finishReason = parsed.choices[0].finish_reason;
+                                }
+                            } catch (e) {
+                                // Skip invalid JSON
+                            }
+                        }
+                    }
+                });
+                
+                res.on('end', () => {
+                    this.stats.successfulRequests++;
+                    
+                    const outputTokens = TokenEstimator.estimate(fullContent);
+                    this.stats.totalTokensOut += outputTokens;
+                    
+                    const result = {
+                        message: {
+                            role: 'assistant',
+                            content: fullContent
+                        },
+                        finishReason: finishReason || 'stop',
+                        usage: {
+                            prompt_tokens: inputTokens,
+                            completion_tokens: outputTokens,
+                            total_tokens: inputTokens + outputTokens
+                        }
+                    };
+                    
+                    if (onChunk) {
+                        onChunk({
+                            content: '',
+                            fullContent,
+                            done: true
+                        });
+                    }
+                    
+                    this.emit('stream-complete', result);
+                    resolve(result);
+                });
+            });
+            
+            req.on('error', (error) => {
+                this.stats.failedRequests++;
+                reject(error);
+            });
+            
+            req.on('timeout', () => {
+                req.destroy();
+                this.stats.failedRequests++;
+                reject(new Error('Request timeout'));
+            });
+            
+            req.write(JSON.stringify(payload));
+            req.end();
+        });
     }
     
     /**
      * Send completion request (non-chat)
      */
     async completion(prompt, options = {}) {
+        this.stats.totalRequests++;
+        
         const payload = {
             model: options.model || this.config.model,
             prompt: prompt,
-            temperature: options.temperature || this.config.temperature,
+            temperature: options.temperature ?? this.config.temperature,
             max_tokens: options.maxTokens || this.config.maxTokens,
             top_p: options.topP || this.config.topP,
             stream: false
         };
         
-        const response = await this.request('/v1/completions', 'POST', payload);
-        
-        if (!response || !response.choices || response.choices.length === 0) {
-            throw new Error('Invalid response from LM Studio');
+        try {
+            const response = await this.requestWithRetry('/v1/completions', 'POST', payload);
+            
+            if (!response || !response.choices || response.choices.length === 0) {
+                throw new Error('Invalid response from LM Studio');
+            }
+            
+            this.stats.successfulRequests++;
+            
+            return {
+                text: response.choices[0].text,
+                finishReason: response.choices[0].finish_reason,
+                usage: response.usage
+            };
+        } catch (error) {
+            this.stats.failedRequests++;
+            throw error;
         }
-        
-        return {
-            text: response.choices[0].text,
-            finishReason: response.choices[0].finish_reason,
-            usage: response.usage
-        };
     }
     
     /**
@@ -149,7 +454,12 @@ class LMStudioClient extends EventEmitter {
      */
     async listModels() {
         const response = await this.request('/v1/models', 'GET');
-        return response.data || [];
+        this.availableModels = (response.data || []).map(m => ({
+            id: m.id,
+            object: m.object,
+            owned_by: m.owned_by
+        }));
+        return this.availableModels;
     }
     
     /**
@@ -236,6 +546,14 @@ class LMStudioClient extends EventEmitter {
      */
     updateConfig(newConfig) {
         this.config = { ...this.config, ...newConfig };
+        
+        // Update cache if settings changed
+        if (this.cache && (newConfig.cacheSize || newConfig.cacheTTL)) {
+            this.cache = new ResponseCache(
+                newConfig.cacheSize || this.config.cacheSize,
+                newConfig.cacheTTL || this.config.cacheTTL
+            );
+        }
     }
     
     /**
@@ -285,7 +603,48 @@ class LMStudioClient extends EventEmitter {
             model: this.config.model,
             availableModels: this.availableModels,
             temperature: this.config.temperature,
-            maxTokens: this.config.maxTokens
+            maxTokens: this.config.maxTokens,
+            stats: this.getStats()
+        };
+    }
+    
+    /**
+     * Get statistics
+     */
+    getStats() {
+        return {
+            ...this.stats,
+            uptime: Date.now() - this.stats.startTime,
+            successRate: this.stats.totalRequests > 0
+                ? ((this.stats.successfulRequests / this.stats.totalRequests) * 100).toFixed(2) + '%'
+                : '0%',
+            cacheHitRate: this.stats.totalRequests > 0
+                ? ((this.stats.cacheHits / this.stats.totalRequests) * 100).toFixed(2) + '%'
+                : '0%'
+        };
+    }
+    
+    /**
+     * Clear cache
+     */
+    clearCache() {
+        if (this.cache) {
+            this.cache.clear();
+        }
+    }
+    
+    /**
+     * Reset statistics
+     */
+    resetStats() {
+        this.stats = {
+            totalRequests: 0,
+            successfulRequests: 0,
+            failedRequests: 0,
+            cacheHits: 0,
+            totalTokensIn: 0,
+            totalTokensOut: 0,
+            startTime: Date.now()
         };
     }
 }
@@ -295,5 +654,7 @@ const defaultClient = new LMStudioClient();
 
 module.exports = {
     LMStudioClient,
+    TokenEstimator,
+    ResponseCache,
     client: defaultClient
 };

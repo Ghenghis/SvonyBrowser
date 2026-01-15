@@ -939,7 +939,40 @@ function getChatbotService() {
     return instance;
 }
 
+// Create singleton for backward compatibility
+const chatbotSingleton = getChatbotService();
+
+// Export both class and singleton methods
 module.exports = {
     ChatbotService,
-    getChatbotService
+    getChatbotService,
+    
+    // Singleton method exports for backward compatibility
+    initialize: () => chatbotSingleton.initialize(),
+    processMessage: (message, context) => chatbotSingleton.processMessage(message, context),
+    getHistory: () => chatbotSingleton.getHistory(),
+    clearHistory: () => chatbotSingleton.clearHistory(),
+    setLMStudioClient: (client) => { chatbotSingleton.lmStudioClient = client; },
+    setMCPManager: (manager) => { chatbotSingleton.mcpManager = manager; },
+    setIntentRouter: (router) => { chatbotSingleton.intentRouter = router; },
+    setConversationMemory: (memory) => { chatbotSingleton.conversationMemory = memory; },
+    getQuickActions: () => chatbotSingleton.getQuickActions(),
+    getStatus: () => chatbotSingleton.getStatus(),
+    shutdown: () => chatbotSingleton.shutdown(),
+    
+    // Event emitter delegation
+    on: (event, handler) => chatbotSingleton.on(event, handler),
+    off: (event, handler) => chatbotSingleton.off(event, handler),
+    emit: (event, ...args) => chatbotSingleton.emit(event, ...args),
+    
+    // Property accessors
+    get lmStudioClient() { return chatbotSingleton.lmStudioClient; },
+    set lmStudioClient(client) { chatbotSingleton.lmStudioClient = client; },
+    get mcpManager() { return chatbotSingleton.mcpManager; },
+    set mcpManager(manager) { chatbotSingleton.mcpManager = manager; },
+    get intentRouter() { return chatbotSingleton.intentRouter; },
+    set intentRouter(router) { chatbotSingleton.intentRouter = router; },
+    get conversationMemory() { return chatbotSingleton.conversationMemory; },
+    set conversationMemory(memory) { chatbotSingleton.conversationMemory = memory; },
+    get isInitialized() { return chatbotSingleton.isInitialized; }
 };

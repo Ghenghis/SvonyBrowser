@@ -456,6 +456,76 @@ async function initializeServices() {
             console.warn('[Main] Playwright Service not available:', e.message);
         }
         
+        // Traffic Processor - Wire traffic to game state
+        try {
+            const { TrafficProcessor } = require('./services/traffic-processor');
+            global.trafficProcessor = new TrafficProcessor({
+                amf3Decoder,
+                gameStateTracker,
+                sessionRecorder
+            });
+            console.log('[Main] Traffic Processor initialized');
+            
+            // Wire traffic capture to processor
+            global.trafficProcessor.on('packetDecoded', (packet) => {
+                sendWindow('packet-decoded', packet);
+            });
+            
+            global.trafficProcessor.on('gameStateUpdate', (update) => {
+                sendWindow('game-state-update', update);
+            });
+        } catch (e) {
+            console.warn('[Main] Traffic Processor not available:', e.message);
+        }
+        
+        // Conversation Memory for Chatbot
+        try {
+            const { ConversationMemory } = require('./services/conversation-memory');
+            global.conversationMemory = new ConversationMemory({
+                maxMessages: 100,
+                maxContextTokens: 4000,
+                persistPath: path.join(app.getPath('userData'), 'conversation-memory.json')
+            });
+            console.log('[Main] Conversation Memory initialized');
+            
+            // Wire to chatbot if available
+            if (chatbotService) {
+                chatbotService.conversationMemory = global.conversationMemory;
+            }
+        } catch (e) {
+            console.warn('[Main] Conversation Memory not available:', e.message);
+        }
+        
+        // Intent Router for intelligent query routing
+        try {
+            const { IntentRouter } = require('./services/intent-router');
+            global.intentRouter = new IntentRouter({
+                lmStudioClient: global.lmStudioClient,
+                mcpManager: mcpClientManager,
+                confidenceThreshold: 0.6
+            });
+            console.log('[Main] Intent Router initialized');
+            
+            // Wire to chatbot if available
+            if (chatbotService) {
+                chatbotService.intentRouter = global.intentRouter;
+            }
+        } catch (e) {
+            console.warn('[Main] Intent Router not available:', e.message);
+        }
+        
+        // Configure Game State Tracker persistence
+        if (gameStateTracker) {
+            gameStateTracker.configurePersistence({
+                path: path.join(app.getPath('userData'), 'game-state.json'),
+                autoSave: true,
+                autoSaveDelay: 30000
+            });
+            
+            // Try to load saved state
+            gameStateTracker.loadState();
+        }
+        
         console.log('[Main] All services initialized');
         
     } catch (error) {

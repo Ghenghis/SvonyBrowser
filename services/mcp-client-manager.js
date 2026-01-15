@@ -1,6 +1,6 @@
 /**
- * MCP Client Manager
- * Manages connections to all MCP servers and provides unified tool access
+ * MCP Client Manager v2.0.7
+ * Manages connections to all MCP servers with health checks, timeouts, and request queuing
  * Integrates evony-rag, evony-rte, and evony-tools servers
  */
 
@@ -10,10 +10,55 @@ const path = require('path');
 const readline = require('readline');
 
 /**
- * MCP Server Connection
+ * Request Queue for managing concurrent requests
+ */
+class RequestQueue {
+    constructor(maxConcurrent = 3) {
+        this.queue = [];
+        this.running = 0;
+        this.maxConcurrent = maxConcurrent;
+    }
+    
+    async add(fn) {
+        return new Promise((resolve, reject) => {
+            this.queue.push({ fn, resolve, reject });
+            this.process();
+        });
+    }
+    
+    async process() {
+        if (this.running >= this.maxConcurrent || this.queue.length === 0) {
+            return;
+        }
+        
+        this.running++;
+        const { fn, resolve, reject } = this.queue.shift();
+        
+        try {
+            const result = await fn();
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        } finally {
+            this.running--;
+            this.process();
+        }
+    }
+    
+    clear() {
+        this.queue = [];
+    }
+    
+    get size() {
+        return this.queue.length;
+    }
+}
+
+/**
+ * MCP Server Connection with health checks and timeouts
  */
 class MCPServerConnection extends EventEmitter {
-    constructor(name, serverPath) {
+    constructor(name, serverPath, options = {}) {
         super();
         this.name = name;
         this.serverPath = serverPath;
@@ -21,8 +66,38 @@ class MCPServerConnection extends EventEmitter {
         this.requestId = 0;
         this.pendingRequests = new Map();
         this.tools = [];
+        this.toolsCache = null;
+        this.toolsCacheTime = 0;
         this.isConnected = false;
         this.rl = null;
+        
+        // Configuration
+        this.config = {
+            requestTimeout: options.requestTimeout || 30000,
+            healthCheckInterval: options.healthCheckInterval || 60000,
+            reconnectDelay: options.reconnectDelay || 5000,
+            maxReconnectAttempts: options.maxReconnectAttempts || 5,
+            toolsCacheTTL: options.toolsCacheTTL || 300000 // 5 minutes
+        };
+        
+        // State
+        this.reconnectAttempts = 0;
+        this.healthCheckTimer = null;
+        this.lastHealthCheck = 0;
+        this.isHealthy = false;
+        
+        // Request queue
+        this.requestQueue = new RequestQueue(3);
+        
+        // Statistics
+        this.stats = {
+            totalRequests: 0,
+            successfulRequests: 0,
+            failedRequests: 0,
+            avgResponseTime: 0,
+            lastError: null,
+            startTime: null
+        };
     }
     
     /**
@@ -31,6 +106,8 @@ class MCPServerConnection extends EventEmitter {
     async start() {
         return new Promise((resolve, reject) => {
             try {
+                console.log(`[MCP:${this.name}] Starting server from ${this.serverPath}`);
+                
                 this.process = spawn('node', [this.serverPath], {
                     stdio: ['pipe', 'pipe', 'pipe'],
                     cwd: path.dirname(this.serverPath)
@@ -47,32 +124,126 @@ class MCPServerConnection extends EventEmitter {
                 });
                 
                 this.process.stderr.on('data', (data) => {
-                    console.log(`[MCP:${this.name}] ${data.toString().trim()}`);
+                    const msg = data.toString().trim();
+                    if (msg) {
+                        console.log(`[MCP:${this.name}] ${msg}`);
+                    }
                 });
                 
                 this.process.on('error', (error) => {
                     console.error(`[MCP:${this.name}] Process error:`, error);
                     this.isConnected = false;
+                    this.isHealthy = false;
+                    this.stats.lastError = error.message;
                     this.emit('error', error);
+                    this.scheduleReconnect();
                 });
                 
                 this.process.on('exit', (code) => {
                     console.log(`[MCP:${this.name}] Process exited with code ${code}`);
                     this.isConnected = false;
+                    this.isHealthy = false;
                     this.emit('disconnected');
+                    
+                    if (code !== 0) {
+                        this.scheduleReconnect();
+                    }
                 });
                 
-                // Initialize the connection
+                // Initialize the connection with timeout
+                const initTimeout = setTimeout(() => {
+                    reject(new Error(`Initialization timeout for ${this.name}`));
+                }, this.config.requestTimeout);
+                
                 this.initialize().then(() => {
+                    clearTimeout(initTimeout);
                     this.isConnected = true;
+                    this.isHealthy = true;
+                    this.reconnectAttempts = 0;
+                    this.stats.startTime = Date.now();
+                    this.startHealthChecks();
                     this.emit('connected');
                     resolve(true);
-                }).catch(reject);
+                }).catch((error) => {
+                    clearTimeout(initTimeout);
+                    reject(error);
+                });
                 
             } catch (error) {
                 reject(error);
             }
         });
+    }
+    
+    /**
+     * Schedule reconnection attempt
+     */
+    scheduleReconnect() {
+        if (this.reconnectAttempts >= this.config.maxReconnectAttempts) {
+            console.error(`[MCP:${this.name}] Max reconnect attempts reached`);
+            this.emit('max-reconnects');
+            return;
+        }
+        
+        this.reconnectAttempts++;
+        const delay = this.config.reconnectDelay * this.reconnectAttempts;
+        
+        console.log(`[MCP:${this.name}] Scheduling reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
+        
+        setTimeout(async () => {
+            try {
+                await this.start();
+            } catch (error) {
+                console.error(`[MCP:${this.name}] Reconnect failed:`, error.message);
+            }
+        }, delay);
+    }
+    
+    /**
+     * Start health check timer
+     */
+    startHealthChecks() {
+        if (this.healthCheckTimer) {
+            clearInterval(this.healthCheckTimer);
+        }
+        
+        this.healthCheckTimer = setInterval(async () => {
+            await this.performHealthCheck();
+        }, this.config.healthCheckInterval);
+    }
+    
+    /**
+     * Perform health check
+     */
+    async performHealthCheck() {
+        if (!this.isConnected) {
+            this.isHealthy = false;
+            return false;
+        }
+        
+        try {
+            const start = Date.now();
+            await this.sendRequest('ping', {}, 5000); // 5 second timeout for health check
+            this.lastHealthCheck = Date.now();
+            this.isHealthy = true;
+            
+            this.emit('health-check', {
+                healthy: true,
+                responseTime: Date.now() - start
+            });
+            
+            return true;
+        } catch (error) {
+            this.isHealthy = false;
+            this.stats.lastError = error.message;
+            
+            this.emit('health-check', {
+                healthy: false,
+                error: error.message
+            });
+            
+            return false;
+        }
     }
     
     /**
@@ -88,26 +259,69 @@ class MCPServerConnection extends EventEmitter {
     }
     
     /**
-     * Send request and wait for response
+     * Send request with timeout
      */
-    async sendRequest(method, params = {}) {
+    async sendRequest(method, params = {}, timeout = null) {
+        const requestTimeout = timeout || this.config.requestTimeout;
+        
         return new Promise((resolve, reject) => {
             const id = ++this.requestId;
+            const startTime = Date.now();
             
-            const timeout = setTimeout(() => {
+            const timeoutHandle = setTimeout(() => {
                 this.pendingRequests.delete(id);
-                reject(new Error(`Request ${method} timed out`));
-            }, 30000);
+                this.stats.failedRequests++;
+                reject(new Error(`Request ${method} timed out after ${requestTimeout}ms`));
+            }, requestTimeout);
             
-            this.pendingRequests.set(id, { resolve, reject, timeout });
-            
-            this.sendMessage({
-                jsonrpc: '2.0',
-                id,
+            this.pendingRequests.set(id, {
+                resolve: (result) => {
+                    clearTimeout(timeoutHandle);
+                    const responseTime = Date.now() - startTime;
+                    this.updateStats(true, responseTime);
+                    resolve(result);
+                },
+                reject: (error) => {
+                    clearTimeout(timeoutHandle);
+                    this.updateStats(false);
+                    reject(error);
+                },
+                timeout: timeoutHandle,
                 method,
-                params
+                startTime
             });
+            
+            this.stats.totalRequests++;
+            
+            try {
+                this.sendMessage({
+                    jsonrpc: '2.0',
+                    id,
+                    method,
+                    params
+                });
+            } catch (error) {
+                this.pendingRequests.delete(id);
+                clearTimeout(timeoutHandle);
+                this.stats.failedRequests++;
+                reject(error);
+            }
         });
+    }
+    
+    /**
+     * Update statistics
+     */
+    updateStats(success, responseTime = 0) {
+        if (success) {
+            this.stats.successfulRequests++;
+            // Update rolling average
+            const total = this.stats.successfulRequests;
+            this.stats.avgResponseTime = 
+                (this.stats.avgResponseTime * (total - 1) + responseTime) / total;
+        } else {
+            this.stats.failedRequests++;
+        }
     }
     
     /**
@@ -118,11 +332,11 @@ class MCPServerConnection extends EventEmitter {
             const message = JSON.parse(line);
             
             if (message.id && this.pendingRequests.has(message.id)) {
-                const { resolve, reject, timeout } = this.pendingRequests.get(message.id);
-                clearTimeout(timeout);
+                const { resolve, reject } = this.pendingRequests.get(message.id);
                 this.pendingRequests.delete(message.id);
                 
                 if (message.error) {
+                    this.stats.lastError = message.error.message;
                     reject(new Error(message.error.message));
                 } else {
                     resolve(message.result);
@@ -145,7 +359,7 @@ class MCPServerConnection extends EventEmitter {
             capabilities: {},
             clientInfo: {
                 name: 'svony-browser',
-                version: '2.0.6'
+                version: '2.0.7'
             }
         });
         
@@ -156,48 +370,88 @@ class MCPServerConnection extends EventEmitter {
         });
         
         // Get available tools
-        const toolsResult = await this.sendRequest('tools/list');
-        this.tools = toolsResult.tools || [];
+        await this.refreshTools();
         
         console.log(`[MCP:${this.name}] Initialized with ${this.tools.length} tools`);
         return result;
     }
     
     /**
-     * Call a tool
+     * Refresh tools list
      */
-    async callTool(toolName, args = {}) {
-        const result = await this.sendRequest('tools/call', {
-            name: toolName,
-            arguments: args
-        });
-        
-        // Parse content from result
-        if (result.content && result.content.length > 0) {
-            const textContent = result.content.find(c => c.type === 'text');
-            if (textContent) {
-                try {
-                    return JSON.parse(textContent.text);
-                } catch {
-                    return textContent.text;
-                }
-            }
-        }
-        
-        return result;
+    async refreshTools() {
+        const toolsResult = await this.sendRequest('tools/list');
+        this.tools = toolsResult.tools || [];
+        this.toolsCache = this.tools;
+        this.toolsCacheTime = Date.now();
+        return this.tools;
     }
     
     /**
-     * Get available tools
+     * Call a tool with queuing
      */
-    getTools() {
+    async callTool(toolName, args = {}) {
+        return this.requestQueue.add(async () => {
+            const result = await this.sendRequest('tools/call', {
+                name: toolName,
+                arguments: args
+            });
+            
+            // Parse content from result
+            if (result.content && result.content.length > 0) {
+                const textContent = result.content.find(c => c.type === 'text');
+                if (textContent) {
+                    try {
+                        return JSON.parse(textContent.text);
+                    } catch {
+                        return textContent.text;
+                    }
+                }
+            }
+            
+            return result;
+        });
+    }
+    
+    /**
+     * Get available tools (with caching)
+     */
+    getTools(forceRefresh = false) {
+        if (forceRefresh || !this.toolsCache || 
+            Date.now() - this.toolsCacheTime > this.config.toolsCacheTTL) {
+            this.refreshTools().catch(err => {
+                console.error(`[MCP:${this.name}] Failed to refresh tools:`, err.message);
+            });
+        }
         return this.tools;
+    }
+    
+    /**
+     * Get statistics
+     */
+    getStats() {
+        return {
+            ...this.stats,
+            uptime: this.stats.startTime ? Date.now() - this.stats.startTime : 0,
+            isConnected: this.isConnected,
+            isHealthy: this.isHealthy,
+            pendingRequests: this.pendingRequests.size,
+            queueSize: this.requestQueue.size,
+            successRate: this.stats.totalRequests > 0
+                ? ((this.stats.successfulRequests / this.stats.totalRequests) * 100).toFixed(2) + '%'
+                : '0%'
+        };
     }
     
     /**
      * Stop the server
      */
     async stop() {
+        if (this.healthCheckTimer) {
+            clearInterval(this.healthCheckTimer);
+            this.healthCheckTimer = null;
+        }
+        
         if (this.rl) {
             this.rl.close();
         }
@@ -208,7 +462,9 @@ class MCPServerConnection extends EventEmitter {
         }
         
         this.isConnected = false;
+        this.isHealthy = false;
         this.pendingRequests.clear();
+        this.requestQueue.clear();
     }
 }
 
@@ -216,11 +472,27 @@ class MCPServerConnection extends EventEmitter {
  * MCP Client Manager - manages all MCP server connections
  */
 class MCPClientManager extends EventEmitter {
-    constructor() {
+    constructor(options = {}) {
         super();
         this.servers = new Map();
         this.toolRegistry = new Map(); // tool name -> server name
         this.isInitialized = false;
+        
+        // Configuration
+        this.config = {
+            requestTimeout: options.requestTimeout || 30000,
+            healthCheckInterval: options.healthCheckInterval || 60000,
+            reconnectDelay: options.reconnectDelay || 5000,
+            maxReconnectAttempts: options.maxReconnectAttempts || 5
+        };
+        
+        // Statistics
+        this.stats = {
+            totalCalls: 0,
+            successfulCalls: 0,
+            failedCalls: 0,
+            startTime: Date.now()
+        };
     }
     
     /**
@@ -249,7 +521,7 @@ class MCPClientManager extends EventEmitter {
         
         for (const config of serverConfigs) {
             try {
-                const server = new MCPServerConnection(config.name, config.path);
+                const server = new MCPServerConnection(config.name, config.path, this.config);
                 
                 server.on('connected', () => {
                     this.emit('server-connected', config.name);
@@ -263,6 +535,14 @@ class MCPClientManager extends EventEmitter {
                     this.emit('server-error', { server: config.name, error });
                 });
                 
+                server.on('health-check', (result) => {
+                    this.emit('health-check', { server: config.name, ...result });
+                });
+                
+                server.on('max-reconnects', () => {
+                    this.emit('server-failed', config.name);
+                });
+                
                 await server.start();
                 this.servers.set(config.name, server);
                 
@@ -271,10 +551,18 @@ class MCPClientManager extends EventEmitter {
                     this.toolRegistry.set(tool.name, config.name);
                 }
                 
-                results.push({ name: config.name, status: 'connected', tools: server.getTools().length });
+                results.push({ 
+                    name: config.name, 
+                    status: 'connected', 
+                    tools: server.getTools().length 
+                });
             } catch (error) {
                 console.error(`[MCPManager] Failed to start ${config.name}:`, error.message);
-                results.push({ name: config.name, status: 'failed', error: error.message });
+                results.push({ 
+                    name: config.name, 
+                    status: 'failed', 
+                    error: error.message 
+                });
             }
         }
         
@@ -284,32 +572,47 @@ class MCPClientManager extends EventEmitter {
     }
     
     /**
-     * Call a tool by name (automatically routes to correct server)
+     * Call a tool by name with timeout
      */
-    async callTool(toolName, args = {}) {
+    async callTool(toolName, args = {}, timeout = null) {
+        this.stats.totalCalls++;
+        
         const serverName = this.toolRegistry.get(toolName);
         
         if (!serverName) {
+            this.stats.failedCalls++;
             throw new Error(`Unknown tool: ${toolName}`);
         }
         
         const server = this.servers.get(serverName);
         
         if (!server || !server.isConnected) {
+            this.stats.failedCalls++;
             throw new Error(`Server ${serverName} not connected`);
         }
         
-        return await server.callTool(toolName, args);
+        if (!server.isHealthy) {
+            console.warn(`[MCPManager] Server ${serverName} is unhealthy, attempting call anyway`);
+        }
+        
+        try {
+            const result = await server.callTool(toolName, args);
+            this.stats.successfulCalls++;
+            return result;
+        } catch (error) {
+            this.stats.failedCalls++;
+            throw error;
+        }
     }
     
     /**
      * Get all available tools across all servers
      */
-    getAllTools() {
+    getAllTools(forceRefresh = false) {
         const tools = [];
         
         for (const [serverName, server] of this.servers) {
-            for (const tool of server.getTools()) {
+            for (const tool of server.getTools(forceRefresh)) {
                 tools.push({
                     ...tool,
                     server: serverName
@@ -334,13 +637,16 @@ class MCPClientManager extends EventEmitter {
     getStatus() {
         const status = {
             initialized: this.isInitialized,
-            servers: {}
+            servers: {},
+            stats: this.getStats()
         };
         
         for (const [name, server] of this.servers) {
             status.servers[name] = {
                 connected: server.isConnected,
-                tools: server.getTools().length
+                healthy: server.isHealthy,
+                tools: server.tools.length,
+                stats: server.getStats()
             };
         }
         
@@ -348,87 +654,67 @@ class MCPClientManager extends EventEmitter {
     }
     
     /**
-     * Evony RAG - Search knowledge base
+     * Get statistics
      */
-    async searchKnowledge(query, limit = 5) {
-        return await this.callTool('evony_search', { query, limit });
+    getStats() {
+        return {
+            ...this.stats,
+            uptime: Date.now() - this.stats.startTime,
+            successRate: this.stats.totalCalls > 0
+                ? ((this.stats.successfulCalls / this.stats.totalCalls) * 100).toFixed(2) + '%'
+                : '0%'
+        };
     }
     
     /**
-     * Evony RAG - Lookup specific topic
+     * Reconnect a specific server
      */
-    async lookupTopic(topic) {
-        return await this.callTool('evony_lookup', { topic });
+    async reconnectServer(serverName) {
+        const server = this.servers.get(serverName);
+        if (!server) {
+            throw new Error(`Unknown server: ${serverName}`);
+        }
+        
+        await server.stop();
+        await server.start();
+        
+        // Re-register tools
+        for (const tool of server.getTools()) {
+            this.toolRegistry.set(tool.name, serverName);
+        }
+        
+        return true;
     }
     
     /**
-     * Evony RAG - Get context for situation
+     * Reconnect all servers
      */
-    async getContext(situation) {
-        return await this.callTool('evony_context', { situation });
+    async reconnectAll() {
+        const results = [];
+        
+        for (const [name, server] of this.servers) {
+            try {
+                await this.reconnectServer(name);
+                results.push({ name, status: 'reconnected' });
+            } catch (error) {
+                results.push({ name, status: 'failed', error: error.message });
+            }
+        }
+        
+        return results;
     }
     
     /**
-     * Evony RTE - Lookup protocol action
+     * Perform health check on all servers
      */
-    async lookupProtocol(identifier) {
-        return await this.callTool('protocol_lookup', { identifier });
-    }
-    
-    /**
-     * Evony RTE - Search protocols
-     */
-    async searchProtocol(query, category = null) {
-        return await this.callTool('protocol_search', { query, category });
-    }
-    
-    /**
-     * Evony RTE - Decode packet
-     */
-    async decodePacket(hexData) {
-        return await this.callTool('decode_packet', { hexData });
-    }
-    
-    /**
-     * Evony RTE - Analyze traffic
-     */
-    async analyzeTraffic(packets) {
-        return await this.callTool('analyze_traffic', { packets });
-    }
-    
-    /**
-     * Evony Tools - Calculate training
-     */
-    async calcTraining(troopType, quantity, buffs = {}) {
-        return await this.callTool('calc_training', { troopType, quantity, buffs });
-    }
-    
-    /**
-     * Evony Tools - Calculate march time
-     */
-    async calcMarch(fromX, fromY, toX, toY, troops, buffs = {}) {
-        return await this.callTool('calc_march', { fromX, fromY, toX, toY, troops, buffs });
-    }
-    
-    /**
-     * Evony Tools - Calculate combat
-     */
-    async calcCombat(attacker, defender, options = {}) {
-        return await this.callTool('calc_combat', { attacker, defender, options });
-    }
-    
-    /**
-     * Evony Tools - Calculate resources
-     */
-    async calcResources(buildings, buffs = {}) {
-        return await this.callTool('calc_resources', { buildings, buffs });
-    }
-    
-    /**
-     * Evony Tools - Calculate building
-     */
-    async calcBuilding(buildingType, targetLevel, currentLevel = 0, buffs = {}) {
-        return await this.callTool('calc_building', { buildingType, targetLevel, currentLevel, buffs });
+    async healthCheckAll() {
+        const results = {};
+        
+        for (const [name, server] of this.servers) {
+            results[name] = await server.performHealthCheck();
+        }
+        
+        return results;
     }
     
     /**
@@ -436,28 +722,14 @@ class MCPClientManager extends EventEmitter {
      */
     async shutdown() {
         for (const [name, server] of this.servers) {
+            console.log(`[MCPManager] Stopping ${name}...`);
             await server.stop();
         }
         
         this.servers.clear();
         this.toolRegistry.clear();
         this.isInitialized = false;
-        this.emit('shutdown');
     }
 }
 
-// Singleton instance
-let instance = null;
-
-function getMCPClientManager() {
-    if (!instance) {
-        instance = new MCPClientManager();
-    }
-    return instance;
-}
-
-module.exports = {
-    MCPClientManager,
-    MCPServerConnection,
-    getMCPClientManager
-};
+module.exports = { MCPClientManager, MCPServerConnection, RequestQueue };

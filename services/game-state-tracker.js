@@ -5,6 +5,8 @@
  */
 
 const { EventEmitter } = require('events');
+const fs = require('fs');
+const path = require('path');
 
 class GameStateTracker extends EventEmitter {
     constructor() {
@@ -95,6 +97,12 @@ class GameStateTracker extends EventEmitter {
         };
         
         this.isTracking = false;
+        
+        // Persistence configuration
+        this.persistencePath = null;
+        this.autoSaveInterval = null;
+        this.autoSaveDelay = 30000; // 30 seconds
+        this.isDirty = false;
     }
     
     /**
@@ -157,6 +165,9 @@ class GameStateTracker extends EventEmitter {
         if (this.history.length > this.maxHistoryLength) {
             this.history = this.history.slice(-this.maxHistoryLength);
         }
+        
+        // Mark as dirty for auto-save
+        this.isDirty = true;
     }
     
     // ==================== Action Handlers ====================
@@ -694,6 +705,254 @@ class GameStateTracker extends EventEmitter {
         };
     }
     
+    // ==================== Persistence Methods ====================
+    
+    /**
+     * Configure persistence
+     */
+    configurePersistence(options = {}) {
+        if (options.path) {
+            this.persistencePath = options.path;
+        }
+        if (options.autoSaveDelay) {
+            this.autoSaveDelay = options.autoSaveDelay;
+        }
+        
+        // Start auto-save if enabled
+        if (options.autoSave && this.persistencePath) {
+            this.startAutoSave();
+        }
+    }
+    
+    /**
+     * Start auto-save timer
+     */
+    startAutoSave() {
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+        
+        this.autoSaveInterval = setInterval(() => {
+            if (this.isDirty) {
+                this.saveState();
+            }
+        }, this.autoSaveDelay);
+    }
+    
+    /**
+     * Stop auto-save timer
+     */
+    stopAutoSave() {
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+            this.autoSaveInterval = null;
+        }
+    }
+    
+    /**
+     * Save state to file
+     */
+    saveState(filePath = null) {
+        const savePath = filePath || this.persistencePath;
+        if (!savePath) {
+            console.warn('[GameStateTracker] No persistence path configured');
+            return false;
+        }
+        
+        try {
+            // Ensure directory exists
+            const dir = path.dirname(savePath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            
+            // Serialize state
+            const stateData = this.serializeState();
+            
+            // Write to file
+            fs.writeFileSync(savePath, JSON.stringify(stateData, null, 2));
+            
+            this.isDirty = false;
+            this.emit('state-saved', savePath);
+            console.log(`[GameStateTracker] State saved to ${savePath}`);
+            return true;
+        } catch (error) {
+            console.error('[GameStateTracker] Failed to save state:', error.message);
+            this.emit('save-error', error);
+            return false;
+        }
+    }
+    
+    /**
+     * Load state from file
+     */
+    loadState(filePath = null) {
+        const loadPath = filePath || this.persistencePath;
+        if (!loadPath) {
+            console.warn('[GameStateTracker] No persistence path configured');
+            return false;
+        }
+        
+        if (!fs.existsSync(loadPath)) {
+            console.log('[GameStateTracker] No saved state found');
+            return false;
+        }
+        
+        try {
+            const data = JSON.parse(fs.readFileSync(loadPath, 'utf8'));
+            this.deserializeState(data);
+            
+            this.isDirty = false;
+            this.emit('state-loaded', loadPath);
+            console.log(`[GameStateTracker] State loaded from ${loadPath}`);
+            return true;
+        } catch (error) {
+            console.error('[GameStateTracker] Failed to load state:', error.message);
+            this.emit('load-error', error);
+            return false;
+        }
+    }
+    
+    /**
+     * Serialize state for persistence
+     */
+    serializeState() {
+        return {
+            version: '2.0.7',
+            timestamp: Date.now(),
+            player: this.state.player,
+            currentCity: this.state.currentCity,
+            cities: Array.from(this.state.cities.entries()).map(([id, city]) => ({
+                ...city,
+                buildings: Array.from(city.buildings.entries())
+            })),
+            heroes: Array.from(this.state.heroes.entries()),
+            marches: Array.from(this.state.marches.entries()),
+            world: {
+                server: this.state.world.server,
+                tiles: Array.from(this.state.world.tiles.entries()).slice(-500), // Limit tiles
+                npcs: Array.from(this.state.world.npcs.entries()),
+                bosses: Array.from(this.state.world.bosses.entries())
+            },
+            alliance: {
+                ...this.state.alliance,
+                members: Array.from(this.state.alliance.members.entries())
+            },
+            buffs: this.state.buffs,
+            items: Array.from(this.state.items.entries()),
+            history: this.history.slice(-100) // Keep last 100 history entries
+        };
+    }
+    
+    /**
+     * Deserialize state from persistence
+     */
+    deserializeState(data) {
+        if (!data || data.version !== '2.0.7') {
+            console.warn('[GameStateTracker] State version mismatch, using defaults');
+            return;
+        }
+        
+        // Restore player
+        this.state.player = data.player || this.state.player;
+        this.state.currentCity = data.currentCity;
+        
+        // Restore cities
+        this.state.cities.clear();
+        if (data.cities) {
+            for (const city of data.cities) {
+                const buildings = new Map(city.buildings || []);
+                this.state.cities.set(city.id, { ...city, buildings });
+            }
+        }
+        
+        // Restore heroes
+        this.state.heroes.clear();
+        if (data.heroes) {
+            for (const [id, hero] of data.heroes) {
+                this.state.heroes.set(id, hero);
+            }
+        }
+        
+        // Restore marches (clear old ones as they're likely expired)
+        this.state.marches.clear();
+        
+        // Restore world
+        if (data.world) {
+            this.state.world.server = data.world.server;
+            this.state.world.tiles.clear();
+            if (data.world.tiles) {
+                for (const [key, tile] of data.world.tiles) {
+                    this.state.world.tiles.set(key, tile);
+                }
+            }
+            this.state.world.npcs.clear();
+            if (data.world.npcs) {
+                for (const [id, npc] of data.world.npcs) {
+                    this.state.world.npcs.set(id, npc);
+                }
+            }
+            this.state.world.bosses.clear();
+            if (data.world.bosses) {
+                for (const [id, boss] of data.world.bosses) {
+                    this.state.world.bosses.set(id, boss);
+                }
+            }
+        }
+        
+        // Restore alliance
+        if (data.alliance) {
+            this.state.alliance.id = data.alliance.id;
+            this.state.alliance.name = data.alliance.name;
+            this.state.alliance.territory = data.alliance.territory || [];
+            this.state.alliance.members.clear();
+            if (data.alliance.members) {
+                for (const [id, member] of data.alliance.members) {
+                    this.state.alliance.members.set(id, member);
+                }
+            }
+        }
+        
+        // Restore buffs (filter expired)
+        const now = Date.now();
+        this.state.buffs = (data.buffs || []).filter(b => !b.expireTime || b.expireTime > now);
+        
+        // Restore items
+        this.state.items.clear();
+        if (data.items) {
+            for (const [id, item] of data.items) {
+                this.state.items.set(id, item);
+            }
+        }
+        
+        // Restore history
+        this.history = data.history || [];
+        
+        this.emit('state-restored');
+    }
+    
+    /**
+     * Export state to JSON string
+     */
+    exportState() {
+        return JSON.stringify(this.serializeState(), null, 2);
+    }
+    
+    /**
+     * Import state from JSON string
+     */
+    importState(jsonString) {
+        try {
+            const data = JSON.parse(jsonString);
+            this.deserializeState(data);
+            this.isDirty = true;
+            return true;
+        } catch (error) {
+            console.error('[GameStateTracker] Failed to import state:', error.message);
+            return false;
+        }
+    }
+    
     /**
      * Reset state
      */
@@ -714,6 +973,7 @@ class GameStateTracker extends EventEmitter {
         };
         this.history = [];
         this.emit('state-reset');
+        this.isDirty = true;
     }
 }
 

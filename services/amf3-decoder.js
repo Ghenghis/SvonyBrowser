@@ -761,6 +761,22 @@ class AMF3Decoder {
         this.offset += 8;
         return value;
     }
+    
+    /**
+     * Convenience method to encode data (delegates to AMF3Encoder)
+     */
+    encode(value) {
+        const encoder = new AMF3Encoder();
+        return encoder.encode(value);
+    }
+    
+    /**
+     * Convenience method to encode packet (delegates to AMF3Encoder)
+     */
+    encodePacket(messages, headers = []) {
+        const encoder = new AMF3Encoder();
+        return encoder.encodePacket(messages, headers);
+    }
 }
 
 /**
