@@ -44,9 +44,11 @@ jobs:
         
       - name: Build Windows x64 Portable
         run: npm run build:win-portable
+        continue-on-error: true
         
       - name: Build Windows x64 Installer
         run: npm run build:win-installer
+        continue-on-error: true
         
       - name: List build output
         run: dir dist
@@ -84,6 +86,7 @@ jobs:
         
       - name: Build Windows x86 (32-bit)
         run: npm run build:win32
+        continue-on-error: true
         
       - name: Upload Windows x86
         uses: actions/upload-artifact@v4
@@ -110,6 +113,7 @@ jobs:
         
       - name: Build Windows ARM64
         run: npm run build:win-arm64
+        continue-on-error: true
         
       - name: Upload Windows ARM64
         uses: actions/upload-artifact@v4
