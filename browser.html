@@ -88,36 +88,234 @@
                 <div id="browser-panels">
                     <!-- Left Panel: AutoEvony Bot -->
                     <div id="left-panel" class="browser-panel">
+                        <!-- Enhanced Panel Header -->
                         <div class="panel-header green">
-                            <span class="panel-title">🌐 Left Panel</span>
-                            <div class="panel-toggle">
-                                <button class="toggle-btn active" data-mode="web" id="left-web-toggle">Web</button>
-                                <button class="toggle-btn" data-mode="swf" id="left-swf-toggle">SWF</button>
+                            <div class="panel-header-left">
+                                <span class="panel-title">🌐 Left Panel</span>
+                                <div class="panel-mode-badge" id="left-mode-badge">WEB</div>
+                                <div class="panel-health" id="left-health" title="Panel Health">
+                                    <div class="health-bar" id="left-health-bar"></div>
+                                </div>
                             </div>
-                            <span id="left-status" class="panel-status"></span>
+                            <div class="panel-toggle">
+                                <button class="toggle-btn active" data-mode="web" id="left-web-toggle" title="Web Mode">Web</button>
+                                <button class="toggle-btn" data-mode="swf" id="left-swf-toggle" title="SWF Mode">SWF</button>
+                                <button class="toggle-btn" data-mode="hybrid" id="left-hybrid-toggle" title="Hybrid Mode (Playwright)">Hybrid</button>
+                            </div>
+                            <div class="panel-status-container">
+                                <span id="left-status" class="panel-status"></span>
+                                <div class="panel-status-indicator" id="left-status-indicator" title="Status: Ready"></div>
+                            </div>
                         </div>
+                        
+                        <!-- Panel Navigation Toolbar -->
+                        <div class="panel-toolbar" id="left-toolbar">
+                            <div class="toolbar-nav">
+                                <button class="panel-nav-btn" id="left-back" title="Go Back (Alt+Left)" disabled>◀</button>
+                                <button class="panel-nav-btn" id="left-forward" title="Go Forward (Alt+Right)" disabled>▶</button>
+                                <button class="panel-nav-btn" id="left-refresh" title="Refresh (F5)">🔄</button>
+                                <button class="panel-nav-btn" id="left-stop" title="Stop Loading">✕</button>
+                            </div>
+                            <div class="toolbar-url">
+                                <input type="text" class="panel-url-input" id="left-url" placeholder="Enter URL or search..." title="URL Bar">
+                                <button class="panel-go-btn" id="left-go" title="Navigate">→</button>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="panel-action-btn" id="left-bookmark" title="Add Bookmark">⭐</button>
+                                <button class="panel-action-btn" id="left-screenshot" title="Take Screenshot">📷</button>
+                                <button class="panel-action-btn" id="left-console" title="Toggle Console">🖥</button>
+                                <button class="panel-action-btn" id="left-menu" title="Panel Menu">☰</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Loading Bar -->
+                        <div class="panel-loading-bar" id="left-loading-bar">
+                            <div class="loading-progress" id="left-loading-progress"></div>
+                        </div>
+                        
+                        <!-- Panel Content -->
                         <div id="left-browser-container" class="panel-content">
                             <webview id="left-webview" src="about:blank" plugins preload="./preload.js"></webview>
+                            
+                            <!-- Panel Error Overlay -->
+                            <div class="panel-error-overlay" id="left-error-overlay" style="display: none;">
+                                <div class="error-content">
+                                    <div class="error-icon">⚠️</div>
+                                    <h3 class="error-title">Loading Failed</h3>
+                                    <p class="error-message" id="left-error-message">Unable to load the page.</p>
+                                    <div class="error-actions">
+                                        <button class="error-btn primary" id="left-retry">🔄 Retry</button>
+                                        <button class="error-btn" id="left-clear-retry">🗑 Clear Cache & Retry</button>
+                                        <button class="error-btn" id="left-fallback">🌐 Try Web Mode</button>
+                                    </div>
+                                    <div class="error-details">
+                                        <details>
+                                            <summary>Technical Details</summary>
+                                            <pre id="left-error-details"></pre>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Panel Console -->
+                            <div class="panel-console" id="left-console-panel" style="display: none;">
+                                <div class="console-header">
+                                    <span>Console</span>
+                                    <button class="console-close" id="left-console-close">✕</button>
+                                </div>
+                                <div class="console-output" id="left-console-output"></div>
+                                <div class="console-input-container">
+                                    <input type="text" class="console-input" id="left-console-input" placeholder="Enter JavaScript...">
+                                    <button class="console-run" id="left-console-run">Run</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Status Bar -->
+                        <div class="panel-status-bar" id="left-status-bar">
+                            <span class="status-item" id="left-load-time">Load: --ms</span>
+                            <span class="status-item" id="left-memory">Mem: --MB</span>
+                            <span class="status-item" id="left-flash-status">Flash: --</span>
+                            <span class="status-item" id="left-sync-status">Sync: Off</span>
                         </div>
                     </div>
                     
                     <!-- Panel Splitter -->
-                    <div id="panel-splitter"></div>
+                    <div id="panel-splitter">
+                        <div class="splitter-handle"></div>
+                    </div>
                     
                     <!-- Right Panel: Evony Client -->
                     <div id="right-panel" class="browser-panel">
+                        <!-- Enhanced Panel Header -->
                         <div class="panel-header blue">
-                            <span class="panel-title">🌐 Right Panel</span>
-                            <div class="panel-toggle">
-                                <button class="toggle-btn active" data-mode="web" id="right-web-toggle">Web</button>
-                                <button class="toggle-btn" data-mode="swf" id="right-swf-toggle">SWF</button>
+                            <div class="panel-header-left">
+                                <span class="panel-title">🌐 Right Panel</span>
+                                <div class="panel-mode-badge" id="right-mode-badge">WEB</div>
+                                <div class="panel-health" id="right-health" title="Panel Health">
+                                    <div class="health-bar" id="right-health-bar"></div>
+                                </div>
                             </div>
-                            <span id="right-status" class="panel-status"></span>
+                            <div class="panel-toggle">
+                                <button class="toggle-btn active" data-mode="web" id="right-web-toggle" title="Web Mode">Web</button>
+                                <button class="toggle-btn" data-mode="swf" id="right-swf-toggle" title="SWF Mode">SWF</button>
+                                <button class="toggle-btn" data-mode="hybrid" id="right-hybrid-toggle" title="Hybrid Mode (Playwright)">Hybrid</button>
+                            </div>
+                            <div class="panel-status-container">
+                                <span id="right-status" class="panel-status"></span>
+                                <div class="panel-status-indicator" id="right-status-indicator" title="Status: Ready"></div>
+                            </div>
                         </div>
+                        
+                        <!-- Panel Navigation Toolbar -->
+                        <div class="panel-toolbar" id="right-toolbar">
+                            <div class="toolbar-nav">
+                                <button class="panel-nav-btn" id="right-back" title="Go Back (Alt+Left)" disabled>◀</button>
+                                <button class="panel-nav-btn" id="right-forward" title="Go Forward (Alt+Right)" disabled>▶</button>
+                                <button class="panel-nav-btn" id="right-refresh" title="Refresh (F6)">🔄</button>
+                                <button class="panel-nav-btn" id="right-stop" title="Stop Loading">✕</button>
+                            </div>
+                            <div class="toolbar-url">
+                                <input type="text" class="panel-url-input" id="right-url" placeholder="Enter URL or search..." title="URL Bar">
+                                <button class="panel-go-btn" id="right-go" title="Navigate">→</button>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="panel-action-btn" id="right-bookmark" title="Add Bookmark">⭐</button>
+                                <button class="panel-action-btn" id="right-screenshot" title="Take Screenshot">📷</button>
+                                <button class="panel-action-btn" id="right-console" title="Toggle Console">🖥</button>
+                                <button class="panel-action-btn" id="right-menu" title="Panel Menu">☰</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Loading Bar -->
+                        <div class="panel-loading-bar" id="right-loading-bar">
+                            <div class="loading-progress" id="right-loading-progress"></div>
+                        </div>
+                        
+                        <!-- Panel Content -->
                         <div id="right-browser-container" class="panel-content">
                             <webview id="right-webview" src="about:blank" plugins preload="./preload.js"></webview>
+                            
+                            <!-- Panel Error Overlay -->
+                            <div class="panel-error-overlay" id="right-error-overlay" style="display: none;">
+                                <div class="error-content">
+                                    <div class="error-icon">⚠️</div>
+                                    <h3 class="error-title">Loading Failed</h3>
+                                    <p class="error-message" id="right-error-message">Unable to load the page.</p>
+                                    <div class="error-actions">
+                                        <button class="error-btn primary" id="right-retry">🔄 Retry</button>
+                                        <button class="error-btn" id="right-clear-retry">🗑 Clear Cache & Retry</button>
+                                        <button class="error-btn" id="right-fallback">🌐 Try Web Mode</button>
+                                    </div>
+                                    <div class="error-details">
+                                        <details>
+                                            <summary>Technical Details</summary>
+                                            <pre id="right-error-details"></pre>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Panel Console -->
+                            <div class="panel-console" id="right-console-panel" style="display: none;">
+                                <div class="console-header">
+                                    <span>Console</span>
+                                    <button class="console-close" id="right-console-close">✕</button>
+                                </div>
+                                <div class="console-output" id="right-console-output"></div>
+                                <div class="console-input-container">
+                                    <input type="text" class="console-input" id="right-console-input" placeholder="Enter JavaScript...">
+                                    <button class="console-run" id="right-console-run">Run</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Status Bar -->
+                        <div class="panel-status-bar" id="right-status-bar">
+                            <span class="status-item" id="right-load-time">Load: --ms</span>
+                            <span class="status-item" id="right-memory">Mem: --MB</span>
+                            <span class="status-item" id="right-flash-status">Flash: --</span>
+                            <span class="status-item" id="right-sync-status">Sync: Off</span>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Panel Context Menu -->
+                <div class="panel-context-menu" id="panel-context-menu" style="display: none;">
+                    <div class="context-menu-item" data-action="copy-url">📋 Copy URL</div>
+                    <div class="context-menu-item" data-action="open-other">↔️ Open in Other Panel</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="add-bookmark">⭐ Add to Bookmarks</div>
+                    <div class="context-menu-item" data-action="screenshot">📷 Take Screenshot</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="view-source">📄 View Source</div>
+                    <div class="context-menu-item" data-action="inspect">🔍 Inspect Element</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="clear-cache">🗑 Clear Panel Cache</div>
+                    <div class="context-menu-item" data-action="reset-panel">🔄 Reset Panel</div>
+                </div>
+                
+                <!-- Bookmarks Dropdown -->
+                <div class="bookmarks-dropdown" id="bookmarks-dropdown" style="display: none;">
+                    <div class="bookmarks-header">
+                        <span>Bookmarks</span>
+                        <button class="bookmarks-close" id="bookmarks-close">✕</button>
+                    </div>
+                    <div class="bookmarks-list" id="bookmarks-list">
+                        <!-- Bookmarks populated dynamically -->
+                    </div>
+                    <div class="bookmarks-footer">
+                        <button class="bookmarks-manage" id="bookmarks-manage">Manage Bookmarks</button>
+                    </div>
+                </div>
+                
+                <!-- Sync Controls -->
+                <div class="sync-controls" id="sync-controls">
+                    <span class="sync-label">Sync:</span>
+                    <button class="sync-btn" id="sync-off" title="Sync Off">Off</button>
+                    <button class="sync-btn" id="sync-mirror" title="Mirror Mode">🔗</button>
+                    <button class="sync-btn" id="sync-compare" title="Compare Mode">⚖️</button>
+                    <button class="sync-btn" id="sync-transfer" title="Transfer Mode">↔️</button>
                 </div>
             </div>
             
@@ -701,6 +899,45 @@
         </div>
     </div>
 
+    <!-- Panel Context Menu -->
+    <div id="panel-context-menu" class="panel-context-menu" style="display: none;">
+        <div class="context-menu-item" data-action="copy-url">📋 Copy URL</div>
+        <div class="context-menu-item" data-action="open-other">↔️ Open in Other Panel</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="add-bookmark">⭐ Add Bookmark</div>
+        <div class="context-menu-item" data-action="screenshot">📷 Take Screenshot</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="view-source">📄 View Source</div>
+        <div class="context-menu-item" data-action="inspect">🔍 Inspect Element</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="clear-cache">🗑️ Clear Cache</div>
+        <div class="context-menu-item" data-action="reset-panel">🔄 Reset Panel</div>
+    </div>
+    
+    <!-- Bookmarks Dropdown -->
+    <div id="bookmarks-dropdown" class="bookmarks-dropdown" style="display: none;">
+        <div class="bookmarks-header">
+            <span>⭐ Bookmarks</span>
+            <button class="bookmarks-close" id="bookmarks-close">✕</button>
+        </div>
+        <div class="bookmarks-list" id="bookmarks-list">
+            <!-- Bookmarks will be populated dynamically -->
+        </div>
+        <div class="bookmarks-footer">
+            <button class="bookmarks-manage" id="bookmarks-manage">Manage Bookmarks</button>
+        </div>
+    </div>
+    
+    <!-- Sync Controls -->
+    <div class="sync-controls" id="sync-controls">
+        <span class="sync-label">Sync:</span>
+        <button class="sync-btn active" id="sync-off" title="Sync Off">⏹️</button>
+        <button class="sync-btn" id="sync-mirror" title="Mirror Mode - Navigate both panels together">🪞</button>
+        <button class="sync-btn" id="sync-compare" title="Compare Mode - Side by side comparison">⚖️</button>
+        <button class="sync-btn" id="sync-transfer" title="Transfer Mode - Copy content between panels">↔️</button>
+    </div>
+
+    <script src="services/panel-ui-controller.js"></script>
     <script src="renderer.js"></script>
 </body>
 </html>

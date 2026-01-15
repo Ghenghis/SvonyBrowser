@@ -1756,6 +1756,207 @@ function setupIPC() {
             return { error: error.message };
         }
     });
+    
+    // ========================================================================
+    // Panel Manager IPC Handlers (v2.0.8)
+    // ========================================================================
+    
+    // Initialize panel manager
+    let panelManager = null;
+    try {
+        const { PanelManager } = require('./services/panel-manager');
+        panelManager = new PanelManager({
+            flashPluginPath: store.get('flashPath'),
+            swfPaths: {
+                left: store.get('autoEvonySWF'),
+                right: store.get('evonySWF')
+            },
+            defaultUrls: {
+                left: store.get('autoEvonyURL') || 'http://www.evony.com',
+                right: `http://${store.get('server') || 'cc2'}.evony.com`
+            }
+        });
+    } catch (error) {
+        console.error('Failed to initialize PanelManager:', error);
+    }
+    
+    // Get panel state
+    ipcMain.handle('panel-get-state', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.getPanelState(panelId);
+    });
+    
+    // Navigate panel
+    ipcMain.handle('panel-navigate', async (event, panelId, url) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.navigate(panelId, url);
+    });
+    
+    // Go back
+    ipcMain.handle('panel-go-back', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.goBack(panelId);
+    });
+    
+    // Go forward
+    ipcMain.handle('panel-go-forward', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.goForward(panelId);
+    });
+    
+    // Refresh panel
+    ipcMain.handle('panel-refresh', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.refresh(panelId);
+    });
+    
+    // Set panel mode (web/swf/hybrid)
+    ipcMain.handle('panel-set-mode', async (event, panelId, mode) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.setMode(panelId, mode);
+    });
+    
+    // Get SWF path for panel
+    ipcMain.handle('get-swf-path', async (event, panelId) => {
+        const paths = {
+            left: store.get('autoEvonySWF'),
+            right: store.get('evonySWF')
+        };
+        return paths[panelId] || null;
+    });
+    
+    // Add bookmark
+    ipcMain.handle('panel-add-bookmark', async (event, panelId, bookmark) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.addBookmark(panelId, bookmark);
+    });
+    
+    // Remove bookmark
+    ipcMain.handle('panel-remove-bookmark', async (event, panelId, bookmarkId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.removeBookmark(panelId, bookmarkId);
+    });
+    
+    // Get bookmarks
+    ipcMain.handle('panel-get-bookmarks', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.getBookmarks(panelId);
+    });
+    
+    // Get history
+    ipcMain.handle('panel-get-history', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.getHistory(panelId);
+    });
+    
+    // Take screenshot
+    ipcMain.handle('panel-screenshot', async (event, panelId) => {
+        try {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `screenshot-${panelId}-${timestamp}.png`;
+            const filepath = path.join(app.getPath('pictures'), 'SvonyBrowser', filename);
+            
+            // Ensure directory exists
+            const dir = path.dirname(filepath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            
+            // Capture from webview via main window
+            if (mainWindow) {
+                const image = await mainWindow.webContents.capturePage();
+                fs.writeFileSync(filepath, image.toPNG());
+                return { success: true, filepath };
+            }
+            return { success: false, error: 'Main window not available' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Set sync mode
+    ipcMain.handle('panel-set-sync-mode', async (event, mode) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.setSyncMode(mode);
+    });
+    
+    // Get sync mode
+    ipcMain.handle('panel-get-sync-mode', async () => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.getSyncMode();
+    });
+    
+    // Execute failsafe recovery
+    ipcMain.handle('panel-failsafe-recover', async (event, panelId, level) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.executeFailsafe(panelId, level);
+    });
+    
+    // Get panel health
+    ipcMain.handle('panel-get-health', async (event, panelId) => {
+        if (!panelManager) return { error: 'Panel manager not initialized' };
+        return panelManager.getHealth(panelId);
+    });
+    
+    // ========================================================================
+    // Panel Playwright Bridge IPC Handlers (v2.0.8)
+    // ========================================================================
+    
+    let panelPlaywrightBridge = null;
+    try {
+        const { PanelPlaywrightBridge } = require('./services/panel-playwright-bridge');
+        panelPlaywrightBridge = new PanelPlaywrightBridge();
+    } catch (error) {
+        console.error('Failed to initialize PanelPlaywrightBridge:', error);
+    }
+    
+    // Start hybrid session
+    ipcMain.handle('panel-hybrid-start', async (event, panelId, url) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.startHybridSession(panelId, url);
+    });
+    
+    // Stop hybrid session
+    ipcMain.handle('panel-hybrid-stop', async (event, panelId) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.stopHybridSession(panelId);
+    });
+    
+    // Auto-login
+    ipcMain.handle('panel-hybrid-login', async (event, panelId, credentials) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.autoLogin(panelId, credentials);
+    });
+    
+    // Auto-fill form
+    ipcMain.handle('panel-hybrid-fill-form', async (event, panelId, formData) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.autoFillForm(panelId, formData);
+    });
+    
+    // Execute script in hybrid session
+    ipcMain.handle('panel-hybrid-execute', async (event, panelId, script) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.executeScript(panelId, script);
+    });
+    
+    // Get hybrid session status
+    ipcMain.handle('panel-hybrid-status', async (event, panelId) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.getSessionStatus(panelId);
+    });
+    
+    // Intercept network requests
+    ipcMain.handle('panel-hybrid-intercept', async (event, panelId, pattern, handler) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.interceptRequests(panelId, pattern);
+    });
+    
+    // Get network log
+    ipcMain.handle('panel-hybrid-network-log', async (event, panelId) => {
+        if (!panelPlaywrightBridge) return { error: 'Playwright bridge not initialized' };
+        return panelPlaywrightBridge.getNetworkLog(panelId);
+    });
 }
 
 // Create main window
