@@ -267,7 +267,9 @@ app.commandLine.appendSwitch("--enable-npapi");
 app.commandLine.appendSwitch("--enable-logging");
 app.commandLine.appendSwitch("--log-level", 4);
 if (pluginName) {
-    app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, pluginName));
+    // pluginName is already the full absolute path from findFlashPlugin()
+    app.commandLine.appendSwitch('ppapi-flash-path', pluginName);
+    console.log('[Flash] Using Flash plugin path:', pluginName);
 }
 app.commandLine.appendSwitch('disable-site-isolation-trials');
 app.commandLine.appendSwitch('no-sandbox');
