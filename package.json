@@ -94,30 +94,22 @@
       {
         "from": "flashver",
         "to": "flashver",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       },
       {
         "from": "swf",
         "to": "swf",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       },
       {
         "from": "themes",
         "to": "themes",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       },
       {
         "from": "mcp-servers",
         "to": "mcp-servers",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       },
       {
         "from": "scripts/setup-flash.bat",
@@ -126,42 +118,39 @@
       {
         "from": "docs",
         "to": "docs",
-        "filter": [
-          "**/*.md",
-          "**/*.png"
-        ]
+        "filter": ["**/*.md", "**/*.png"]
+      },
+      {
+        "from": "icons",
+        "to": "icons",
+        "filter": ["**/*"]
       }
     ],
     "publish": null,
     "win": {
+      "icon": "icons/icon.ico",
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "arch": ["x64", "ia32"]
         },
         {
           "target": "portable",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "arch": ["x64", "ia32"]
         },
         {
           "target": "zip",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "arch": ["x64", "ia32"]
         }
       ],
+      
       "publisherName": "Ghenghis",
       "verifyUpdateCodeSignature": false,
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
+      
+      
       "uninstallDisplayName": "Svony Browser",
       "license": "LICENSE",
       "oneClick": false,
@@ -176,19 +165,14 @@
       "artifactName": "SvonyBrowser-Portable-${version}-${arch}.${ext}"
     },
     "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
+      "target": ["dmg", "zip"],
+      
       "category": "public.app-category.utilities",
       "artifactName": "SvonyBrowser-${version}-${arch}.${ext}"
     },
     "linux": {
-      "target": [
-        "AppImage",
-        "deb",
-        "tar.gz"
-      ],
+      "target": ["AppImage", "deb", "tar.gz"],
+      
       "category": "Utility",
       "artifactName": "SvonyBrowser-${version}-${arch}.${ext}"
     },
