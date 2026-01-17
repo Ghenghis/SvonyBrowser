@@ -1,0 +1,1196 @@
+[
+  {
+    "Name": "asset-inventory.json",
+    "Length": 0,
+    "Extension": ".json",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets"
+  },
+  {
+    "Name": "AUTOEVONY_ASSETS_INVENTORY.md",
+    "Length": 7010,
+    "Extension": ".md",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets"
+  },
+  {
+    "Name": "101_com.evony.eum.GetDataXML_XMLTroop.bin",
+    "Length": 9545,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "119_com.evony.eum.GetDataXML_XMLTech.bin",
+    "Length": 61754,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "47_com.evony.eum.GetDataXML_XMLItem.bin",
+    "Length": 722567,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "60_com.evony.eum.GetDataXML_XMLPlayerLogo.bin",
+    "Length": 1944,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "71_com.evony.eum.GetDataXML_XMLCastleLogo.bin",
+    "Length": 338,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "96_com.evony.eum.GetDataXML_XMLBuilding.bin",
+    "Length": 78746,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "98_com.evony.eum.GetDataXML_XMLEquipTech.bin",
+    "Length": 90663,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "99_com.evony.eum.GetDataXML_XMLFort.bin",
+    "Length": 3249,
+    "Extension": ".bin",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\data"
+  },
+  {
+    "Name": "107_AutoEvony2__embed__font_DejaVu_Sans_bold_italic_653331763_DejaVu Sans.ttf",
+    "Length": 267552,
+    "Extension": ".ttf",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\fonts"
+  },
+  {
+    "Name": "124_AutoEvony2__embed__font_DejaVu_Sans_medium_normal_356255468_DejaVu Sans.ttf",
+    "Length": 250316,
+    "Extension": ".ttf",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\fonts"
+  },
+  {
+    "Name": "68_AutoEvony2__embed__font_DejaVu_Sans_bold_normal_1092898251_DejaVu Sans.ttf",
+    "Length": 256060,
+    "Extension": ".ttf",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\fonts"
+  },
+  {
+    "Name": "94_AutoEvony2__embed__font_DejaVu_Sans_medium_italic_83311012_DejaVu Sans.ttf",
+    "Length": 268436,
+    "Extension": ".ttf",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\fonts"
+  },
+  {
+    "Name": "1.png",
+    "Length": 195,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "100_autoevony.gui.controls.themes.ThemeAssets__embed_numStepDn_png.png",
+    "Length": 158,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "102_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_a_icon_png_384125722.png",
+    "Length": 866,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "103_autoevony.gui.controls.themes.ThemeAssets__embed_editBtnDown_png.png",
+    "Length": 911,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "104_autoevony.gui.controls.themes.ThemeAssets__embed_editBtnOver_png.png",
+    "Length": 815,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "105_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_taxes_png_499416011.png",
+    "Length": 964,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "106_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_prestige_png_988543979.png",
+    "Length": 964,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "108_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOffOver_png.png",
+    "Length": 1058,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "109_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtn_png.png",
+    "Length": 467,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "11.svg",
+    "Length": 1370,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "110_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtnDown_png.png",
+    "Length": 463,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "111_autoevony.gui.controls.themes.ThemeAssets__embed_numStepUp_png.png",
+    "Length": 144,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "112_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOn_png.png",
+    "Length": 1244,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "113_autoevony.gui.controls.themes.ThemeAssets__embed_refreshBtnOver_png.png",
+    "Length": 1213,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "114_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_prod_png_99042219.png",
+    "Length": 830,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "115_autoevony.gui.controls.themes.ThemeAssets__embed_clearTextBtn_png.png",
+    "Length": 313,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "116_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_cata_icon_png_1823416280.png",
+    "Length": 1418,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "117_autoevony.gui.controls.themes.ThemeAssets__embed_classicBlue_rePopUpWinTitleBg_png.png",
+    "Length": 14011,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "118_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_sw_icon_png_656076794.png",
+    "Length": 1348,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "120_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOnDisabled_png.png",
+    "Length": 1181,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "121_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_i_icon_png_627990212.png",
+    "Length": 1359,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "122_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_w_icon_png_367385154.png",
+    "Length": 917,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "123_autoevony.gui.AlertWin_alertIco.png",
+    "Length": 3708,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "125_autoevony.gui.controls.themes.ThemeAssets__embed_clearTextBtnOver_png.png",
+    "Length": 329,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "126_autoevony.gui.controls.themes.ThemeAssets__embed_refreshBtn_png.png",
+    "Length": 1217,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "127_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtnDisabled_png.png",
+    "Length": 442,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "128_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtn_png.png",
+    "Length": 453,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "129_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtnOver_png.png",
+    "Length": 459,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "13.svg",
+    "Length": 1233,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "130_autoevony.gui.controls.themes.ThemeAssets__embed_classicBlue_cityInfoLine_png.png",
+    "Length": 718,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "131_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_t_icon_png_706362488.png",
+    "Length": 1184,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "14.svg",
+    "Length": 527,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "16.svg",
+    "Length": 747,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "18.svg",
+    "Length": 796,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "2.svg",
+    "Length": 996,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "20.svg",
+    "Length": 811,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "22.svg",
+    "Length": 2030,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "30_autoevony.gui.controls.themes.ThemeAssets__embed_subAttribIcon_disabled_png.png",
+    "Length": 79,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "31_autoevony.gui.CityPanelBean_SUZ_ICON.png",
+    "Length": 664,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "32_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_g_icon_png_195689896.png",
+    "Length": 1640,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "33_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_s_icon_png_332564056.png",
+    "Length": 1413,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "34_autoevony.gui.controls.themes.ThemeAssets__embed_winCloseBtn_png.png",
+    "Length": 262,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "35_autoevony.gui.controls.themes.ThemeAssets__embed_editButton_png.png",
+    "Length": 824,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "36_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_honor_png_2025036117.png",
+    "Length": 958,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "37_autoevony.gui.controls.themes.ThemeAssets__embed_refreshBtnDown_png.png",
+    "Length": 1195,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "38_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_loyGrieve_png_471597483.png",
+    "Length": 910,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "39_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_alliance_png_1159272469.png",
+    "Length": 962,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "4.svg",
+    "Length": 1054,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "40_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_r_icon_png_350636924.png",
+    "Length": 1298,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "41_autoevony.gui.MainScreen_RefreshIcon.png",
+    "Length": 332,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "42_autoevony.gui.AlertWin_confirmIco.png",
+    "Length": 3750,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "43_autoevony.gui.controls.themes.ThemeAssets__embed_addAttribIcon_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "44_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOnOver_png.png",
+    "Length": 1184,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "45_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOff_png.png",
+    "Length": 1049,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "46_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtnOver_png.png",
+    "Length": 465,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "48_autoevony.gui.controls.themes.ThemeAssets__embed_cityInfoBackGrnd_png.png",
+    "Length": 187,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "49_autoevony.gui.controls.themes.ThemeAssets__embed_editBtnDisabled_png.png",
+    "Length": 788,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "50_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_w_icon_png_313115048.png",
+    "Length": 1270,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "51_autoevony.gui.MainScreen_PauseIcon.png",
+    "Length": 138,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "52_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOffDisabled_png.png",
+    "Length": 1192,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "53_autoevony.gui.MainScreen__embed_mxml_autoevony_gui_images_helpIcon_png_987429035.png",
+    "Length": 1560,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "54_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_c_icon_png_1441123226.png",
+    "Length": 1423,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "55_autoevony.gui.controls.themes.ThemeAssets__embed_cityInfoLine_png.png",
+    "Length": 662,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "56_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_rank_png_1843179317.png",
+    "Length": 876,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "57_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_s_icon_png_724491398.png",
+    "Length": 868,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "58_autoevony.gui.controls.themes.ThemeAssets__embed_winCloseBtnOver_png.png",
+    "Length": 324,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "59_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_ranking_png_445787723.png",
+    "Length": 897,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "6.svg",
+    "Length": 1920,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "61_autoevony.gui.controls.themes.ThemeAssets__embed_addAttribIcon_disabled_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "62_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_Age2Quest_png_2079013973.png",
+    "Length": 1771,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "63_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtnDown_png.png",
+    "Length": 467,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "64_autoevony.gui.controls.themes.ThemeAssets__embed_checkBoxSelected_png.png",
+    "Length": 695,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "65_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_p_icon_png_1427655496.png",
+    "Length": 1074,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "66_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtnDisabled_png.png",
+    "Length": 438,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "67_autoevony.gui.controls.themes.ThemeAssets__embed_winCloseBtnDown_png.png",
+    "Length": 339,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "69_autoevony.gui.controls.themes.ThemeAssets__embed_subAttribIcon_png.png",
+    "Length": 79,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "70_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_wo_icon_png_43741154.png",
+    "Length": 1084,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "72_autoevony.gui.TopInfo_AllianceLv5.png",
+    "Length": 553,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "73_autoevony.gui.TopInfo_AllianceLv4.png",
+    "Length": 487,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "74_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_cp_icon_png_666664940.png",
+    "Length": 1147,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "75_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_pop_png_1631794581.png",
+    "Length": 1008,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "76_autoevony.gui.controls.themes.ThemeAssets__embed_rePopUpWinTitleBg_png.png",
+    "Length": 11521,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "77_autoevony.gui.controls.themes.ThemeAssets__embed_addIcon_disabled_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "78_autoevony.gui.controls.themes.ThemeAssets__embed_checkBox_png.png",
+    "Length": 235,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "79_autoevony.gui.controls.themes.ThemeAssets__embed_clearLogBtn_png.png",
+    "Length": 1733,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "80_autoevony.gui.TopInfo_AllianceLv2.png",
+    "Length": 326,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "81_autoevony.gui.TopInfo_AllianceLv3.png",
+    "Length": 464,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "82_autoevony.gui.controls.themes.ThemeAssets__embed_clearLogBtnDown_png.png",
+    "Length": 2281,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "83_autoevony.gui.TopInfo_AllianceLv1.png",
+    "Length": 312,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "84_autoevony.gui.controls.themes.ThemeAssets__embed_classicBlue_cityInfoBackGrnd_png.png",
+    "Length": 224,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "85_autoevony.gui.controls.themes.ThemeAssets__embed_clearLogBtnOver_png.png",
+    "Length": 2205,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "86_autoevony.gui.CityPanelBean_COL_ICON.png",
+    "Length": 621,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "87_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_f_icon_png_472776098.png",
+    "Length": 1230,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "88_autoevony.gui.controls.themes.ThemeAssets__embed_classicBlue_winCloseBtnOver_png.png",
+    "Length": 42897,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "89_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_b_icon_png_353381212.png",
+    "Length": 1259,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "9.svg",
+    "Length": 1455,
+    "Extension": ".svg",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "90_autoevony.gui.controls.themes.ThemeAssets__embed_addIcon_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "91_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_title_png_2018272843.png",
+    "Length": 875,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "92_autoevony.gui.MainScreen_ResumeIcon.png",
+    "Length": 285,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "93_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_gameCoins_png_216677973.png",
+    "Length": 825,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "95_autoevony.gui.controls.themes.ThemeAssets__embed_checkBoxDisable_png.png",
+    "Length": 214,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "97_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_gift_png_2082389813.png",
+    "Length": 362,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\all"
+  },
+  {
+    "Name": "72_autoevony.gui.TopInfo_AllianceLv5.png",
+    "Length": 553,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\alliance"
+  },
+  {
+    "Name": "73_autoevony.gui.TopInfo_AllianceLv4.png",
+    "Length": 487,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\alliance"
+  },
+  {
+    "Name": "80_autoevony.gui.TopInfo_AllianceLv2.png",
+    "Length": 326,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\alliance"
+  },
+  {
+    "Name": "81_autoevony.gui.TopInfo_AllianceLv3.png",
+    "Length": 464,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\alliance"
+  },
+  {
+    "Name": "83_autoevony.gui.TopInfo_AllianceLv1.png",
+    "Length": 312,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\alliance"
+  },
+  {
+    "Name": "103_autoevony.gui.controls.themes.ThemeAssets__embed_editBtnDown_png.png",
+    "Length": 911,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "104_autoevony.gui.controls.themes.ThemeAssets__embed_editBtnOver_png.png",
+    "Length": 815,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "109_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtn_png.png",
+    "Length": 467,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "110_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtnDown_png.png",
+    "Length": 463,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "113_autoevony.gui.controls.themes.ThemeAssets__embed_refreshBtnOver_png.png",
+    "Length": 1213,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "126_autoevony.gui.controls.themes.ThemeAssets__embed_refreshBtn_png.png",
+    "Length": 1217,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "127_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtnDisabled_png.png",
+    "Length": 442,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "128_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtn_png.png",
+    "Length": 453,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "129_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtnOver_png.png",
+    "Length": 459,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "34_autoevony.gui.controls.themes.ThemeAssets__embed_winCloseBtn_png.png",
+    "Length": 262,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "37_autoevony.gui.controls.themes.ThemeAssets__embed_refreshBtnDown_png.png",
+    "Length": 1195,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "41_autoevony.gui.MainScreen_RefreshIcon.png",
+    "Length": 332,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "46_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtnOver_png.png",
+    "Length": 465,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "49_autoevony.gui.controls.themes.ThemeAssets__embed_editBtnDisabled_png.png",
+    "Length": 788,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "51_autoevony.gui.MainScreen_PauseIcon.png",
+    "Length": 138,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "58_autoevony.gui.controls.themes.ThemeAssets__embed_winCloseBtnOver_png.png",
+    "Length": 324,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "63_autoevony.gui.controls.themes.ThemeAssets__embed_RE_nextBtnDown_png.png",
+    "Length": 467,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "66_autoevony.gui.controls.themes.ThemeAssets__embed_RE_previousBtnDisabled_png.png",
+    "Length": 438,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "67_autoevony.gui.controls.themes.ThemeAssets__embed_winCloseBtnDown_png.png",
+    "Length": 339,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "79_autoevony.gui.controls.themes.ThemeAssets__embed_clearLogBtn_png.png",
+    "Length": 1733,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "82_autoevony.gui.controls.themes.ThemeAssets__embed_clearLogBtnDown_png.png",
+    "Length": 2281,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "85_autoevony.gui.controls.themes.ThemeAssets__embed_clearLogBtnOver_png.png",
+    "Length": 2205,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "88_autoevony.gui.controls.themes.ThemeAssets__embed_classicBlue_winCloseBtnOver_png.png",
+    "Length": 42897,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "92_autoevony.gui.MainScreen_ResumeIcon.png",
+    "Length": 285,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\buttons"
+  },
+  {
+    "Name": "100_autoevony.gui.controls.themes.ThemeAssets__embed_numStepDn_png.png",
+    "Length": 158,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "108_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOffOver_png.png",
+    "Length": 1058,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "111_autoevony.gui.controls.themes.ThemeAssets__embed_numStepUp_png.png",
+    "Length": 144,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "112_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOn_png.png",
+    "Length": 1244,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "120_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOnDisabled_png.png",
+    "Length": 1181,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "123_autoevony.gui.AlertWin_alertIco.png",
+    "Length": 3708,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "30_autoevony.gui.controls.themes.ThemeAssets__embed_subAttribIcon_disabled_png.png",
+    "Length": 79,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "42_autoevony.gui.AlertWin_confirmIco.png",
+    "Length": 3750,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "43_autoevony.gui.controls.themes.ThemeAssets__embed_addAttribIcon_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "44_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOnOver_png.png",
+    "Length": 1184,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "45_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOff_png.png",
+    "Length": 1049,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "52_autoevony.gui.controls.themes.ThemeAssets__embed_RE_toggleBoxOffDisabled_png.png",
+    "Length": 1192,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "53_autoevony.gui.MainScreen__embed_mxml_autoevony_gui_images_helpIcon_png_987429035.png",
+    "Length": 1560,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "61_autoevony.gui.controls.themes.ThemeAssets__embed_addAttribIcon_disabled_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "64_autoevony.gui.controls.themes.ThemeAssets__embed_checkBoxSelected_png.png",
+    "Length": 695,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "69_autoevony.gui.controls.themes.ThemeAssets__embed_subAttribIcon_png.png",
+    "Length": 79,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "77_autoevony.gui.controls.themes.ThemeAssets__embed_addIcon_disabled_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "78_autoevony.gui.controls.themes.ThemeAssets__embed_checkBox_png.png",
+    "Length": 235,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "90_autoevony.gui.controls.themes.ThemeAssets__embed_addIcon_png.png",
+    "Length": 90,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "95_autoevony.gui.controls.themes.ThemeAssets__embed_checkBoxDisable_png.png",
+    "Length": 214,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\controls"
+  },
+  {
+    "Name": "121_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_i_icon_png_627990212.png",
+    "Length": 1359,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\resources"
+  },
+  {
+    "Name": "32_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_g_icon_png_195689896.png",
+    "Length": 1640,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\resources"
+  },
+  {
+    "Name": "33_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_s_icon_png_332564056.png",
+    "Length": 1413,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\resources"
+  },
+  {
+    "Name": "50_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_w_icon_png_313115048.png",
+    "Length": 1270,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\resources"
+  },
+  {
+    "Name": "87_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_resoLogo_f_icon_png_472776098.png",
+    "Length": 1230,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\resources"
+  },
+  {
+    "Name": "105_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_taxes_png_499416011.png",
+    "Length": 964,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "106_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_prestige_png_988543979.png",
+    "Length": 964,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "114_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_prod_png_99042219.png",
+    "Length": 830,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "117_autoevony.gui.controls.themes.ThemeAssets__embed_classicBlue_rePopUpWinTitleBg_png.png",
+    "Length": 14011,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "36_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_honor_png_2025036117.png",
+    "Length": 958,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "39_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_alliance_png_1159272469.png",
+    "Length": 962,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "56_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_rank_png_1843179317.png",
+    "Length": 876,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "59_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_ranking_png_445787723.png",
+    "Length": 897,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "75_autoevony.gui.CityPanel__embed_mxml_autoevony_gui_images_pop_png_1631794581.png",
+    "Length": 1008,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "76_autoevony.gui.controls.themes.ThemeAssets__embed_rePopUpWinTitleBg_png.png",
+    "Length": 11521,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "93_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_gameCoins_png_216677973.png",
+    "Length": 825,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "97_autoevony.gui.TopInfo__embed_mxml_autoevony_gui_images_gift_png_2082389813.png",
+    "Length": 362,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\status"
+  },
+  {
+    "Name": "102_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_a_icon_png_384125722.png",
+    "Length": 866,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "116_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_cata_icon_png_1823416280.png",
+    "Length": 1418,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "118_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_sw_icon_png_656076794.png",
+    "Length": 1348,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "122_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_w_icon_png_367385154.png",
+    "Length": 917,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "131_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_t_icon_png_706362488.png",
+    "Length": 1184,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "40_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_r_icon_png_350636924.png",
+    "Length": 1298,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "54_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_c_icon_png_1441123226.png",
+    "Length": 1423,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "57_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_s_icon_png_724491398.png",
+    "Length": 868,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "65_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_p_icon_png_1427655496.png",
+    "Length": 1074,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "70_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_wo_icon_png_43741154.png",
+    "Length": 1084,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "74_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_cp_icon_png_666664940.png",
+    "Length": 1147,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "89_autoevony.gui.newarmy.NewArmyWin__embed_mxml_autoevony_gui_images_troopLogo_b_icon_png_353381212.png",
+    "Length": 1259,
+    "Extension": ".png",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\icons\\troops"
+  },
+  {
+    "Name": "25_autoevony.gui.MainScreen_Attack_Several_Sound_autoevony.gui.MainScreen_Attack_Several_Sound.mp3",
+    "Length": 12062,
+    "Extension": ".mp3",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\sounds"
+  },
+  {
+    "Name": "26_autoevony.gui.MainScreen_Attack_Ended_Sound_autoevony.gui.MainScreen_Attack_Ended_Sound.mp3",
+    "Length": 11594,
+    "Extension": ".mp3",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\sounds"
+  },
+  {
+    "Name": "27_autoevony.gui.MainScreen_Attack_Sound_autoevony.gui.MainScreen_Attack_Sound.mp3",
+    "Length": 10814,
+    "Extension": ".mp3",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\sounds"
+  },
+  {
+    "Name": "28_autoevony.gui.MainScreen_Attempted_Sound_autoevony.gui.MainScreen_Attempted_Sound.mp3",
+    "Length": 79830,
+    "Extension": ".mp3",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\sounds"
+  },
+  {
+    "Name": "29_autoevony.gui.MainScreen_Scouted_Sound_autoevony.gui.MainScreen_Scouted_Sound.mp3",
+    "Length": 78994,
+    "Extension": ".mp3",
+    "DirectoryName": "G:\\Github\\SvonyBrowser-v2.2.12\\assets\\sounds"
+  }
+]

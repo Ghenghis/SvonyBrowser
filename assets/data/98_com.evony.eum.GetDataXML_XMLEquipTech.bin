@@ -1,0 +1,1641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<equipmenttechlist>
+  <equipmenttech equipmenttechid="weapon" type="1" name="Weaponry" wikides="“Never give a sword to a man who can't dance.” --  Confucius &#x00A;&#x00A;As medieval combat grew more frequent and more vicious, weapons were improved in both their design and composition. Halberds allowed untrained foot soldiers to pull knights from their mounts, while smiths and chemists created new materials for blades – like steel.">
+    <equipmentdefine des="0" name="Weaponry" lv="0" icon="images/equipTech/weapon0.png"/>
+    <equipmentdefine des="Level 1 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Weaponry" lv="1" icon="images/equipTech/weapon1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+        <build type="22" name="Forge" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Weaponry" lv="2" icon="images/equipTech/weapon2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+        <build type="22" name="Forge" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Weaponry" lv="3" icon="images/equipTech/weapon3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+        <build type="22" name="Forge" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Weaponry" lv="4" icon="images/equipTech/weapon4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+        <build type="22" name="Forge" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Weaponry" lv="5" icon="images/equipTech/weapon5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+        <build type="22" name="Forge" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Weaponry" lv="6" icon="images/equipTech/weapon6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+        <build type="22" name="Forge" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Weaponry" lv="7" icon="images/equipTech/weapon7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+        <build type="22" name="Forge" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Weaponry" lv="8" icon="images/equipTech/weapon8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+        <build type="22" name="Forge" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Weaponry" lv="9" icon="images/equipTech/weapon9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+        <build type="22" name="Forge" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Weaponry technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Weaponry" lv="10" icon="images/equipTech/weapon10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+        <build type="22" name="Forge" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="shield" type="2" name="Shield Construction" wikides="“Your helmet you put on for your own protection, but the shield for the common good of all.” -- Demaratos  &#x00A;&#x00A;While shields of various types have existed throughout history, the middle ages saw advancements in shield technology that allowed for greater range of motion while maintaining a solid defense. Shields were an important defense and symbol of power in warfare.">
+    <equipmentdefine des="0" name="Shield Construction" lv="0" icon="images/equipTech/shield0.png"/>
+    <equipmentdefine des="Level 1 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Shield Construction" lv="1" icon="images/equipTech/shield1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+        <build type="22" name="Forge" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Shield Construction" lv="2" icon="images/equipTech/shield2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+        <build type="22" name="Forge" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Shield Construction" lv="3" icon="images/equipTech/shield3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+        <build type="22" name="Forge" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Shield Construction" lv="4" icon="images/equipTech/shield4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+        <build type="22" name="Forge" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Shield Construction" lv="5" icon="images/equipTech/shield5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+        <build type="22" name="Forge" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Shield Construction" lv="6" icon="images/equipTech/shield6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+        <build type="22" name="Forge" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Shield Construction" lv="7" icon="images/equipTech/shield7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+        <build type="22" name="Forge" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Shield Construction" lv="8" icon="images/equipTech/shield8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+        <build type="22" name="Forge" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Shield Construction" lv="9" icon="images/equipTech/shield9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+        <build type="22" name="Forge" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Shield Construction technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Shield Construction" lv="10" icon="images/equipTech/shield10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+        <build type="22" name="Forge" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.2" name="Wood" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="mounts" type="3" name="Mount Training" wikides="“It's hard to lead a cavalry charge if you think you look funny on a horse.” -- Adlai E. Stevenson  &#x00A;&#x00A;By the middle ages, animal husbandry had become an art form. Horses were bread for speed, stamina and endurance; trained respond to rider's battle commands and even bit and kicked enemies. For many a knight, his mount was itself a potent weapon.">
+    <equipmentdefine des="0" name="Mount Training" lv="0" icon="images/equipTech/mounts0.png"/>
+    <equipmentdefine des="Level 1 Mount Training technology enhances hero's moving speed by 10 points" name="Mount Training" lv="1" icon="images/equipTech/mounts1.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="1"/>
+        <build type="20" name="Stable" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Mount Training technology enhances hero's moving speed by 20 points" name="Mount Training" lv="2" icon="images/equipTech/mounts2.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="2"/>
+        <build type="20" name="Stable" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Mount Training technology enhances hero's moving speed by 30 points" name="Mount Training" lv="3" icon="images/equipTech/mounts3.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="3"/>
+        <build type="20" name="Stable" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Mount Training technology enhances hero's moving speed by 40 points" name="Mount Training" lv="4" icon="images/equipTech/mounts4.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="4"/>
+        <build type="20" name="Stable" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Mount Training technology enhances hero's moving speed by 50 points" name="Mount Training" lv="5" icon="images/equipTech/mounts5.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="5"/>
+        <build type="20" name="Stable" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Mount Training technology enhances hero's moving speed by 60 points" name="Mount Training" lv="6" icon="images/equipTech/mounts6.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="6"/>
+        <build type="20" name="Stable" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Mount Training technology enhances hero's moving speed by 70 points" name="Mount Training" lv="7" icon="images/equipTech/mounts7.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="7"/>
+        <build type="20" name="Stable" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Mount Training technology enhances hero's moving speed by 80 points" name="Mount Training" lv="8" icon="images/equipTech/mounts8.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="8"/>
+        <build type="20" name="Stable" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Mount Training technology enhances hero's moving speed by 90 points" name="Mount Training" lv="9" icon="images/equipTech/mounts9.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="9"/>
+        <build type="20" name="Stable" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Mount Training technology enhances hero's moving speed by 100 points" name="Mount Training" lv="10" icon="images/equipTech/mounts10.png">
+      <buildlist>
+        <build type="22" name="Forge" lv="10"/>
+        <build type="20" name="Stable" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.4" name="Thoroughbred" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="neck" type="4" name="Necklace Fabrication" wikides="“Behold the turtle. He makes progress only when he sticks his neck out.” -- James Bryant Conant &#x00A;&#x00A;Jewelry worn about the neck symbolizes wealth and power. A steel collar turn aside a deadly blade.">
+    <equipmentdefine des="0" name="Necklace Fabrication" lv="0" icon="images/equipTech/neck0.png"/>
+    <equipmentdefine des="Level 1 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Necklace Fabrication" lv="1" icon="images/equipTech/neck1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+        <build type="23" name="Marketplace" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Necklace Fabrication" lv="2" icon="images/equipTech/neck2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+        <build type="23" name="Marketplace" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Necklace Fabrication" lv="3" icon="images/equipTech/neck3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+        <build type="23" name="Marketplace" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Necklace Fabrication" lv="4" icon="images/equipTech/neck4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+        <build type="23" name="Marketplace" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Necklace Fabrication" lv="5" icon="images/equipTech/neck5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+        <build type="23" name="Marketplace" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Necklace Fabrication" lv="6" icon="images/equipTech/neck6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+        <build type="23" name="Marketplace" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Necklace Fabrication" lv="7" icon="images/equipTech/neck7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+        <build type="23" name="Marketplace" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Necklace Fabrication" lv="8" icon="images/equipTech/neck8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+        <build type="23" name="Marketplace" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Necklace Fabrication" lv="9" icon="images/equipTech/neck9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+        <build type="23" name="Marketplace" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Necklace Fabrication technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Necklace Fabrication" lv="10" icon="images/equipTech/neck10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+        <build type="23" name="Marketplace" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="accessories" type="5" name="Charm" wikides="“An object in possession seldom retains the same charm that it had in pursuit.” -- Pliny the Elder &#x00A;&#x00A;From antiquity, charms have been worn in battle by those who believed they would lend them strength in battle. Whether or not the items possessed any magical properties is immaterial, because belief that they possessed magic was often advantage enough.">
+    <equipmentdefine des="0" name="Charm" lv="0" icon="images/equipTech/accessories0.png"/>
+    <equipmentdefine des="Level 1 Charm technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Charm" lv="1" icon="images/equipTech/accessories1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+        <build type="23" name="Marketplace" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Charm technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Charm" lv="2" icon="images/equipTech/accessories2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+        <build type="23" name="Marketplace" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Charm technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Charm" lv="3" icon="images/equipTech/accessories3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+        <build type="23" name="Marketplace" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Charm technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Charm" lv="4" icon="images/equipTech/accessories4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+        <build type="23" name="Marketplace" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Charm technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Charm" lv="5" icon="images/equipTech/accessories5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+        <build type="23" name="Marketplace" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Charm technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Charm" lv="6" icon="images/equipTech/accessories6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+        <build type="23" name="Marketplace" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Charm technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Charm" lv="7" icon="images/equipTech/accessories7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+        <build type="23" name="Marketplace" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Charm technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Charm" lv="8" icon="images/equipTech/accessories8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+        <build type="23" name="Marketplace" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Charm technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Charm" lv="9" icon="images/equipTech/accessories9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+        <build type="23" name="Marketplace" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Charm technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Charm" lv="10" icon="images/equipTech/accessories10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+        <build type="23" name="Marketplace" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="ring" type="6" name="Ring Crafting" wikides="“A ring is a halo on your finger.” -- Doug Copeland &#x00A;&#x00A;From the earliest times, rings have been symbols of royalty. In the middle ages, rings often bore a crest of a house or family and were an expression of loyalty and commitment to the wearer's liege, while simultaneously expressing that lord's trust in the wearer.">
+    <equipmentdefine des="0" name="Ring Crafting" lv="0" icon="images/equipTech/ring0.png"/>
+    <equipmentdefine des="Level 1 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Ring Crafting" lv="1" icon="images/equipTech/ring1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+        <build type="23" name="Marketplace" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Ring Crafting" lv="2" icon="images/equipTech/ring2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+        <build type="23" name="Marketplace" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="2"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Ring Crafting" lv="3" icon="images/equipTech/ring3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+        <build type="23" name="Marketplace" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Ring Crafting" lv="4" icon="images/equipTech/ring4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+        <build type="23" name="Marketplace" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Ring Crafting" lv="5" icon="images/equipTech/ring5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+        <build type="23" name="Marketplace" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Ring Crafting" lv="6" icon="images/equipTech/ring6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+        <build type="23" name="Marketplace" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Ring Crafting" lv="7" icon="images/equipTech/ring7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+        <build type="23" name="Marketplace" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Ring Crafting" lv="8" icon="images/equipTech/ring8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+        <build type="23" name="Marketplace" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Ring Crafting" lv="9" icon="images/equipTech/ring9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+        <build type="23" name="Marketplace" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Ring Crafting technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Ring Crafting" lv="10" icon="images/equipTech/ring10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+        <build type="23" name="Marketplace" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.3" name="Crude Gemstone" count="18"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="head" type="7" name="Head Gearing" wikides="“Uneasy lies the head that wears a crown.” -- William Shakespeare &#x00A;&#x00A;It didn't take long after warfare began for soldiers to find the usefulness of protecting their heads. By the middle ages, helmets had developed to be not only effective in protecting from attacks, but imposing to enemies as well.">
+    <equipmentdefine des="0" name="Head Gearing" lv="0" icon="images/equipTech/head0.png"/>
+    <equipmentdefine des="Level 1 Head Gearing technology enhances hero's attribute by 1 point(s)" name="Head Gearing" lv="1" icon="images/equipTech/head1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Head Gearing technology enhances hero's attribute by 2 point(s)" name="Head Gearing" lv="2" icon="images/equipTech/head2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Head Gearing technology enhances hero's attribute by 3 point(s)" name="Head Gearing" lv="3" icon="images/equipTech/head3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Head Gearing technology enhances hero's attribute by 4 point(s)" name="Head Gearing" lv="4" icon="images/equipTech/head4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Head Gearing technology enhances hero's attribute by 5 point(s)" name="Head Gearing" lv="5" icon="images/equipTech/head5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Head Gearing technology enhances hero's attribute by 6 point(s)" name="Head Gearing" lv="6" icon="images/equipTech/head6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Head Gearing technology enhances hero's attribute by 7 point(s)" name="Head Gearing" lv="7" icon="images/equipTech/head7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Head Gearing technology enhances hero's attribute by 8 point(s)" name="Head Gearing" lv="8" icon="images/equipTech/head8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Head Gearing technology enhances hero's attribute by 9 point(s)" name="Head Gearing" lv="9" icon="images/equipTech/head9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Head Gearing technology enhances hero's attribute by 10 point(s)" name="Head Gearing" lv="10" icon="images/equipTech/head10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="shoulders" type="8" name="Shoulder Gearing" wikides="“Responsibilities gravitate to the person who can shoulder them.” -- Tom Stoppard &#x00A;&#x00A;As warfare advanced technologically, obvious weak points had to be protected as well. A broken shoulder could be as lethal as a sharp blow to the neck, and so armor was developed to protect this key area from easy attack.">
+    <equipmentdefine des="0" name="Shoulder Gearing" lv="0" icon="images/equipTech/shoulders0.png"/>
+    <equipmentdefine des="Level 1 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Shoulder Gearing" lv="1" icon="images/equipTech/shoulders1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Shoulder Gearing" lv="2" icon="images/equipTech/shoulders2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Shoulder Gearing" lv="3" icon="images/equipTech/shoulders3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Shoulder Gearing" lv="4" icon="images/equipTech/shoulders4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Shoulder Gearing" lv="5" icon="images/equipTech/shoulders5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Shoulder Gearing" lv="6" icon="images/equipTech/shoulders6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Shoulder Gearing" lv="7" icon="images/equipTech/shoulders7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Shoulder Gearing" lv="8" icon="images/equipTech/shoulders8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Shoulder Gearing" lv="9" icon="images/equipTech/shoulders9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Shoulder Gearing technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Shoulder Gearing" lv="10" icon="images/equipTech/shoulders10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="chest" type="9" name="Chest Gearing" wikides="“There is no armor against fate.” -- James Shirley &#x00A;&#x00A;In medieval warfare, no piece of armor was more essential than the breastplate. Whether fashioned from a simple hide, boiled leather or polished steel, it provided defense from all sorts of attacks. The best chest armor provided the same defense while allowing greater speed and movement.">
+    <equipmentdefine des="0" name="Chest Gearing" lv="0" icon="images/equipTech/chest0.png"/>
+    <equipmentdefine des="Level 1 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Chest Gearing" lv="1" icon="images/equipTech/chest1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Chest Gearing" lv="2" icon="images/equipTech/chest2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Chest Gearing" lv="3" icon="images/equipTech/chest3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="2"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Chest Gearing" lv="4" icon="images/equipTech/chest4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Chest Gearing" lv="5" icon="images/equipTech/chest5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Chest Gearing" lv="6" icon="images/equipTech/chest6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Chest Gearing" lv="7" icon="images/equipTech/chest7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Chest Gearing" lv="8" icon="images/equipTech/chest8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Chest Gearing" lv="9" icon="images/equipTech/chest9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Chest Gearing technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Chest Gearing" lv="10" icon="images/equipTech/chest10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+        <item type="equipment.tech.upgrade.1" name="Iron Ore" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="back" type="10" name="Back Gearing" wikides="“Only trust thyself, and another shall not betray thee.” -- William Penn &#x00A;&#x00A;The back is perhaps the most important area of the body to armor. An attack from the front can be blocked or deflected, but an attack from the rear will hit every time.">
+    <equipmentdefine des="0" name="Back Gearin" lv="0" icon="images/equipTech/back0.png"/>
+    <equipmentdefine des="Level 1 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Back Gearing" lv="1" icon="images/equipTech/back1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Back Gearing" lv="2" icon="images/equipTech/back2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Back Gearing" lv="3" icon="images/equipTech/back3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Back Gearing" lv="4" icon="images/equipTech/back4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Back Gearing" lv="5" icon="images/equipTech/back5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Back Gearing" lv="6" icon="images/equipTech/back6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Back Gearing" lv="7" icon="images/equipTech/back7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Back Gearing" lv="8" icon="images/equipTech/back8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Back Gearing" lv="9" icon="images/equipTech/back9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Back Gearing technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Back Gearing" lv="10" icon="images/equipTech/back10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="18"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="wrist" type="11" name="Gauntlets" wikides="“A sword never kills anybody; it is a tool in the killer's hand.” --  Lucius Annaeus Seneca &#x00A;&#x00A;Hand protection was key in medieval combat. Crossguards on swords were a start, but soldiers soon found it prudent to wear gauntlets as well, to keep their fingers safe from errant blows. As the technology improved, gauntlets were able to offer better protection without interfering with grip.">
+    <equipmentdefine des="0" name="Gauntlets" lv="0" icon="images/equipTech/wrist0.png"/>
+    <equipmentdefine des="Level 1 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Gauntlets" lv="1" icon="images/equipTech/wrist1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Gauntlets" lv="2" icon="images/equipTech/wrist2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Gauntlets" lv="3" icon="images/equipTech/wrist3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Gauntlets" lv="4" icon="images/equipTech/wrist4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Gauntlets" lv="5" icon="images/equipTech/wrist5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Gauntlets" lv="6" icon="images/equipTech/wrist6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Gauntlets" lv="7" icon="images/equipTech/wrist7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Gauntlets" lv="8" icon="images/equipTech/wrist8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Gauntlets" lv="9" icon="images/equipTech/wrist9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Gauntlets technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Gauntlets" lv="10" icon="images/equipTech/wrist10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="18"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="waist" type="12" name="Belts" wikides="“You got to choose between tightening your belt or losing your pants.” -- Navjot Singh Sidhu &#x00A;&#x00A;The girdle is the piece of armor that holds all the soldier's armor in place. Without the belt he is less protected, moves slower and is less confident. Likewise, the soldier's scabbard is attached to the belt. A belt then, is the very cornerstone of the medieval soldier.">
+    <equipmentdefine des="0" name="Belts" lv="0" icon="images/equipTech/waist0.png"/>
+    <equipmentdefine des="Level 1 Belts technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Belts" lv="1" icon="images/equipTech/waist1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Belts technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Belts" lv="2" icon="images/equipTech/waist2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Belts technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Belts" lv="3" icon="images/equipTech/waist3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Belts technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Belts" lv="4" icon="images/equipTech/waist4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Belts technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Belts" lv="5" icon="images/equipTech/waist5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Belts technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Belts" lv="6" icon="images/equipTech/waist6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Belts technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Belts" lv="7" icon="images/equipTech/waist7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Belts technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Belts" lv="8" icon="images/equipTech/waist8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Belts technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Belts" lv="9" icon="images/equipTech/waist9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Belts technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Belts" lv="10" icon="images/equipTech/waist10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="18"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="legs" type="13" name="Legs Gearing" wikides="“In the morning a man walks with his whole body; in the evening, only with his legs.” -- Ralph Waldo Emerson  &#x00A;&#x00A;Unlike other body parts, the legs were often unarmored on many medieval combatants – to disastrous results. Knights included legplates in their head to toe armor ensembles, thus presenting no weaknesses to enemies – and they were all the more powerful for it.">
+    <equipmentdefine des="0" name="Legs Gearing" lv="0" icon="images/equipTech/legs0.png"/>
+    <equipmentdefine des="Level 1 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Legs Gearing" lv="1" icon="images/equipTech/legs1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Legs Gearing" lv="2" icon="images/equipTech/legs2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Legs Gearing" lv="3" icon="images/equipTech/legs3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Legs Gearing" lv="4" icon="images/equipTech/legs4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Legs Gearing" lv="5" icon="images/equipTech/legs5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Legs Gearing" lv="6" icon="images/equipTech/legs6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Legs Gearing" lv="7" icon="images/equipTech/legs7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Legs Gearing" lv="8" icon="images/equipTech/legs8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Legs Gearing" lv="9" icon="images/equipTech/legs9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Legs Gearing technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Legs Gearing" lv="10" icon="images/equipTech/legs10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="18"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+  <equipmenttech equipmenttechid="feet" type="14" name="Foot Gear" wikides="“Be sure you put your feet in the right place, then stand firm.” -- Abraham Lincoln  &#x00A;&#x00A;Boots were imperative for medieval combat, offering protection from debilitating foot injuries that could leave a soldier unable to fight.  Like other pieces of armor, foot gear improved to become lighter and less cumbersome on the wearer.">
+    <equipmentdefine des="0" name="Foot Gear" lv="0" icon="images/equipTech/feet0.png"/>
+    <equipmentdefine des="Level 1 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 1 point(s)" name="Foot Gear" lv="1" icon="images/equipTech/feet1.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="1"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="1"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 2 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 2 point(s)" name="Foot Gear" lv="2" icon="images/equipTech/feet2.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="2"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="2"/>
+      </itemlist>
+    </equipmentdefine>
+    <equipmentdefine des="Level 3 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 3 point(s)" name="Foot Gear" lv="3" icon="images/equipTech/feet3.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="3"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="4"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 4 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 4 point(s)" name="Foot Gear" lv="4" icon="images/equipTech/feet4.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="4"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="6"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 5 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 5 point(s)" name="Foot Gear" lv="5" icon="images/equipTech/feet5.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="5"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="8"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 6 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 6 point(s)" name="Foot Gear" lv="6" icon="images/equipTech/feet6.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="6"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="10"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 7 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 7 point(s)" name="Foot Gear" lv="7" icon="images/equipTech/feet7.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="7"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="12"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 8 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 8 point(s)" name="Foot Gear" lv="8" icon="images/equipTech/feet8.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="8"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="14"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 9 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 9 point(s)" name="Foot Gear" lv="9" icon="images/equipTech/feet9.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="9"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="16"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+    <equipmentdefine des="Level 10 Foot Gear technology enhances hero's attack, politics or intelligence attribute  by 10 point(s)" name="Foot Gear" lv="10" icon="images/equipTech/feet10.png">
+      <buildlist>
+        <build type="26" name="Workshop" lv="10"/>
+      </buildlist>
+      <itemlist>
+        <item type="equipment.tech.upgrade.5" name="Fabric" count="18"/>
+      </itemlist>
+      <upgradeitem>
+        <item type="equipment.tech.upgrade.book1" count="1" name="The Lost Armor scripte"/>
+      </upgradeitem>
+    </equipmentdefine>
+  </equipmenttech>
+</equipmenttechlist>

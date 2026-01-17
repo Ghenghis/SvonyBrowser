@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Svony Browser - Evony Analysis Suite</title>
@@ -7,23 +8,32 @@
     <link rel="stylesheet" href="themes/panel-responsive.css">
     <link rel="stylesheet" href="themes/hybrid-error-styles.css">
 </head>
+
 <body>
     <!-- Top Spacer for dragging -->
     <div id="topspacer"></div>
-    
+
     <!-- Window Controls (Windows only) -->
     <div id="window-controls" style="display: none;">
         <div class="button" id="min-button">
-            <img class="icon" srcset="icons/min-w-10.png 1x, icons/min-w-12.png 1.25x, icons/min-w-15.png 1.5x, icons/min-w-15.png 1.75x, icons/min-w-20.png 2x, icons/min-w-20.png 2.25x, icons/min-w-24.png 2.5x, icons/min-w-30.png 3x, icons/min-w-30.png 3.5x" draggable="false" />
+            <img class="icon"
+                srcset="icons/min-w-10.png 1x, icons/min-w-12.png 1.25x, icons/min-w-15.png 1.5x, icons/min-w-15.png 1.75x, icons/min-w-20.png 2x, icons/min-w-20.png 2.25x, icons/min-w-24.png 2.5x, icons/min-w-30.png 3x, icons/min-w-30.png 3.5x"
+                draggable="false" />
         </div>
         <div class="button" id="max-button">
-            <img class="icon" srcset="icons/max-w-10.png 1x, icons/max-w-12.png 1.25x, icons/max-w-15.png 1.5x, icons/max-w-15.png 1.75x, icons/max-w-20.png 2x, icons/max-w-20.png 2.25x, icons/max-w-24.png 2.5x, icons/max-w-30.png 3x, icons/max-w-30.png 3.5x" draggable="false" />
+            <img class="icon"
+                srcset="icons/max-w-10.png 1x, icons/max-w-12.png 1.25x, icons/max-w-15.png 1.5x, icons/max-w-15.png 1.75x, icons/max-w-20.png 2x, icons/max-w-20.png 2.25x, icons/max-w-24.png 2.5x, icons/max-w-30.png 3x, icons/max-w-30.png 3.5x"
+                draggable="false" />
         </div>
         <div class="button" id="restore-button">
-            <img class="icon" srcset="icons/restore-w-10.png 1x, icons/restore-w-12.png 1.25x, icons/restore-w-15.png 1.5x, icons/restore-w-15.png 1.75x, icons/restore-w-20.png 2x, icons/restore-w-20.png 2.25x, icons/restore-w-24.png 2.5x, icons/restore-w-30.png 3x, icons/restore-w-30.png 3.5x" draggable="false" />
+            <img class="icon"
+                srcset="icons/restore-w-10.png 1x, icons/restore-w-12.png 1.25x, icons/restore-w-15.png 1.5x, icons/restore-w-15.png 1.75x, icons/restore-w-20.png 2x, icons/restore-w-20.png 2.25x, icons/restore-w-24.png 2.5x, icons/restore-w-30.png 3x, icons/restore-w-30.png 3.5x"
+                draggable="false" />
         </div>
         <div class="button" id="close-button">
-            <img class="icon" srcset="icons/close-w-10.png 1x, icons/close-w-12.png 1.25x, icons/close-w-15.png 1.5x, icons/close-w-15.png 1.75x, icons/close-w-20.png 2x, icons/close-w-20.png 2.25x, icons/close-w-24.png 2.5x, icons/close-w-30.png 3x, icons/close-w-30.png 3.5x" draggable="false" />
+            <img class="icon"
+                srcset="icons/close-w-10.png 1x, icons/close-w-12.png 1.25x, icons/close-w-15.png 1.5x, icons/close-w-15.png 1.75x, icons/close-w-20.png 2x, icons/close-w-20.png 2.25x, icons/close-w-24.png 2.5x, icons/close-w-30.png 3x, icons/close-w-30.png 3.5x"
+                draggable="false" />
         </div>
     </div>
 
@@ -32,9 +42,11 @@
         <!-- View Controls -->
         <div class="toolbar-section">
             <span class="toolbar-label">View:</span>
-            <button id="btn-left-only" class="toolbar-btn" title="Show AutoEvony panel only (Ctrl+1)">◀ Bot Only</button>
+            <button id="btn-left-only" class="toolbar-btn" title="Show AutoEvony panel only (Ctrl+1)">◀ Bot
+                Only</button>
             <button id="btn-both-panels" class="toolbar-btn active" title="Show both panels (Ctrl+2)">◀ Both ▶</button>
-            <button id="btn-right-only" class="toolbar-btn" title="Show Evony Client panel only (Ctrl+3)">Client ▶</button>
+            <button id="btn-right-only" class="toolbar-btn" title="Show Evony Client panel only (Ctrl+3)">Client
+                ▶</button>
             <div class="toolbar-divider"></div>
             <button id="btn-swap-panels" class="toolbar-btn" title="Swap left and right panels (Ctrl+S)">⇄ Swap</button>
             <div class="toolbar-divider"></div>
@@ -50,7 +62,7 @@
             </select>
             <button id="btn-auto-fit" class="toolbar-btn" title="Auto-fit panels to window (Ctrl+F)">⊞ Fit</button>
         </div>
-        
+
         <!-- Server Selection -->
         <div class="toolbar-section">
             <span class="toolbar-label">Server:</span>
@@ -62,22 +74,23 @@
                 <option value="cc5">cc5.evony.com</option>
             </select>
         </div>
-        
+
         <!-- Quick Actions -->
         <div class="toolbar-section">
             <button id="btn-reload-left" class="toolbar-btn" title="Reload AutoEvony (F5)">🔄 Reload Left</button>
             <button id="btn-reload-right" class="toolbar-btn" title="Reload Evony Client (F6)">🔄 Reload Right</button>
             <div class="toolbar-divider"></div>
-            <button id="btn-clear-cache" class="toolbar-btn" title="Clear browser cache and cookies">🗑 Clear Cache</button>
+            <button id="btn-clear-cache" class="toolbar-btn" title="Clear browser cache and cookies">🗑 Clear
+                Cache</button>
         </div>
-        
+
         <!-- Tools -->
         <div class="toolbar-section">
             <button id="btn-sol-editor" class="toolbar-btn" title="Open Flash SOL file editor">📁 SOL Editor</button>
             <button id="btn-fiddler" class="toolbar-btn" title="Open Fiddler traffic inspector">📊 Fiddler</button>
             <button id="btn-settings" class="toolbar-btn" title="Application settings">⚙ Settings</button>
         </div>
-        
+
         <!-- Status Indicators -->
         <div class="toolbar-section status-section">
             <div id="lm-studio-status" class="status-indicator warning" title="LM Studio: Connecting..."></div>
@@ -98,7 +111,7 @@
                 <button class="tab-btn" data-tab="debug">🐛 Debug</button>
                 <button class="tab-btn" data-tab="automation">🤖 Automation</button>
             </div>
-            
+
             <!-- Browser Tab -->
             <div id="tab-browser" class="tab-content active">
                 <div id="browser-panels">
@@ -114,45 +127,55 @@
                                 </div>
                             </div>
                             <div class="panel-toggle">
-                                <button class="toggle-btn active" data-mode="web" id="left-web-toggle" title="Web Mode">Web</button>
-                                <button class="toggle-btn" data-mode="swf" id="left-swf-toggle" title="SWF Mode">SWF</button>
-                                <button class="toggle-btn" data-mode="hybrid" id="left-hybrid-toggle" title="Hybrid Mode (Playwright)">Hybrid</button>
+                                <button class="toggle-btn active" data-mode="web" id="left-web-toggle"
+                                    title="Web Mode">Web</button>
+                                <button class="toggle-btn" data-mode="swf" id="left-swf-toggle"
+                                    title="SWF Mode">SWF</button>
+                                <button class="toggle-btn" data-mode="hybrid" id="left-hybrid-toggle"
+                                    title="Hybrid Mode (Playwright)">Hybrid</button>
+                                <button class="toggle-btn share-btn" id="share-left-to-right"
+                                    title="Share Left → Right">Share</button>
                             </div>
                             <div class="panel-status-container">
                                 <span id="left-status" class="panel-status"></span>
-                                <div class="panel-status-indicator" id="left-status-indicator" title="Status: Ready"></div>
+                                <div class="panel-status-indicator" id="left-status-indicator" title="Status: Ready">
+                                </div>
                             </div>
                         </div>
-                        
+
                         <!-- Panel Navigation Toolbar -->
                         <div class="panel-toolbar" id="left-toolbar">
                             <div class="toolbar-nav">
-                                <button class="panel-nav-btn" id="left-back" title="Go Back (Alt+Left)" disabled>◀</button>
-                                <button class="panel-nav-btn" id="left-forward" title="Go Forward (Alt+Right)" disabled>▶</button>
+                                <button class="panel-nav-btn" id="left-back" title="Go Back (Alt+Left)"
+                                    disabled>◀</button>
+                                <button class="panel-nav-btn" id="left-forward" title="Go Forward (Alt+Right)"
+                                    disabled>▶</button>
                                 <button class="panel-nav-btn" id="left-refresh" title="Refresh (F5)">🔄</button>
                                 <button class="panel-nav-btn" id="left-stop" title="Stop Loading">✕</button>
                             </div>
                             <div class="toolbar-url">
-                                <input type="text" class="panel-url-input" id="left-url" placeholder="Enter URL or search..." title="URL Bar">
+                                <input type="text" class="panel-url-input" id="left-url"
+                                    placeholder="Enter URL or search..." title="URL Bar">
                                 <button class="panel-go-btn" id="left-go" title="Navigate">→</button>
                             </div>
                             <div class="toolbar-actions">
                                 <button class="panel-action-btn" id="left-bookmark" title="Add Bookmark">⭐</button>
-                                <button class="panel-action-btn" id="left-screenshot" title="Take Screenshot">📷</button>
+                                <button class="panel-action-btn" id="left-screenshot"
+                                    title="Take Screenshot">📷</button>
                                 <button class="panel-action-btn" id="left-console" title="Toggle Console">🖥</button>
                                 <button class="panel-action-btn" id="left-menu" title="Panel Menu">☰</button>
                             </div>
                         </div>
-                        
+
                         <!-- Panel Loading Bar -->
                         <div class="panel-loading-bar" id="left-loading-bar">
                             <div class="loading-progress" id="left-loading-progress"></div>
                         </div>
-                        
+
                         <!-- Panel Content -->
                         <div id="left-browser-container" class="panel-content">
                             <webview id="left-webview" src="about:blank" plugins preload="./preload.js"></webview>
-                            
+
                             <!-- Panel Error Overlay -->
                             <div class="panel-error-overlay" id="left-error-overlay" style="display: none;">
                                 <div class="error-content">
@@ -172,7 +195,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Panel Console -->
                             <div class="panel-console" id="left-console-panel" style="display: none;">
                                 <div class="console-header">
@@ -181,12 +204,13 @@
                                 </div>
                                 <div class="console-output" id="left-console-output"></div>
                                 <div class="console-input-container">
-                                    <input type="text" class="console-input" id="left-console-input" placeholder="Enter JavaScript...">
+                                    <input type="text" class="console-input" id="left-console-input"
+                                        placeholder="Enter JavaScript...">
                                     <button class="console-run" id="left-console-run">Run</button>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Panel Status Bar -->
                         <div class="panel-status-bar" id="left-status-bar">
                             <span class="status-item" id="left-load-time">Load: --ms</span>
@@ -195,63 +219,73 @@
                             <span class="status-item" id="left-sync-status">Sync: Off</span>
                         </div>
                     </div>
-                    
+
                     <!-- Panel Splitter -->
                     <div id="panel-splitter">
                         <div class="splitter-handle"></div>
                     </div>
-                    
+
                     <!-- Right Panel: Evony Client -->
                     <div id="right-panel" class="browser-panel">
                         <!-- Enhanced Panel Header -->
                         <div class="panel-header blue">
                             <div class="panel-header-left">
                                 <span class="panel-title">🌐 Right Panel</span>
-                                <div class="panel-mode-badge" id="right-mode-badge">WEB</div>
+                                <div class="panel-mode-badge" id="right-mode-badge">SWF</div>
                                 <div class="panel-health" id="right-health" title="Panel Health">
                                     <div class="health-bar" id="right-health-bar"></div>
                                 </div>
                             </div>
                             <div class="panel-toggle">
-                                <button class="toggle-btn active" data-mode="web" id="right-web-toggle" title="Web Mode">Web</button>
-                                <button class="toggle-btn" data-mode="swf" id="right-swf-toggle" title="SWF Mode">SWF</button>
-                                <button class="toggle-btn" data-mode="hybrid" id="right-hybrid-toggle" title="Hybrid Mode (Playwright)">Hybrid</button>
+                                <button class="toggle-btn" data-mode="web" id="right-web-toggle"
+                                    title="Web Mode">Web</button>
+                                <button class="toggle-btn active" data-mode="swf" id="right-swf-toggle"
+                                    title="SWF Mode">SWF</button>
+                                <button class="toggle-btn" data-mode="hybrid" id="right-hybrid-toggle"
+                                    title="Hybrid Mode (Playwright)">Hybrid</button>
+                                <button class="toggle-btn share-btn" id="share-right-to-left"
+                                    title="Share Right → Left">Share</button>
                             </div>
                             <div class="panel-status-container">
                                 <span id="right-status" class="panel-status"></span>
-                                <div class="panel-status-indicator" id="right-status-indicator" title="Status: Ready"></div>
+                                <div class="panel-status-indicator" id="right-status-indicator" title="Status: Ready">
+                                </div>
                             </div>
                         </div>
-                        
+
                         <!-- Panel Navigation Toolbar -->
                         <div class="panel-toolbar" id="right-toolbar">
                             <div class="toolbar-nav">
-                                <button class="panel-nav-btn" id="right-back" title="Go Back (Alt+Left)" disabled>◀</button>
-                                <button class="panel-nav-btn" id="right-forward" title="Go Forward (Alt+Right)" disabled>▶</button>
+                                <button class="panel-nav-btn" id="right-back" title="Go Back (Alt+Left)"
+                                    disabled>◀</button>
+                                <button class="panel-nav-btn" id="right-forward" title="Go Forward (Alt+Right)"
+                                    disabled>▶</button>
                                 <button class="panel-nav-btn" id="right-refresh" title="Refresh (F6)">🔄</button>
                                 <button class="panel-nav-btn" id="right-stop" title="Stop Loading">✕</button>
                             </div>
                             <div class="toolbar-url">
-                                <input type="text" class="panel-url-input" id="right-url" placeholder="Enter URL or search..." title="URL Bar">
+                                <input type="text" class="panel-url-input" id="right-url"
+                                    placeholder="Enter URL or search..." title="URL Bar">
                                 <button class="panel-go-btn" id="right-go" title="Navigate">→</button>
                             </div>
                             <div class="toolbar-actions">
                                 <button class="panel-action-btn" id="right-bookmark" title="Add Bookmark">⭐</button>
-                                <button class="panel-action-btn" id="right-screenshot" title="Take Screenshot">📷</button>
+                                <button class="panel-action-btn" id="right-screenshot"
+                                    title="Take Screenshot">📷</button>
                                 <button class="panel-action-btn" id="right-console" title="Toggle Console">🖥</button>
                                 <button class="panel-action-btn" id="right-menu" title="Panel Menu">☰</button>
                             </div>
                         </div>
-                        
+
                         <!-- Panel Loading Bar -->
                         <div class="panel-loading-bar" id="right-loading-bar">
                             <div class="loading-progress" id="right-loading-progress"></div>
                         </div>
-                        
+
                         <!-- Panel Content -->
                         <div id="right-browser-container" class="panel-content">
                             <webview id="right-webview" src="about:blank" plugins preload="./preload.js"></webview>
-                            
+
                             <!-- Panel Error Overlay -->
                             <div class="panel-error-overlay" id="right-error-overlay" style="display: none;">
                                 <div class="error-content">
@@ -271,7 +305,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Panel Console -->
                             <div class="panel-console" id="right-console-panel" style="display: none;">
                                 <div class="console-header">
@@ -280,12 +314,13 @@
                                 </div>
                                 <div class="console-output" id="right-console-output"></div>
                                 <div class="console-input-container">
-                                    <input type="text" class="console-input" id="right-console-input" placeholder="Enter JavaScript...">
+                                    <input type="text" class="console-input" id="right-console-input"
+                                        placeholder="Enter JavaScript...">
                                     <button class="console-run" id="right-console-run">Run</button>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Panel Status Bar -->
                         <div class="panel-status-bar" id="right-status-bar">
                             <span class="status-item" id="right-load-time">Load: --ms</span>
@@ -295,7 +330,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Panel Context Menu -->
                 <div class="panel-context-menu" id="panel-context-menu" style="display: none;">
                     <div class="context-menu-item" data-action="copy-url">📋 Copy URL</div>
@@ -310,7 +345,7 @@
                     <div class="context-menu-item" data-action="clear-cache">🗑 Clear Panel Cache</div>
                     <div class="context-menu-item" data-action="reset-panel">🔄 Reset Panel</div>
                 </div>
-                
+
                 <!-- Bookmarks Dropdown -->
                 <div class="bookmarks-dropdown" id="bookmarks-dropdown" style="display: none;">
                     <div class="bookmarks-header">
@@ -324,7 +359,7 @@
                         <button class="bookmarks-manage" id="bookmarks-manage">Manage Bookmarks</button>
                     </div>
                 </div>
-                
+
                 <!-- Sync Controls -->
                 <div class="sync-controls" id="sync-controls">
                     <span class="sync-label">Sync:</span>
@@ -334,7 +369,7 @@
                     <button class="sync-btn" id="sync-transfer" title="Transfer Mode">↔️</button>
                 </div>
             </div>
-            
+
             <!-- Traffic Tab -->
             <div id="tab-traffic" class="tab-content">
                 <div class="traffic-toolbar">
@@ -369,7 +404,8 @@
                         </select>
                     </div>
                     <div class="toolbar-right">
-                        <label class="auto-scroll-toggle"><input type="checkbox" id="traffic-autoscroll" checked> Auto-scroll</label>
+                        <label class="auto-scroll-toggle"><input type="checkbox" id="traffic-autoscroll" checked>
+                            Auto-scroll</label>
                         <span id="traffic-status">Idle</span>
                         <span id="traffic-count">0 entries</span>
                     </div>
@@ -425,7 +461,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Protocol Tab -->
             <div id="tab-protocol" class="tab-content">
                 <div id="protocol-container">
@@ -494,7 +530,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Tools Tab -->
             <div id="tab-tools" class="tab-content">
                 <div class="tools-container">
@@ -505,7 +541,7 @@
                         <button id="amf-decode" class="primary-btn">Decode</button>
                         <pre id="amf-output"></pre>
                     </div>
-                    
+
                     <!-- Training Calculator -->
                     <div class="tool-card">
                         <h3>Training Calculator</h3>
@@ -533,14 +569,14 @@
                         <button id="calc-training" class="primary-btn">Calculate</button>
                         <div id="calc-result"></div>
                     </div>
-                    
+
                     <!-- MCP Server Status -->
                     <div class="tool-card">
                         <h3>MCP Server Status</h3>
                         <div id="mcp-status-list"></div>
                         <button id="mcp-reconnect" class="primary-btn">Reconnect All</button>
                     </div>
-                    
+
                     <!-- Combat Simulator -->
                     <div class="tool-card wide">
                         <h3>⚔️ Combat Simulator</h3>
@@ -638,7 +674,7 @@
                         </div>
                         <div id="combat-results" class="combat-results"></div>
                     </div>
-                    
+
                     <!-- Session Recorder -->
                     <div class="tool-card">
                         <h3>📹 Session Recorder</h3>
@@ -658,7 +694,7 @@
                             <div id="sessions-container"></div>
                         </div>
                     </div>
-                    
+
                     <!-- Game State Viewer -->
                     <div class="tool-card">
                         <h3>🎮 Game State</h3>
@@ -685,7 +721,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Debug Tab -->
             <div id="tab-debug" class="tab-content">
                 <div class="debug-container">
@@ -716,7 +752,7 @@
                             <div class="log-placeholder">No logs captured yet...</div>
                         </div>
                     </div>
-                    
+
                     <!-- Network Inspector -->
                     <div class="debug-section">
                         <div class="debug-header">
@@ -747,7 +783,7 @@
                         </div>
                         <div id="network-list" class="network-list"></div>
                     </div>
-                    
+
                     <!-- Performance Monitor -->
                     <div class="debug-section">
                         <div class="debug-header">
@@ -762,26 +798,34 @@
                             <div class="metric-card">
                                 <div class="metric-label">CPU</div>
                                 <div class="metric-value" id="perf-cpu">0%</div>
-                                <div class="metric-bar"><div class="metric-fill cpu" id="perf-cpu-bar"></div></div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill cpu" id="perf-cpu-bar"></div>
+                                </div>
                             </div>
                             <div class="metric-card">
                                 <div class="metric-label">Memory</div>
                                 <div class="metric-value" id="perf-memory">0 MB</div>
-                                <div class="metric-bar"><div class="metric-fill memory" id="perf-memory-bar"></div></div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill memory" id="perf-memory-bar"></div>
+                                </div>
                             </div>
                             <div class="metric-card">
                                 <div class="metric-label">FPS</div>
                                 <div class="metric-value" id="perf-fps">60</div>
-                                <div class="metric-bar"><div class="metric-fill fps" id="perf-fps-bar"></div></div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill fps" id="perf-fps-bar"></div>
+                                </div>
                             </div>
                             <div class="metric-card">
                                 <div class="metric-label">Latency</div>
                                 <div class="metric-value" id="perf-latency">0 ms</div>
-                                <div class="metric-bar"><div class="metric-fill latency" id="perf-latency-bar"></div></div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill latency" id="perf-latency-bar"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Console -->
                     <div class="debug-section">
                         <div class="debug-header">
@@ -798,7 +842,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Automation Tab -->
             <div id="tab-automation" class="tab-content">
                 <div class="automation-container">
@@ -822,7 +866,7 @@
                             <div class="actions-placeholder">Recorded actions will appear here...</div>
                         </div>
                     </div>
-                    
+
                     <!-- Automation Templates -->
                     <div class="automation-section">
                         <div class="automation-header">
@@ -873,7 +917,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Script Runner -->
                     <div class="automation-section">
                         <div class="automation-header">
@@ -904,7 +948,7 @@
                         </div>
                         <div id="runner-queue" class="runner-queue"></div>
                     </div>
-                    
+
                     <!-- Scheduled Tasks -->
                     <div class="automation-section">
                         <div class="automation-header">
@@ -917,7 +961,7 @@
                             <div class="task-placeholder">No scheduled tasks. Click "+ Add Task" to create one.</div>
                         </div>
                     </div>
-                    
+
                     <!-- Agent Mode -->
                     <div class="automation-section agent-section">
                         <div class="automation-header">
@@ -951,7 +995,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Side Panel - Chatbot -->
         <div id="side-panel">
             <div class="side-panel-header">
@@ -978,10 +1022,12 @@
                     <div class="chatbot-attachments" id="chatbot-attachments"></div>
                     <div class="chatbot-input-row">
                         <button id="chatbot-attach" class="attach-btn" title="Attach file">📎</button>
-                        <textarea id="chatbot-input" placeholder="Ask about Evony protocols, strategies, or commands..."></textarea>
+                        <textarea id="chatbot-input"
+                            placeholder="Ask about Evony protocols, strategies, or commands..."></textarea>
                         <button id="chatbot-send" class="send-btn">Send</button>
                     </div>
-                    <input type="file" id="chatbot-file-input" style="display: none;" accept=".json,.txt,.log,.amf,.swf,.xml">
+                    <input type="file" id="chatbot-file-input" style="display: none;"
+                        accept=".json,.txt,.log,.amf,.swf,.xml">
                 </div>
             </div>
         </div>
@@ -1046,7 +1092,7 @@
                             <input type="checkbox" id="setting-updates" checked>
                         </div>
                     </div>
-                    
+
                     <!-- Browser Settings -->
                     <div id="settings-browser" class="settings-section">
                         <h3>🌐 Browser Settings</h3>
@@ -1069,7 +1115,7 @@
                             <input type="checkbox" id="setting-adblock" checked>
                         </div>
                     </div>
-                    
+
                     <!-- Flash Settings -->
                     <div id="settings-flash" class="settings-section">
                         <h3>⚡ Flash Settings</h3>
@@ -1084,7 +1130,7 @@
                             <button class="browse-btn">Browse</button>
                         </div>
                     </div>
-                    
+
                     <!-- MCP Settings -->
                     <div id="settings-mcp" class="settings-section">
                         <h3>🔌 MCP Server Settings</h3>
@@ -1097,7 +1143,7 @@
                             <input type="text" id="setting-mcp-url" placeholder="ws://localhost:3000">
                         </div>
                     </div>
-                    
+
                     <!-- LM Studio Settings -->
                     <div id="settings-llm" class="settings-section">
                         <h3>🤖 LM Studio Integration</h3>
@@ -1107,7 +1153,8 @@
                         </div>
                         <div class="setting-group">
                             <label>LM Studio URL</label>
-                            <input type="text" id="setting-lm-url" placeholder="http://localhost:1234" value="http://localhost:1234">
+                            <input type="text" id="setting-lm-url" placeholder="http://localhost:1234"
+                                value="http://localhost:1234">
                             <small>Enter your LM Studio server URL (e.g., http://192.168.0.3:1234)</small>
                         </div>
                         <div class="setting-group">
@@ -1115,7 +1162,8 @@
                             <select id="setting-lm-model">
                                 <option value="local-model">Auto-detect (local-model)</option>
                             </select>
-                            <button id="refresh-models-btn" class="secondary-btn" style="margin-left:8px;">Refresh Models</button>
+                            <button id="refresh-models-btn" class="secondary-btn" style="margin-left:8px;">Refresh
+                                Models</button>
                         </div>
                         <div class="setting-group">
                             <label>Temperature</label>
@@ -1129,10 +1177,11 @@
                         <div class="setting-group">
                             <label>Connection Status</label>
                             <span id="lm-connection-status" class="status-badge disconnected">Disconnected</span>
-                            <button id="test-lm-connection-btn" class="secondary-btn" style="margin-left:8px;">Test Connection</button>
+                            <button id="test-lm-connection-btn" class="secondary-btn" style="margin-left:8px;">Test
+                                Connection</button>
                         </div>
                     </div>
-                    
+
                     <!-- Automation Settings -->
                     <div id="settings-automation" class="settings-section">
                         <h3>🤖 Automation Settings</h3>
@@ -1149,7 +1198,7 @@
                             <input type="checkbox" id="setting-auto-train">
                         </div>
                     </div>
-                    
+
                     <!-- Advanced Settings -->
                     <div id="settings-advanced" class="settings-section">
                         <h3>⚙️ Advanced Settings</h3>
@@ -1194,7 +1243,7 @@
         <div class="context-menu-item" data-action="clear-cache">🗑️ Clear Cache</div>
         <div class="context-menu-item" data-action="reset-panel">🔄 Reset Panel</div>
     </div>
-    
+
     <!-- Bookmarks Dropdown -->
     <div id="bookmarks-dropdown" class="bookmarks-dropdown" style="display: none;">
         <div class="bookmarks-header">
@@ -1208,7 +1257,7 @@
             <button class="bookmarks-manage" id="bookmarks-manage">Manage Bookmarks</button>
         </div>
     </div>
-    
+
     <!-- Sync Controls -->
     <div class="sync-controls" id="sync-controls">
         <span class="sync-label">Sync:</span>
@@ -1221,4 +1270,5 @@
     <script src="services/panel-ui-controller.js"></script>
     <script src="renderer.js"></script>
 </body>
+
 </html>

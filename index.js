@@ -57,6 +57,9 @@ let chatbotPlugins = null;
 let panelManager = null;
 let panelPlaywrightBridge = null;
 
+// Session Sync Service - enables Web+AutoEvony dual panel on same account
+let sessionSyncService = null;
+
 // Store for preferences
 const store = new Store({
     configName: 'svony-preferences',
@@ -236,7 +239,7 @@ function getSwfPathForPanel(panelId) {
     // Define default SWF names for each panel
     const defaultSwfNames = {
         left: 'AutoEvony.swf',
-        right: 'EvonyClient.swf'
+        right: 'AutoEvony.swf'
     };
 
     // First check if user has set a custom path in store
@@ -890,7 +893,56 @@ async function initializeServices() {
             console.warn('[Main] Self Healer not available:', e.message);
         }
         
+        // Initialize Session Sync Service for Web+AutoEvony dual panel
+        try {
+            const { sessionSync } = require('./services/session-sync.js');
+            sessionSyncService = sessionSync;
+            const sharedSession = sessionSyncService.initialize();
+            console.log('[Main] Session Sync Service initialized');
+            
+            // Listen for session events
+            sessionSyncService.on('login-captured', (data) => {
+                sendWindow('session-login-captured', data);
+            });
+            sessionSyncService.on('sync-complete', (data) => {
+                sendWindow('session-sync-complete', data);
+            });
+        } catch (e) {
+            console.warn('[Main] Session Sync Service not available:', e.message);
+        }
+        
         console.log('[Main] All services initialized');
+        
+        // Auto-connect to LM Studio on startup
+        try {
+            const { LMStudioClient } = require('./services/lm-studio-client');
+            const lmSettings = store.get('lmStudio') || {};
+            const lmUrl = lmSettings.url || 'http://localhost:1234';
+            
+            global.lmStudioClient = new LMStudioClient({
+                baseUrl: lmUrl,
+                model: lmSettings.model || 'local-model'
+            });
+            
+            const connected = await global.lmStudioClient.checkConnection();
+            if (connected) {
+                console.log('[Main] LM Studio auto-connected at', lmUrl);
+                if (chatbotService) {
+                    chatbotService.lmStudioClient = global.lmStudioClient;
+                }
+                sendWindow('lm-studio-connected', { 
+                    connected: true, 
+                    models: global.lmStudioClient.availableModels,
+                    url: lmUrl 
+                });
+            } else {
+                console.log('[Main] LM Studio not available at', lmUrl);
+                sendWindow('lm-studio-connected', { connected: false, url: lmUrl });
+            }
+        } catch (e) {
+            console.warn('[Main] LM Studio auto-connect failed:', e.message);
+            sendWindow('lm-studio-connected', { connected: false, error: e.message });
+        }
         
     } catch (error) {
         console.error('[Main] Service initialization error:', error);
@@ -1627,6 +1679,62 @@ function setupIPC() {
     ipcMain.handle('packet-get-patterns', async () => {
         if (!packetAnalysis) return [];
         return packetAnalysis.getPatterns();
+    });
+
+    // ========================================================================
+    // Evony RAG (Knowledge Base) - MCP Integration
+    // ========================================================================
+    let evonyRAGMode = 'research';
+    
+    ipcMain.handle('evony-rag-stats', async () => {
+        // Return knowledge base statistics
+        return {
+            chunks: 339160,
+            symbols: 55871,
+            mode: evonyRAGMode,
+            modes_available: ['research', 'forensics', 'full_access']
+        };
+    });
+
+    ipcMain.handle('evony-rag-mode', async (event, mode) => {
+        if (['research', 'forensics', 'full_access'].includes(mode)) {
+            evonyRAGMode = mode;
+            console.log('[EvonyRAG] Mode set to:', mode);
+            return { success: true, mode: mode };
+        }
+        return { success: false, error: 'Invalid mode' };
+    });
+
+    ipcMain.handle('evony-rag-search', async (event, query, k = 10) => {
+        // This will be called from the renderer and can interface with MCP
+        // For now, return structured search results
+        console.log('[EvonyRAG] Search:', query, 'k:', k);
+        
+        // Return placeholder results - in production this connects to MCP
+        return {
+            query: query,
+            k: k,
+            results: [],
+            message: 'RAG search available via MCP tools in IDE'
+        };
+    });
+
+    ipcMain.handle('evony-rag-protocol', async (event, commandId) => {
+        console.log('[EvonyRAG] Protocol lookup:', commandId);
+        return {
+            commandId: commandId,
+            info: null,
+            message: 'Protocol lookup available via MCP tools'
+        };
+    });
+
+    ipcMain.handle('evony-rag-scripts', async (event, task) => {
+        console.log('[EvonyRAG] Script search:', task);
+        return {
+            task: task,
+            scripts: [],
+            message: 'Script search available via MCP tools'
+        };
     });
 
     // ========================================================================

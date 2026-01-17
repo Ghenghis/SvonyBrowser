@@ -13,10 +13,10 @@ const store = new Store({
     configName: 'svony-preferences'
 });
 
-// State management
+// State management - STRICT DEFAULTS: Left=Web, Right=AutoEvony SWF
 const state = {
     leftPanelMode: 'web',
-    rightPanelMode: 'web',
+    rightPanelMode: 'swf',
     sidePanelCollapsed: false,
     trafficCapturing: false,
     trafficEntries: [],
@@ -1536,19 +1536,28 @@ function setupPanelNavigationHandlers(panel, webview) {
     }
 }
 
-// Initialize panels with default URLs
-// Note: Use http://www.evony.com for login - site will redirect to game server after login
+// Initialize panels with STRICT DEFAULTS: Left=Web, Right=AutoEvony SWF
 function initializePanels() {
     const server = store.get('defaultServer') || 'cc2';
     
-    // Left panel: Web login page (HTTP required for Flash)
-    const leftUrl = store.get('leftPanelUrl') || 'http://www.evony.com';
-    
-    // Right panel: Game server (HTTP required for Flash)
-    const rightUrl = store.get('rightPanelUrl') || `http://${server}.evony.com`;
-    
+    // STRICT DEFAULT: Left panel = Web mode
+    const leftUrl = 'http://www.evony.com';
     elements.leftWebview.src = leftUrl;
-    elements.rightWebview.src = rightUrl;
+    state.leftPanelMode = 'web';
+    
+    // STRICT DEFAULT: Right panel = AutoEvony SWF mode
+    state.rightPanelMode = 'swf';
+    
+    // Enforce mode switches after DOM is ready
+    setTimeout(() => {
+        // Left panel: Web mode (already default)
+        togglePanelMode('left', 'web');
+        
+        // Right panel: SWF mode (AutoEvony)
+        togglePanelMode('right', 'swf');
+        
+        console.log('[Init] STRICT DEFAULTS enforced: Left=Web, Right=SWF');
+    }, 500);
 }
 
 // Keyboard shortcuts
@@ -2869,17 +2878,7 @@ function initializeEnhancedFeatures() {
     initializeSessionRecorder();
     initializeGameState();
     
-    // Replace default send with enhanced version
-    elements.chatbotSend.removeEventListener('click', sendChatMessage);
-    elements.chatbotSend.addEventListener('click', sendChatMessageWithAttachments);
-    
-    elements.chatbotInput.removeEventListener('keydown', handleChatKeydown);
-    elements.chatbotInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendChatMessageWithAttachments();
-        }
-    });
+    // Chatbot listeners already set up in init() - don't add duplicates
     
     // Use enhanced traffic entry handler
     ipcRenderer.removeAllListeners('traffic-entry');
@@ -4791,3 +4790,125 @@ if (document.readyState === 'loading') {
 window.ErrorNotification = ErrorNotification;
 window.safeIpcCall = safeIpcCall;
 window.withRetry = withRetry;
+
+// ============================================================================
+// Share Mode - Sets default panel configuration
+// DEFAULT: Left=Web (evony.com), Right=SWF (AutoEvony.swf)
+// ============================================================================
+
+let shareModeActive = false;
+
+/**
+ * Activate Share Mode - sets panels to default configuration
+ * Left = www.evony.com (Web mode)
+ * Right = AutoEvony.swf (SWF mode)
+ */
+function activateShareMode() {
+    const leftWebview = document.getElementById('left-webview');
+    const rightWebview = document.getElementById('right-webview');
+    const leftUrlInput = document.getElementById('left-url');
+    const rightUrlInput = document.getElementById('right-url');
+    
+    if (!leftWebview || !rightWebview) {
+        console.error('[Share] Webviews not found');
+        return false;
+    }
+    
+    // Set LEFT panel to Web mode (evony.com)
+    const webUrl = 'http://www.evony.com';
+    leftWebview.src = webUrl;
+    if (leftUrlInput) leftUrlInput.value = webUrl;
+    state.leftPanelMode = 'web';
+    
+    // Set RIGHT panel to SWF mode (AutoEvony.swf)  
+    togglePanelMode('right', 'swf');
+    
+    // Update toggle buttons
+    updatePanelToggles();
+    
+    shareModeActive = true;
+    
+    // Update Share buttons to show active
+    const leftBtn = document.getElementById('share-left-to-right');
+    const rightBtn = document.getElementById('share-right-to-left');
+    if (leftBtn) {
+        leftBtn.classList.add('active');
+        leftBtn.textContent = '🔗 Shared';
+    }
+    if (rightBtn) {
+        rightBtn.classList.add('active');
+        rightBtn.textContent = '🔗 Shared';
+    }
+    
+    console.log('[Share] ACTIVATED - Left=Web(evony.com), Right=SWF(AutoEvony)');
+    return true;
+}
+
+/**
+ * Deactivate Share Mode - just resets button state
+ */
+function deactivateShareMode() {
+    shareModeActive = false;
+    
+    const leftBtn = document.getElementById('share-left-to-right');
+    const rightBtn = document.getElementById('share-right-to-left');
+    if (leftBtn) {
+        leftBtn.classList.remove('active');
+        leftBtn.textContent = 'Share';
+    }
+    if (rightBtn) {
+        rightBtn.classList.remove('active');
+        rightBtn.textContent = 'Share';
+    }
+    
+    console.log('[Share] Deactivated');
+}
+
+/**
+ * Initialize Share Mode buttons
+ * Share button sets defaults: Left=Web, Right=SWF
+ */
+function initializeShareMode() {
+    const shareLeftBtn = document.getElementById('share-left-to-right');
+    const shareRightBtn = document.getElementById('share-right-to-left');
+    
+    // Both Share buttons do the same thing: set default config
+    if (shareLeftBtn) {
+        shareLeftBtn.addEventListener('click', () => {
+            if (shareModeActive) {
+                deactivateShareMode();
+            } else {
+                activateShareMode();
+            }
+        });
+    }
+    
+    if (shareRightBtn) {
+        shareRightBtn.addEventListener('click', () => {
+            if (shareModeActive) {
+                deactivateShareMode();
+            } else {
+                activateShareMode();
+            }
+        });
+    }
+    
+    // Auto-activate share mode on startup (default config)
+    setTimeout(() => {
+        activateShareMode();
+    }, 1000);
+    
+    console.log('[Share] Initialized - Default: Left=Web, Right=SWF');
+}
+
+window.activateShareMode = activateShareMode;
+window.deactivateShareMode = deactivateShareMode;
+
+// Initialize share mode when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initializeShareMode, 300);
+    });
+} else {
+    setTimeout(initializeShareMode, 300);
+}

@@ -1,0 +1,27 @@
+// Initialize panels with default URLs
+// Left = WEB (www.evony.com), Right = SWF (AutoEvony.swf)
+async function initializePanels() {
+    // Left panel: WEB mode - www.evony.com
+    elements.leftWebview.src = 'http://www.evony.com';
+    console.log('[Renderer] Left panel: WEB (www.evony.com)');
+    
+    // Right panel: SWF mode - AutoEvony.swf
+    try {
+        const swfPath = await ipcRenderer.invoke('get-swf-path', 'right');
+        if (swfPath) {
+            elements.rightWebview.src = 'file://' + swfPath;
+            console.log('[Renderer] Right panel: SWF (' + swfPath + ')');
+            state.rightPanelMode = 'swf';
+        } else {
+            // Fallback to web if SWF not found
+            elements.rightWebview.src = 'http://www.evony.com';
+            console.log('[Renderer] Right panel: WEB fallback (SWF not found)');
+        }
+    } catch (e) {
+        elements.rightWebview.src = 'http://www.evony.com';
+        console.log('[Renderer] Right panel: WEB fallback (error:', e.message + ')');
+    }
+    
+    // Update toggle buttons to reflect initial state
+    updatePanelToggles();
+}

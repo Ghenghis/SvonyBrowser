@@ -693,7 +693,7 @@ Just type your question naturally! Examples:
     async handleStatus() {
         const status = {
             chatbot: this.isInitialized,
-            lmStudio: this.lmStudioClient?.isConnected?.() || false,
+            lmStudio: this.lmStudioClient?.isConnected || false,
             mcp: this.mcpManager?.getStatus?.() || { initialized: false },
             playwright: this.playwrightService?.getStatus?.() || { initialized: false },
             gameState: !!this.gameState
@@ -725,7 +725,7 @@ Just type your question naturally! Examples:
      */
     async handleGeneralQuery(message) {
         // Try LM Studio if connected
-        if (this.lmStudioClient && this.lmStudioClient.isConnected()) {
+        if (this.lmStudioClient && this.lmStudioClient.isConnected) {
             try {
                 const systemPrompt = `You are the Evony Co-Pilot, an AI assistant for the Evony game analysis suite. 
 You help players with game strategies, troop training, combat calculations, protocol analysis, and more.
@@ -906,7 +906,7 @@ Be concise and helpful.`;
     getStatus() {
         return {
             initialized: this.isInitialized,
-            lmStudioConnected: this.lmStudioClient?.isConnected?.() || false,
+            lmStudioConnected: this.lmStudioClient?.isConnected || false,
             mcpStatus: this.mcpManager?.getStatus?.() || null,
             hasGameState: !!this.gameState,
             historyLength: this.conversationHistory.length
