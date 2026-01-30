@@ -1,0 +1,244 @@
+// =====================================================
+// ACCOUNT SCANNER - FIND 8B-20B TROOP ACCOUNTS
+// Best accounts for glitch testing
+// =====================================================
+//
+// CRITERIA:
+// - 8B to 20B total troops = IDEAL for testing
+// - Not too small (won't hit glitch thresholds)
+// - Not too large (don't risk big accounts)
+//
+// RUN THIS: On each account to check troop count
+// OUTPUT: Whether account is suitable for testing
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "ACCOUNT SCANNER - GLITCH TEST CANDIDATES"
+echo "Looking for 8B-20B troop accounts"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// SCAN ACCOUNT
+// =====================================================
+
+set minTroops 8000000000
+set maxTroops 20000000000
+
+// Get account info
+set accountName $c.player.name$
+echo "Account: %accountName%"
+echo ""
+
+// Scan all cities
+set numCities $c.allCities.length$
+echo "Cities: %numCities%"
+echo ""
+
+set totalAccountTroops 0
+set totalAccountFood 0
+
+set cityIdx 0
+label scanCities
+
+if {%cityIdx%>=%numCities%} goto scanComplete
+
+switchcity %cityIdx%
+sleep 0.3
+
+set cityName $c.castle.name$
+set cityTroops $c.cm.allTroop.total$
+set cityFood $c.castle.resource.food.amount$
+
+echo "City %cityIdx% (%cityName%):"
+echo "  Troops: %cityTroops%"
+echo "  Food: %cityFood%"
+
+set totalAccountTroops {%totalAccountTroops%+%cityTroops%}
+set totalAccountFood {%totalAccountFood%+%cityFood%}
+
+set cityIdx {%cityIdx%+1}
+goto scanCities
+
+label scanComplete
+
+echo ""
+echo "=================================================="
+echo "ACCOUNT TOTALS"
+echo "=================================================="
+echo ""
+echo "Account: %accountName%"
+echo "Total Troops: %totalAccountTroops%"
+echo "Total Food: %totalAccountFood%"
+echo ""
+
+// Check if suitable for testing
+if {%totalAccountTroops%<%minTroops%} goto tooSmall
+if {%totalAccountTroops%>%maxTroops%} goto tooLarge
+
+goto justRight
+
+label tooSmall
+echo "❌ TOO SMALL for glitch testing"
+echo "   Need at least 8B troops to hit glitch thresholds"
+echo "   This account has: %totalAccountTroops%"
+echo ""
+echo "   Use this account for: building up troops"
+goto showDetails
+
+label tooLarge
+echo "⚠️ TOO LARGE - Don't risk this account!"
+echo "   Account has over 20B troops"
+echo "   This account has: %totalAccountTroops%"
+echo ""
+echo "   Use smaller alt accounts for testing first!"
+goto showDetails
+
+label justRight
+echo "✅ PERFECT FOR TESTING!"
+echo "   Account is in 8B-20B range"
+echo "   This account has: %totalAccountTroops%"
+echo ""
+echo "   Ready for glitch script testing!"
+goto showDetails
+
+label showDetails
+
+// =====================================================
+// DETAILED TROOP BREAKDOWN
+// =====================================================
+
+echo ""
+echo "=================================================="
+echo "TROOP BREAKDOWN (All Cities Combined)"
+echo "=================================================="
+echo ""
+
+switchcity 0
+sleep 0.3
+
+// Get combined troop counts
+set total_wo 0
+set total_w 0
+set total_s 0
+set total_p 0
+set total_sw 0
+set total_a 0
+set total_c 0
+set total_cata 0
+set total_t 0
+set total_b 0
+set total_r 0
+set total_cp 0
+
+set cityIdx 0
+label countTroops
+
+if {%cityIdx%>=%numCities%} goto countDone
+
+switchcity %cityIdx%
+sleep 0.2
+
+set total_wo {%total_wo%+$c.castle.troop.peasants$}
+set total_w {%total_w%+$c.castle.troop.militia$}
+set total_s {%total_s%+$c.castle.troop.scouter$}
+set total_p {%total_p%+$c.castle.troop.pikemen$}
+set total_sw {%total_sw%+$c.castle.troop.swordsmen$}
+set total_a {%total_a%+$c.castle.troop.archer$}
+set total_c {%total_c%+$c.castle.troop.lightCavalry$}
+set total_cata {%total_cata%+$c.castle.troop.heavyCavalry$}
+set total_t {%total_t%+$c.castle.troop.carriage$}
+set total_b {%total_b%+$c.castle.troop.ballista$}
+set total_r {%total_r%+$c.castle.troop.batteringRam$}
+set total_cp {%total_cp%+$c.castle.troop.catapult$}
+
+set cityIdx {%cityIdx%+1}
+goto countTroops
+
+label countDone
+
+echo "Workers:      %total_wo%"
+echo "Warriors:     %total_w%"
+echo "Scouts:       %total_s%"
+echo "Pikemen:      %total_p%"
+echo "Swordsmen:    %total_sw%"
+echo "Archers:      %total_a%"
+echo "Cavalry:      %total_c%"
+echo "Cataphracts:  %total_cata%"
+echo "Transporters: %total_t%"
+echo "Ballista:     %total_b%"
+echo "BattRams:     %total_r%"
+echo "Catapults:    %total_cp%"
+echo ""
+
+// =====================================================
+// GLITCH POTENTIAL ANALYSIS
+// =====================================================
+
+echo "=================================================="
+echo "GLITCH POTENTIAL"
+echo "=================================================="
+echo ""
+
+// Check each type for glitch potential
+// Threshold for 1 glitch per type
+
+set s_thresh 1073741824
+set p_thresh 715827883
+set a_thresh 536870912
+set c_thresh 238609295
+set cata_thresh 126322568
+set b_thresh 85899346
+set r_thresh 42949673
+set cp_thresh 17179870
+
+// Count how many types can hit glitch
+set glitchTypes 0
+
+if {%total_s%>%s_thresh%} echo "Scouts: ✅ Can glitch (%total_s% > %s_thresh%)"
+if {%total_s%>%s_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_s%<=%s_thresh%} echo "Scouts: ❌ Need more (%total_s% / %s_thresh%)"
+
+if {%total_p%>%p_thresh%} echo "Pikemen: ✅ Can glitch"
+if {%total_p%>%p_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_p%<=%p_thresh%} echo "Pikemen: ❌ Need more"
+
+if {%total_sw%>%p_thresh%} echo "Swordsmen: ✅ Can glitch"
+if {%total_sw%>%p_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_sw%<=%p_thresh%} echo "Swordsmen: ❌ Need more"
+
+if {%total_a%>%a_thresh%} echo "Archers: ✅ Can glitch"
+if {%total_a%>%a_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_a%<=%a_thresh%} echo "Archers: ❌ Need more"
+
+if {%total_c%>%c_thresh%} echo "Cavalry: ✅ Can glitch"
+if {%total_c%>%c_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_c%<=%c_thresh%} echo "Cavalry: ❌ Need more"
+
+if {%total_cata%>%cata_thresh%} echo "Cataphracts: ✅ Can glitch"
+if {%total_cata%>%cata_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_cata%<=%cata_thresh%} echo "Cataphracts: ❌ Need more"
+
+if {%total_b%>%b_thresh%} echo "Ballista: ✅ Can glitch"
+if {%total_b%>%b_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_b%<=%b_thresh%} echo "Ballista: ❌ Need more"
+
+if {%total_r%>%r_thresh%} echo "BattRams: ✅ Can glitch"
+if {%total_r%>%r_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_r%<=%r_thresh%} echo "BattRams: ❌ Need more"
+
+if {%total_cp%>%cp_thresh%} echo "Catapults: ✅ Can glitch"
+if {%total_cp%>%cp_thresh%} set glitchTypes {%glitchTypes%+1}
+if {%total_cp%<=%cp_thresh%} echo "Catapults: ❌ Need more"
+
+echo ""
+echo "Troop types that can glitch: %glitchTypes% / 9"
+echo "Potential food gen: %glitchTypes% × 2.147B = {%glitchTypes%*2147483647}/hr"
+echo ""
+
+echo "=================================================="
+echo "SCAN COMPLETE"
+echo "=================================================="

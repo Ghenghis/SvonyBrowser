@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "prefer-const": "error",
+    "no-console": "warn",
+    "no-unused-vars": "error",
+    "no-var": "error"
+  },
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2021": true
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "@typescript-eslint/recommended"
+  ],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 12
+  }
+}

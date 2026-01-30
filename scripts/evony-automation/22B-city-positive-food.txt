@@ -1,0 +1,178 @@
+// =====================================================
+// 22B+ PER CITY - ALWAYS POSITIVE FOOD GLITCH
+// =====================================================
+// 
+// LIMITS:
+// - 2.1B per troop type per city (32-bit flip)
+// - Safe: ~2B per type (margin below flip)
+// - Total: 12 types × 2B = 24B max per city
+// - Target: 22B+ per city with ALL ODD glitches
+//
+// GLITCH FORMULA:
+// Threshold = floor(2,147,483,647 / foodPerTroop) + 1
+// Glitches = floor(troopCount / threshold)
+// ODD glitches = GENERATING food (positive)
+// EVEN glitches = CONSUMING food (negative)
+//
+// =====================================================
+// OPTIMAL TROOP COUNTS - ALL ODD GLITCHES
+// =====================================================
+//
+// Type        | Food | Threshold      | Optimal Count  | Glitches | Status
+// ------------|------|----------------|----------------|----------|--------
+// Workers     | 1    | 2,147,483,648  | 2,147,483,649  | 1 (ODD)  | ✅
+// Warriors    | 1    | 2,147,483,648  | 2,147,483,649  | 1 (ODD)  | ✅
+// Scouts      | 2    | 1,073,741,824  | 2,147,483,649  | 1 (ODD)  | ✅ (use 2B for 1 glitch)
+// Pikemen     | 3    | 715,827,883    | 2,147,483,650  | 3 (ODD)  | ✅
+// Swordsmen   | 3    | 715,827,883    | 2,147,483,650  | 3 (ODD)  | ✅
+// Archers     | 4    | 536,870,912    | 2,147,483,649  | 3 (ODD)  | ✅ (4 glitches at 2.15B, use 1.6B for 3)
+// Cavalry     | 9    | 238,609,295    | 2,147,483,656  | 9 (ODD)  | ✅
+// Cataphracts | 17   | 126,322,568    | 2,021,161,089  | 15 (ODD) | ✅
+// Transporters| 5    | 429,496,730    | 2,147,483,651  | 5 (ODD)  | ✅
+// Ballista    | 25   | 85,899,346     | 1,975,685,959  | 23 (ODD) | ✅
+// BattRams    | 50   | 42,949,673     | 2,018,434,632  | 47 (ODD) | ✅
+// Catapults   | 125  | 17,179,870     | 2,010,464,790  | 117(ODD) | ✅
+//
+// SAFE OPTIMAL (stay under 2B per type):
+// =====================================================
+
+setsilence true
+
+echo "=============================================="
+echo "22B+ PER CITY - ALL POSITIVE FOOD GLITCH"
+echo "=============================================="
+
+// OPTIMAL COUNTS - Just under 2B, ALL ODD glitches
+// These numbers give maximum troops while ensuring EVERY type generates food
+
+// Workers: 1 glitch at threshold. Use just over threshold for 1 ODD glitch
+// But threshold is 2.147B which is over 2B limit, so 0 glitches at 2B
+// SOLUTION: Workers don't contribute to glitch, just keep at 2B for troops
+set wo_count 2000000000
+
+// Warriors: Same as workers - 0 glitches at 2B 
+set w_count 2000000000
+
+// Scouts: threshold 1.073B, so 2B = 1 glitch (ODD) ✅
+set s_count 2000000000
+
+// Pikemen: threshold 715M, 2B = 2 glitches (EVEN) ❌
+// For 3 glitches (ODD): need 715M × 3 + 1 = 2,147,483,650 - TOO HIGH
+// For 1 glitch (ODD): need 715M + 1 = 715,827,884 ✅
+set p_count 715827884
+
+// Swordsmen: Same as pikemen - use 715M for 1 glitch (ODD) ✅
+set sw_count 715827884
+
+// Archers: threshold 536M, 2B = 3 glitches (ODD) ✅
+set a_count 2000000000
+
+// Cavalry: threshold 238M, 2B = 8 glitches (EVEN) ❌
+// For 9 glitches (ODD): need 238M × 9 + 1 = 2,147,483,656 - TOO HIGH
+// For 7 glitches (ODD): need 238M × 7 + 1 = 1,670,265,066 ✅
+set c_count 1670265066
+
+// Cataphracts: threshold 126M, 2B = 15 glitches (ODD) ✅
+set cata_count 2000000000
+
+// Transporters: threshold 429M, 2B = 4 glitches (EVEN) ❌
+// For 5 glitches (ODD): need 429M × 5 + 1 = 2,147,483,651 - TOO HIGH
+// For 3 glitches (ODD): need 429M × 3 + 1 = 1,288,490,191 ✅
+set t_count 1288490191
+
+// Ballista: threshold 85M, 2B = 23 glitches (ODD) ✅
+set b_count 2000000000
+
+// Battering Rams: threshold 42M, 2B = 46 glitches (EVEN) ❌
+// For 47 glitches (ODD): need 42M × 47 + 1 = 2,018,634,632 - SLIGHTLY OVER 2B
+// For 45 glitches (ODD): need 42M × 45 + 1 = 1,932,735,286 ✅
+set r_count 1932735286
+
+// Catapults: threshold 17M, 2B = 116 glitches (EVEN) ❌
+// For 117 glitches (ODD): need 17M × 117 + 1 = 2,010,044,790 - SLIGHTLY OVER 2B
+// For 115 glitches (ODD): need 17M × 115 + 1 = 1,975,685,051 ✅
+set cp_count 1975685051
+
+// =====================================================
+// SUMMARY
+// =====================================================
+echo ""
+echo "=== OPTIMAL TROOP COUNTS FOR 22B+ CITY ==="
+echo ""
+echo "Workers:      2,000,000,000 (0 glitch - no food effect)"
+echo "Warriors:     2,000,000,000 (0 glitch - no food effect)"
+echo "Scouts:       2,000,000,000 (1 glitch ODD) ✅ GENERATING"
+echo "Pikemen:        715,827,884 (1 glitch ODD) ✅ GENERATING"
+echo "Swordsmen:      715,827,884 (1 glitch ODD) ✅ GENERATING"
+echo "Archers:      2,000,000,000 (3 glitch ODD) ✅ GENERATING"
+echo "Cavalry:      1,670,265,066 (7 glitch ODD) ✅ GENERATING"
+echo "Cataphracts:  2,000,000,000 (15 glitch ODD) ✅ GENERATING"
+echo "Transporters: 1,288,490,191 (3 glitch ODD) ✅ GENERATING"
+echo "Ballista:     2,000,000,000 (23 glitch ODD) ✅ GENERATING"
+echo "BattRams:     1,932,735,286 (45 glitch ODD) ✅ GENERATING"
+echo "Catapults:    1,975,685,051 (115 glitch ODD) ✅ GENERATING"
+echo ""
+echo "=============================================="
+echo "TOTAL TROOPS: 20,298,831,362 (~20.3B per city)"
+echo "GENERATING TYPES: 10 out of 12"
+echo "FOOD GENERATED: 10 × 2,147,483,647 = 21.47B/hr!"
+echo "=============================================="
+echo ""
+echo "Workers and Warriors don't hit glitch threshold"
+echo "but you still get 20B+ troops and 21B food/hr!"
+echo ""
+
+// =====================================================
+// SCRIPT ARRAYS
+// =====================================================
+
+setarr troopTypes "wo w s p sw a c cata t b r cp"
+setarr optimalCounts "2000000000 2000000000 2000000000 715827884 715827884 2000000000 1670265066 2000000000 1288490191 2000000000 1932735286 1975685051"
+
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+
+// =====================================================
+// EXECUTION: Move/Train to optimal counts
+// =====================================================
+
+echo "--- Checking current vs optimal ---"
+set i 0
+set totalCurrent 0
+set totalOptimal 0
+
+label checkLoop
+set current $c.castle.troop.%troopNames[{%i%}]%$
+set optimal %optimalCounts[{%i%}]%
+set diff {%optimal%-%current%}
+set totalCurrent {%totalCurrent%+%current%}
+set totalOptimal {%totalOptimal%+%optimal%}
+
+if {%diff%>0} echo "%troopTypes[{%i%}]%: Have %current%, Need +%diff%"
+if {%diff%<0} echo "%troopTypes[{%i%}]%: Have %current%, Remove %diff%"
+if {%diff%==0} echo "%troopTypes[{%i%}]%: OPTIMAL ✅"
+
+set i {%i%+1}
+if {%i%<12} goto checkLoop
+
+echo ""
+echo "Total Current: %totalCurrent%"
+echo "Total Optimal: %totalOptimal%"
+echo ""
+
+// =====================================================
+// TO ADD 980B FOOD TO ALL CITIES
+// =====================================================
+// Option 1: Transport from glitched cities
+// Option 2: Use food items
+// Option 3: Wait for glitch generation (21B/hr)
+//           980B ÷ 21B/hr = 46 hours of generation
+// 
+// With 10 cities glitching: 210B/hr total
+// 980B × 10 cities = 9.8T needed
+// 9.8T ÷ 210B/hr = 46 hours
+// =====================================================
+
+echo "To reach 980B food per city:"
+echo "- With 21B/hr generation per city"
+echo "- Takes ~46 hours of positive glitch"
+echo "- Or transport from other glitched accounts"

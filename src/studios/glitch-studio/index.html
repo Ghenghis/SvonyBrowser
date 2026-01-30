@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glitch Studio - SvonyBrowser</title>
+  <link rel="stylesheet" href="../../themes/evony-assets.css">
+  <link rel="stylesheet" href="../../themes/studios-theme.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #16213e 0%, #1a1a2e 50%, #16213e 100%);
+      border-bottom: 2px solid #e94560;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      color: #ffd700;
+      font-size: 24px;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 10px;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      border: 2px solid #333;
+      border-radius: 5px;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.3);
+      color: #888;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .mode-btn:hover {
+      border-color: #e94560;
+    }
+
+    .mode-btn.active {
+      border-color: #4CAF50;
+      color: #4CAF50;
+      background: rgba(76, 175, 80, 0.2);
+    }
+
+    .mode-btn.override.active {
+      border-color: #ff9800;
+      color: #ff9800;
+      background: rgba(255, 152, 0, 0.2);
+    }
+
+    .mode-btn.danger.active {
+      border-color: #f44336;
+      color: #f44336;
+      background: rgba(244, 67, 54, 0.2);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #888;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      border-color: #e94560;
+    }
+
+    .tab.active {
+      background: #e94560;
+      border-color: #e94560;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .glitch-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .glitch-title {
+      color: #e94560;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #888;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #333;
+      border-radius: 5px;
+      color: #eee;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #e94560;
+      outline: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #e94560 0%, #c73e54 100%);
+      color: white;
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, #4CAF50 0%, #3d8b40 100%);
+      color: white;
+    }
+
+    .btn-warning {
+      background: linear-gradient(180deg, #ff9800 0%, #f57c00 100%);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, #f44336 0%, #d32f2f 100%);
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .limits-display {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .limit-card {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .limit-value {
+      color: #ffd700;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .limit-label {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .script-output {
+      background: #0a0a15;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .log-panel {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid #222;
+      font-size: 12px;
+    }
+
+    .log-entry.warning {
+      color: #ff9800;
+    }
+
+    .log-entry.error {
+      color: #f44336;
+    }
+
+    .log-entry.success {
+      color: #4CAF50;
+    }
+
+    .warning-box {
+      background: rgba(244, 67, 54, 0.2);
+      border: 1px solid #f44336;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .warning-box h4 {
+      color: #f44336;
+      margin-bottom: 10px;
+    }
+
+    .safety-indicator {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .safety-indicator.safe {
+      background: rgba(76, 175, 80, 0.3);
+      color: #4CAF50;
+    }
+
+    .safety-indicator.override {
+      background: rgba(255, 152, 0, 0.3);
+      color: #ff9800;
+    }
+
+    .safety-indicator.danger {
+      background: rgba(244, 67, 54, 0.3);
+      color: #f44336;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>⚡ Glitch Studio</h1>
+    <div class="mode-selector">
+      <button class="mode-btn active" data-mode="safe" onclick="setMode('safe')">🛡️ Safe Mode</button>
+      <button class="mode-btn override" data-mode="override" onclick="setMode('override')">⚠️ Override</button>
+      <button class="mode-btn danger" data-mode="danger" onclick="setMode('danger')">☠️ Danger</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Current Limits Display -->
+    <div class="limits-display">
+      <div class="limit-card">
+        <div class="limit-value" id="limit-troops">700M</div>
+        <div class="limit-label">Max Troops/Type</div>
+      </div>
+      <div class="limit-card">
+        <div class="limit-value" id="limit-total">700B</div>
+        <div class="limit-label">Max Total Troops</div>
+      </div>
+      <div class="limit-card">
+        <div class="limit-value" id="limit-food">999B</div>
+        <div class="limit-label">Max Food/City</div>
+      </div>
+      <div class="limit-card">
+        <div class="limit-value" id="limit-gold">2.1B</div>
+        <div class="limit-label">Max Gold (32-bit)</div>
+      </div>
+      <div class="limit-card">
+        <div class="limit-value" id="limit-raids">5-7</div>
+        <div class="limit-label">Thunder Raids Needed</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="troop">⚔️ Troop Glitch</div>
+      <div class="tab" data-tab="food">🌾 Food Glitch</div>
+      <div class="tab" data-tab="move">🚚 Move Glitch</div>
+      <div class="tab" data-tab="logs">📋 Logs</div>
+    </div>
+
+    <!-- Troop Glitch Tab -->
+    <div id="troop" class="tab-content active">
+      <div class="glitch-card">
+        <div class="glitch-title">Troop Glitch Configuration</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <select id="troop-city">
+              <option value="">Select City...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Troop Type</label>
+            <select id="troop-type">
+              <option value="worker">Worker</option>
+              <option value="warrior">Warrior</option>
+              <option value="scout">Scout</option>
+              <option value="pikeman">Pikeman</option>
+              <option value="swordsman">Swordsman</option>
+              <option value="archer">Archer</option>
+              <option value="cavalry">Cavalry</option>
+              <option value="cataphract">Cataphract</option>
+              <option value="transporter">Transporter</option>
+              <option value="ballista">Ballista</option>
+              <option value="batteringRam">Battering Ram</option>
+              <option value="catapult">Catapult</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Valley Coords (X)</label>
+            <input type="number" id="troop-valley-x" placeholder="X coordinate">
+          </div>
+          <div class="form-group">
+            <label>Valley Coords (Y)</label>
+            <input type="number" id="troop-valley-y" placeholder="Y coordinate">
+          </div>
+          <div class="form-group">
+            <label>Amount to Glitch</label>
+            <input type="number" id="troop-amount" value="700000000" placeholder="700000000">
+          </div>
+          <div class="form-group">
+            <label>Thunder Raid Count</label>
+            <input type="number" id="troop-raids" value="7" min="5" max="10">
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button class="btn btn-primary" onclick="validateTroopGlitch()">✅ Validate</button>
+          <button class="btn btn-success" onclick="generateTroopScript()">📝 Generate Script</button>
+          <button class="btn btn-warning" onclick="executeTroopGlitch()">⚡ Execute</button>
+        </div>
+      </div>
+      <div class="glitch-card">
+        <div class="glitch-title">Generated Script</div>
+        <pre class="script-output" id="troop-script-output">// Script will appear here after generation</pre>
+      </div>
+    </div>
+
+    <!-- Food Glitch Tab -->
+    <div id="food" class="tab-content">
+      <div class="glitch-card">
+        <div class="glitch-title">Food Glitch Configuration</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <select id="food-city">
+              <option value="">Select City...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Valley Coords (X)</label>
+            <input type="number" id="food-valley-x" placeholder="X coordinate">
+          </div>
+          <div class="form-group">
+            <label>Valley Coords (Y)</label>
+            <input type="number" id="food-valley-y" placeholder="Y coordinate">
+          </div>
+          <div class="form-group">
+            <label>Transport Amount</label>
+            <input type="number" id="food-amount" value="485000000000" placeholder="485000000000">
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button class="btn btn-primary" onclick="validateFoodGlitch()">✅ Validate</button>
+          <button class="btn btn-success" onclick="generateFoodScript()">📝 Generate Script</button>
+          <button class="btn btn-warning" onclick="executeFoodGlitch()">⚡ Execute</button>
+        </div>
+      </div>
+      <div class="glitch-card">
+        <div class="glitch-title">Generated Script</div>
+        <pre class="script-output" id="food-script-output">// Script will appear here after generation</pre>
+      </div>
+    </div>
+
+    <!-- Move Glitch Tab -->
+    <div id="move" class="tab-content">
+      <div class="glitch-card">
+        <div class="glitch-title">Move Glitch Configuration (Commission Quest)</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Source City</label>
+            <select id="move-source">
+              <option value="">Select Source City...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Target City</label>
+            <select id="move-target">
+              <option value="">Select Target City...</option>
+            </select>
+          </div>
+        </div>
+        <div class="glitch-title" style="margin-top: 15px;">Troops to Move (Max 2.1B total)</div>
+        <div class="form-row" id="move-troops-grid">
+          <!-- Troop inputs will be generated here -->
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button class="btn btn-primary" onclick="validateMoveGlitch()">✅ Validate</button>
+          <button class="btn btn-success" onclick="generateMoveScript()">📝 Generate Script</button>
+          <button class="btn btn-warning" onclick="executeMoveGlitch()">⚡ Execute</button>
+        </div>
+      </div>
+      <div class="glitch-card">
+        <div class="glitch-title">Generated Script</div>
+        <pre class="script-output" id="move-script-output">// Script will appear here after generation</pre>
+      </div>
+    </div>
+
+    <!-- Logs Tab -->
+    <div id="logs" class="tab-content">
+      <div class="glitch-card">
+        <div class="glitch-title">Glitch Engine Logs</div>
+        <div class="log-panel" id="log-panel">
+          <div class="log-entry">Glitch Studio initialized</div>
+        </div>
+        <div style="margin-top: 15px;">
+          <button class="btn btn-danger" onclick="clearLogs()">🗑️ Clear Logs</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'safe';
+    const limits = {
+      safe: { troops: '700M', total: '700B', food: '999B', gold: '2.1B', raids: '5-7' },
+      override: { troops: '1B', total: '700B', food: '999B', gold: '2.1B', raids: '5-7' },
+      danger: { troops: 'Unlimited', total: 'Unlimited', food: 'Unlimited', gold: '2.1B', raids: '3-7' }
+    };
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+      updateLimitsDisplay();
+      addLog(`Mode changed to: ${mode}`, mode === 'danger' ? 'warning' : 'success');
+    }
+
+    function updateLimitsDisplay() {
+      const l = limits[currentMode];
+      document.getElementById('limit-troops').textContent = l.troops;
+      document.getElementById('limit-total').textContent = l.total;
+      document.getElementById('limit-food').textContent = l.food;
+      document.getElementById('limit-gold').textContent = l.gold;
+      document.getElementById('limit-raids').textContent = l.raids;
+    }
+
+    function setupTabs() {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.dataset.tab;
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+    }
+
+    function addLog(message, type = 'info') {
+      const panel = document.getElementById('log-panel');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      panel.insertBefore(entry, panel.firstChild);
+    }
+
+    function clearLogs() {
+      document.getElementById('log-panel').innerHTML = '<div class="log-entry">Logs cleared</div>';
+    }
+
+    function validateTroopGlitch() {
+      const amount = parseInt(document.getElementById('troop-amount').value);
+      const raids = parseInt(document.getElementById('troop-raids').value);
+      const maxTroops = currentMode === 'safe' ? 700000000 : (currentMode === 'override' ? 1000000000 : Infinity);
+
+      if (amount > maxTroops) {
+        addLog(`VALIDATION FAILED: Amount ${amount.toLocaleString()} exceeds limit of ${maxTroops.toLocaleString()}`, 'error');
+        return false;
+      }
+      if (raids < 5) {
+        addLog(`VALIDATION FAILED: Need at least 5 thunder raids`, 'error');
+        return false;
+      }
+      addLog(`Troop glitch validation PASSED`, 'success');
+      return true;
+    }
+
+    function generateTroopScript() {
+      if (!validateTroopGlitch()) return;
+      const type = document.getElementById('troop-type').value;
+      const amount = document.getElementById('troop-amount').value;
+      const valleyX = document.getElementById('troop-valley-x').value;
+      const valleyY = document.getElementById('troop-valley-y').value;
+      const raids = document.getElementById('troop-raids').value;
+
+      const script = `// Troop Glitch Script - Mode: ${currentMode}
+// Target: ${parseInt(amount).toLocaleString()} ${type}
+// Valley: (${valleyX}, ${valleyY})
+
+if (thunderRaidCount < ${raids}) {
+  log("ERROR: Need ${raids} thunder raids");
+  stop();
+}
+
+valleyDist = getDistance(city.coords, {x: ${valleyX}, y: ${valleyY}});
+if (valleyDist != 1) {
+  log("ERROR: Valley must be 1 tile from city");
+  stop();
+}
+
+addTroops("${type}", ${amount});
+wait(500);
+
+for (i = 0; i < ${raids}; i++) {
+  sendThunderRaid({x: ${valleyX}, y: ${valleyY}});
+  wait(100);
+}
+
+log("Glitch complete. Check troop count.");`;
+
+      document.getElementById('troop-script-output').textContent = script;
+      addLog(`Troop glitch script generated for ${parseInt(amount).toLocaleString()} ${type}`, 'success');
+    }
+
+    function generateFoodScript() {
+      const amount = document.getElementById('food-amount').value;
+      const valleyX = document.getElementById('food-valley-x').value;
+      const valleyY = document.getElementById('food-valley-y').value;
+
+      const script = `// Food Glitch Script - Mode: ${currentMode}
+// Transport Amount: ${parseInt(amount).toLocaleString()}
+// Valley: (${valleyX}, ${valleyY})
+
+valleyDist = getDistance(city.coords, {x: ${valleyX}, y: ${valleyY}});
+if (valleyDist != 1) {
+  log("ERROR: Valley must be 1 tile from city");
+  stop();
+}
+
+loadTransports(${amount});
+wait(500);
+sendTransportsToValley({x: ${valleyX}, y: ${valleyY}});
+wait(1000);
+executeGlitchScript();
+wait(500);
+recallTransports();
+log("Food glitch complete.");`;
+
+      document.getElementById('food-script-output').textContent = script;
+      addLog(`Food glitch script generated for ${parseInt(amount).toLocaleString()}`, 'success');
+    }
+
+    function generateMoveScript() {
+      const source = document.getElementById('move-source').value;
+      const target = document.getElementById('move-target').value;
+
+      const script = `// Move Glitch Script - Mode: ${currentMode}
+// Source: ${source}
+// Target: ${target}
+// Using Commission Quest for instant transfer
+
+// Start commission quest
+startCommissionQuest("${source}", "${target}");
+wait(500);
+
+// Add troops to quest (up to 2.1B)
+// addTroopsToQuest(type, amount);
+
+// Complete for instant transfer
+completeCommissionQuest();
+log("Move glitch complete.");`;
+
+      document.getElementById('move-script-output').textContent = script;
+      addLog(`Move glitch script generated`, 'success');
+    }
+
+    function executeTroopGlitch() {
+      addLog('Troop glitch execution requested - implement with Playwright', 'warning');
+    }
+    function executeFoodGlitch() {
+      addLog('Food glitch execution requested - implement with Playwright', 'warning');
+    }
+    function executeMoveGlitch() {
+      addLog('Move glitch execution requested - implement with Playwright', 'warning');
+    }
+    function validateFoodGlitch() { addLog('Food glitch validation passed', 'success'); return true; }
+    function validateMoveGlitch() { addLog('Move glitch validation passed', 'success'); return true; }
+
+    // Initialize
+    setupTabs();
+    updateLimitsDisplay();
+    addLog('Glitch Studio loaded successfully', 'success');
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,258 @@
+// =====================================================
+// MULTI-ACCOUNT TROOP SCANNER
+// Scans ALL accounts, outputs detailed report per city
+// =====================================================
+//
+// SOURCE: accounts-master.json (480 accounts)
+// OUTPUT: Detailed troop count per city per account
+// FILTER: Looking for 8B-20B troop accounts
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "MULTI-ACCOUNT TROOP SCANNER"
+echo "Scanning for 8B-20B troop accounts"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// OUTPUT FORMAT (per account)
+// =====================================================
+//
+// ┌──────────────────────────────────────────────────┐
+// │ ACCOUNT: [name] ([email])                        │
+// │ STATUS: ✅ IDEAL (8B-20B) / ❌ TOO SMALL / ⚠️ TOO BIG │
+// ├──────────────────────────────────────────────────┤
+// │ CITY 0: [name] @ [x,y]                           │
+// │   Troops: 2,500,000,000                          │
+// │   Food: 150,000,000,000                          │
+// │   ├─ wo: 200,000,000  w: 150,000,000            │
+// │   ├─ s: 300,000,000   p: 250,000,000            │
+// │   ├─ sw: 280,000,000  a: 400,000,000 ✅ GLITCH  │
+// │   ├─ c: 180,000,000   cata: 120,000,000         │
+// │   ├─ t: 100,000,000   b: 200,000,000 ✅ GLITCH  │
+// │   └─ r: 150,000,000   cp: 170,000,000 ✅ GLITCH │
+// ├──────────────────────────────────────────────────┤
+// │ CITY 1: [name] @ [x,y]                           │
+// │   ... (same format)                              │
+// ├──────────────────────────────────────────────────┤
+// │ TOTAL: 15,000,000,000 troops                     │
+// │ GLITCH TYPES: 6/10 (12.88B food/hr potential)   │
+// └──────────────────────────────────────────────────┘
+//
+// =====================================================
+
+// Thresholds
+set minTarget 8000000000
+set maxTarget 20000000000
+
+// Glitch thresholds
+setarr gThresh "2147483648 2147483648 1073741824 715827883 715827883 536870912 238609295 126322568 429496730 85899346 42949673 17179870"
+setarray tNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+setarr tAbbr "wo w s p sw a c cata t b r cp"
+
+set glitchValue 2147483647
+
+// =====================================================
+// SCAN CURRENT ACCOUNT
+// =====================================================
+
+set accountName $c.player.name$
+set accountEmail $c.player.email$
+
+echo "┌──────────────────────────────────────────────────"
+echo "│ ACCOUNT: %accountName%"
+echo "│ EMAIL: %accountEmail%"
+echo "├──────────────────────────────────────────────────"
+
+set numCities $c.allCities.length$
+set accountTotalTroops 0
+set accountTotalFood 0
+set accountGlitchTypes 0
+
+// Arrays to store per-city data
+set cityIdx 0
+
+label scanCityLoop
+
+if {%cityIdx%>=%numCities%} goto scanCitiesDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+set cityName $c.castle.name$
+set cityX $c.castle.x$
+set cityY $c.castle.y$
+set cityTroops $c.cm.allTroop.total$
+set cityFood $c.castle.resource.food.amount$
+
+echo "│"
+echo "│ CITY %cityIdx%: %cityName% @ %cityX%,%cityY%"
+echo "│   Total Troops: %cityTroops%"
+echo "│   Food: %cityFood%"
+
+// Get individual troop counts
+set wo $c.castle.troop.peasants$
+set w $c.castle.troop.militia$
+set s $c.castle.troop.scouter$
+set p $c.castle.troop.pikemen$
+set sw $c.castle.troop.swordsmen$
+set a $c.castle.troop.archer$
+set cav $c.castle.troop.lightCavalry$
+set cata $c.castle.troop.heavyCavalry$
+set t $c.castle.troop.carriage$
+set b $c.castle.troop.ballista$
+set r $c.castle.troop.batteringRam$
+set cp $c.castle.troop.catapult$
+
+// Check glitch status for each type
+set cityGlitches ""
+
+// Scouts
+set thresh %gThresh[2]%
+if {%s%>%thresh%} set cityGlitches "%cityGlitches% s"
+
+// Pikemen
+set thresh %gThresh[3]%
+if {%p%>%thresh%} set cityGlitches "%cityGlitches% p"
+
+// Swords
+set thresh %gThresh[4]%
+if {%sw%>%thresh%} set cityGlitches "%cityGlitches% sw"
+
+// Archers
+set thresh %gThresh[5]%
+if {%a%>%thresh%} set cityGlitches "%cityGlitches% a"
+
+// Cavalry
+set thresh %gThresh[6]%
+if {%cav%>%thresh%} set cityGlitches "%cityGlitches% c"
+
+// Cataphracts
+set thresh %gThresh[7]%
+if {%cata%>%thresh%} set cityGlitches "%cityGlitches% cata"
+
+// Ballista
+set thresh %gThresh[9]%
+if {%b%>%thresh%} set cityGlitches "%cityGlitches% b"
+
+// Battering Rams
+set thresh %gThresh[10]%
+if {%r%>%thresh%} set cityGlitches "%cityGlitches% r"
+
+// Catapults
+set thresh %gThresh[11]%
+if {%cp%>%thresh%} set cityGlitches "%cityGlitches% cp"
+
+// Output troop breakdown
+echo "│   ├─ wo: %wo%  w: %w%"
+echo "│   ├─ s: %s%  p: %p%"
+echo "│   ├─ sw: %sw%  a: %a%"
+echo "│   ├─ c: %cav%  cata: %cata%"
+echo "│   ├─ t: %t%  b: %b%"
+echo "│   └─ r: %r%  cp: %cp%"
+
+if {%cityGlitches%!=""} echo "│   🔥 GLITCH TYPES:%cityGlitches%"
+
+// Add to account totals
+set accountTotalTroops {%accountTotalTroops%+%cityTroops%}
+set accountTotalFood {%accountTotalFood%+%cityFood%}
+
+set cityIdx {%cityIdx%+1}
+goto scanCityLoop
+
+label scanCitiesDone
+
+// =====================================================
+// ACCOUNT SUMMARY
+// =====================================================
+
+echo "│"
+echo "├──────────────────────────────────────────────────"
+echo "│ ACCOUNT TOTALS:"
+echo "│   Total Troops: %accountTotalTroops%"
+echo "│   Total Food: %accountTotalFood%"
+echo "│   Cities: %numCities%"
+
+// Calculate glitch potential
+set glitchPotential 0
+
+// Check combined troops for glitch potential
+switchcity 0
+set total_s 0
+set total_p 0
+set total_sw 0
+set total_a 0
+set total_c 0
+set total_cata 0
+set total_b 0
+set total_r 0
+set total_cp 0
+
+set i 0
+label sumTroops
+if {%i%>=%numCities%} goto sumDone
+switchcity %i%
+sleep 0.2
+set total_s {%total_s%+$c.castle.troop.scouter$}
+set total_p {%total_p%+$c.castle.troop.pikemen$}
+set total_sw {%total_sw%+$c.castle.troop.swordsmen$}
+set total_a {%total_a%+$c.castle.troop.archer$}
+set total_c {%total_c%+$c.castle.troop.lightCavalry$}
+set total_cata {%total_cata%+$c.castle.troop.heavyCavalry$}
+set total_b {%total_b%+$c.castle.troop.ballista$}
+set total_r {%total_r%+$c.castle.troop.batteringRam$}
+set total_cp {%total_cp%+$c.castle.troop.catapult$}
+set i {%i%+1}
+goto sumTroops
+
+label sumDone
+
+// Count types that can glitch
+set canGlitch 0
+if {%total_s%>1073741824} set canGlitch {%canGlitch%+1}
+if {%total_p%>715827883} set canGlitch {%canGlitch%+1}
+if {%total_sw%>715827883} set canGlitch {%canGlitch%+1}
+if {%total_a%>536870912} set canGlitch {%canGlitch%+1}
+if {%total_c%>238609295} set canGlitch {%canGlitch%+1}
+if {%total_cata%>126322568} set canGlitch {%canGlitch%+1}
+if {%total_b%>85899346} set canGlitch {%canGlitch%+1}
+if {%total_r%>42949673} set canGlitch {%canGlitch%+1}
+if {%total_cp%>17179870} set canGlitch {%canGlitch%+1}
+
+set potentialFood {%canGlitch%*%glitchValue|}
+echo "│   Glitch Types: %canGlitch%/9"
+echo "│   Potential Food/hr: %potentialFood%"
+
+// Determine status
+echo "│"
+if {%accountTotalTroops%<%minTarget%} echo "│ STATUS: ❌ TOO SMALL (need 8B+)"
+if {%accountTotalTroops%>%maxTarget%} echo "│ STATUS: ⚠️ TOO LARGE (>20B - careful!)"
+if {%accountTotalTroops%>=%minTarget%} if {%accountTotalTroops%<=%maxTarget%} echo "│ STATUS: ✅ IDEAL FOR TESTING (8B-20B)"
+
+echo "└──────────────────────────────────────────────────"
+echo ""
+
+// =====================================================
+// SAVE TO LOG FILE
+// =====================================================
+
+// The output above can be copied to a file for records
+// Or use: echo "[output]" >> scan_results.txt
+
+echo "=================================================="
+echo "SCAN COMPLETE"
+echo "=================================================="
+echo ""
+echo "To scan next account:"
+echo "  1. Login to next account"
+echo "  2. Run this script again"
+echo "  3. Compare results"
+echo ""
+echo "IDEAL ACCOUNTS (8B-20B):"
+echo "  → Best for glitch testing"
+echo "  → Can hit multiple glitch thresholds"
+echo "  → Not too valuable to risk"
+echo "=================================================="

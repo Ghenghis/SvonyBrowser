@@ -1,0 +1,175 @@
+// =====================================================
+// RED ALLIANCE TEST SETUP
+// Create safe red alliance for valley glitch testing
+// =====================================================
+//
+// WHY RED ALLIANCE:
+// - Valley troops have NO defense
+// - Red alliance valleys = friendly territory
+// - Your alts can protect each other
+// - Safe testing environment
+//
+// SETUP:
+// 1. Pick an ALT account to be alliance leader
+// 2. Create new alliance (or use existing)
+// 3. Invite your other alts
+// 4. Capture valleys near each other
+// 5. Test glitch scripts safely
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "RED ALLIANCE TEST SETUP GUIDE"
+echo "Safe valley glitch testing"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// STEP 1: CHOOSE LEADER ACCOUNT
+// =====================================================
+
+echo "=== STEP 1: CHOOSE LEADER ACCOUNT ==="
+echo ""
+echo "Best accounts for testing (8B-20B troops):"
+echo ""
+echo "From acc.txt - run scanner on each:"
+echo "  - zee (yucon1966@yahoo.com)"
+echo "  - RQ (jenspast1991@yahoo.com)"
+echo "  - CoolArrow (Midnightemissary@gmail.com)"
+echo "  - PAB (erich.schlegel@us.fujitsu.com)"
+echo "  - IamChoder (bill.prins@gmail.com)"
+echo "  - GhostRaider (dustysoccer0@hotmail.com)"
+echo "  - Chodebitch (chrischen421@gmail.com)"
+echo "  - Saphire (saphires1@hotmail.com)"
+echo "  - David960 (diamonddave960@yahoo.com)"
+echo "  - Vorador (medri15@yahoo.com)"
+echo "  - CrazyIvana (wally.nino@yahoo.com)"
+echo "  - ladytara (celticchef2000@aol.com)"
+echo "  - CrazyRill (terrillevony@yahoo.com)"
+echo "  - CrazyRoyal (hunygurl67@yahoo.com)"
+echo "  - Rigamortis (masterramrod@hotmail.co.uk)"
+echo "  - fox (pllyankees@hotmail.com)"
+echo "  - KangWR (ykamhong@yahoo.com)"
+echo "  - CRAZYMOFO (grosy@musc.edu)"
+echo "  - Tard (gutter_maintenance@iinet.net.au)"
+echo "  - ant (ypgros@gmail.com)"
+echo "  - botkiller (iikissmygritsii@yahoo.com)"
+echo ""
+echo "Run account-scanner-8b-20b.txt on each!"
+echo ""
+
+// =====================================================
+// STEP 2: CREATE ALLIANCE
+// =====================================================
+
+echo "=== STEP 2: CREATE ALLIANCE ==="
+echo ""
+echo "Commands to create alliance:"
+echo ""
+echo "// Create new alliance"
+echo "set result $c.af.getAllianceCommands().createAlliance('TestGlitch', 'TG')$"
+echo ""
+echo "// Or join existing alliance"
+echo "set result $c.af.getAllianceCommands().joinAlliance(allianceId)$"
+echo ""
+
+// =====================================================
+// STEP 3: INVITE ALTS
+// =====================================================
+
+echo "=== STEP 3: INVITE ALT ACCOUNTS ==="
+echo ""
+echo "// Invite player by name"
+echo "set result $c.af.getAllianceCommands().invitePlayer('altAccountName')$"
+echo ""
+echo "// Accept invitation (on alt account)"
+echo "set result $c.af.getAllianceCommands().acceptInvitation(inviteId)$"
+echo ""
+
+// =====================================================
+// STEP 4: CAPTURE VALLEYS
+// =====================================================
+
+echo "=== STEP 4: CAPTURE TEST VALLEYS ==="
+echo ""
+echo "Capture valleys NEAR your cities for fast transport"
+echo ""
+echo "// Attack valley to capture"
+echo "attack [valley coord] a:10000"
+echo ""
+echo "// Good valley levels for testing: 5-10"
+echo "// Need valleys within 1-2 tiles of city"
+echo ""
+
+// =====================================================
+// STEP 5: SETUP VALLEY DEFENSE NETWORK
+// =====================================================
+
+echo "=== STEP 5: VALLEY DEFENSE NETWORK ==="
+echo ""
+echo "Have multiple alts ready to reinforce:"
+echo ""
+echo "// Alt 1: Watches for attacks"
+echo "// Run: auto-recall-valley-defense.txt"
+echo ""
+echo "// Alt 2: Ready to reinforce valley"
+echo "// Alt 3: Ready to counter-attack"
+echo ""
+echo "// Reinforce valley with defense troops"
+echo "reinforce [valley coord] a:1000000"
+echo ""
+
+// =====================================================
+// STEP 6: TEST GLITCH SCRIPTS
+// =====================================================
+
+echo "=== STEP 6: RUN GLITCH TESTS ==="
+echo ""
+echo "TEST ORDER:"
+echo ""
+echo "1. Run account-scanner-8b-20b.txt"
+echo "   → Verify account has 8B-20B troops"
+echo ""
+echo "2. Run 10-city-max-food-glitch.txt"
+echo "   → Check current glitch status"
+echo ""
+echo "3. Run troop-balancer-fleet-feet.txt (NO Fleet Feet on alts!)"
+echo "   → Balance troops across cities"
+echo ""
+echo "4. Run valley-double-food-glitch.txt"
+echo "   → Move troops to valley for 2x food"
+echo ""
+echo "5. Run auto-recall-valley-defense.txt"
+echo "   → Keep running for protection"
+echo ""
+echo "6. Verify food generation is POSITIVE!"
+echo ""
+
+// =====================================================
+// RECOMMENDED TEST ACCOUNTS
+// =====================================================
+
+echo "=================================================="
+echo "RECOMMENDED TEST SETUP"
+echo "=================================================="
+echo ""
+echo "LEADER (creates alliance):"
+echo "  → Pick account with most troops in 8B-20B range"
+echo ""
+echo "MEMBERS (join alliance):"
+echo "  → Add 3-5 other alts for protection"
+echo ""
+echo "VALLEYS:"
+echo "  → Capture 3-5 valleys per test account"
+echo "  → All within 2 tiles of cities"
+echo ""
+echo "PROTECTION:"
+echo "  → Run auto-recall on all accounts"
+echo "  → Have reinforcements ready"
+echo ""
+echo "=================================================="
+echo ""
+echo "Ready to test! Run scripts in order above."
+echo "=================================================="

@@ -1,0 +1,201 @@
+// =====================================================
+// 10 CITY MAXIMUM FOOD GLITCH - BEST POSSIBLE
+// =====================================================
+//
+// GOAL: Maximum food generation across 10 cities
+// METHOD: ALL 12 troop types with ODD glitches
+//
+// MAX THEORETICAL:
+// - 12 types × 2.147B/hr = 25.77B food/hr per city
+// - 10 cities × 25.77B = 257.7B food/hr TOTAL
+//
+// REALISTIC (10 types ODD achievable under 2B limit):
+// - 10 types × 2.147B/hr = 21.47B food/hr per city
+// - 10 cities × 21.47B = 214.7B food/hr TOTAL
+//
+// =====================================================
+// OPTIMAL TROOP COUNTS - ALL ODD GLITCHES (per city)
+// =====================================================
+//
+// Workers/Warriors have threshold 2.147B - can't hit 1 glitch under 2B
+// So we optimize the other 10 types for ODD glitches
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "10 CITY MAXIMUM FOOD GLITCH"
+echo "=================================================="
+echo ""
+echo "Per City Configuration:"
+echo ""
+
+// OPTIMAL COUNTS FOR MAXIMUM ODD GLITCHES (all under 2B)
+// =====================================================
+
+// Workers (threshold 2,147,483,648): Can't reach 1 glitch under 2B
+// Keep max troops for army strength
+set wo 2000000000
+echo "Workers:      2,000,000,000 | 0 glitch | troops only"
+
+// Warriors (threshold 2,147,483,648): Same as workers
+set w 2000000000
+echo "Warriors:     2,000,000,000 | 0 glitch | troops only"
+
+// Scouts (threshold 1,073,741,824): 2B = 1 glitch (ODD) ✅
+set s 2000000000
+echo "Scouts:       2,000,000,000 | 1 glitch ODD | ✅ +2.147B/hr"
+
+// Pikemen (threshold 715,827,883): 
+// 1 glitch = 715,827,884 (ODD) ✅
+// 2 glitches = 1,431,655,767 (EVEN)
+// 3 glitches = 2,147,483,650 (over 2B!)
+// USE: 715,827,884 for 1 ODD glitch
+set p 715827884
+echo "Pikemen:        715,827,884 | 1 glitch ODD | ✅ +2.147B/hr"
+
+// Swordsmen (threshold 715,827,883): Same as Pikemen
+set sw 715827884
+echo "Swordsmen:      715,827,884 | 1 glitch ODD | ✅ +2.147B/hr"
+
+// Archers (threshold 536,870,912):
+// 1 glitch = 536,870,913 (ODD) ✅
+// 2 glitches = 1,073,741,825 (EVEN)
+// 3 glitches = 1,610,612,737 (ODD) ✅
+// 4 glitches = 2,147,483,649 (over 2B!)
+// USE: 1,610,612,737 for 3 ODD glitches (more troops)
+set a 1610612737
+echo "Archers:      1,610,612,737 | 3 glitch ODD | ✅ +2.147B/hr"
+
+// Cavalry (threshold 238,609,295):
+// 7 glitches = 1,670,265,066 (ODD) ✅
+// 8 glitches = 1,908,874,361 (EVEN)
+// 9 glitches = 2,147,483,656 (over 2B!)
+// USE: 1,670,265,066 for 7 ODD glitches
+set c 1670265066
+echo "Cavalry:      1,670,265,066 | 7 glitch ODD | ✅ +2.147B/hr"
+
+// Cataphracts (threshold 126,322,568):
+// 15 glitches = 1,894,838,521 (ODD) ✅
+// 16 glitches = 2,021,161,089 (EVEN) - still under 2B but EVEN
+// USE: 1,894,838,521 for 15 ODD glitches
+set cata 1894838521
+echo "Cataphracts:  1,894,838,521 | 15 glitch ODD | ✅ +2.147B/hr"
+
+// Transporters (threshold 429,496,730):
+// 3 glitches = 1,288,490,191 (ODD) ✅
+// 4 glitches = 1,717,986,921 (EVEN)
+// 5 glitches = 2,147,483,651 (over 2B!)
+// USE: 1,288,490,191 for 3 ODD glitches
+set t 1288490191
+echo "Transporters: 1,288,490,191 | 3 glitch ODD | ✅ +2.147B/hr"
+
+// Ballista (threshold 85,899,346):
+// 21 glitches = 1,803,886,267 (ODD) ✅
+// 22 glitches = 1,889,785,613 (EVEN)
+// 23 glitches = 1,975,684,959 (ODD) ✅
+// USE: 1,975,684,959 for 23 ODD glitches (more troops)
+set b 1975684959
+echo "Ballista:     1,975,684,959 | 23 glitch ODD | ✅ +2.147B/hr"
+
+// Battering Rams (threshold 42,949,673):
+// 45 glitches = 1,932,735,286 (ODD) ✅
+// 46 glitches = 1,975,684,959 (EVEN)
+// 47 glitches = 2,018,634,632 (ODD) - slightly over 2B, risky
+// USE: 1,932,735,286 for 45 ODD glitches (safe)
+set r 1932735286
+echo "BattRams:     1,932,735,286 | 45 glitch ODD | ✅ +2.147B/hr"
+
+// Catapults (threshold 17,179,870):
+// 113 glitches = 1,941,325,311 (ODD) ✅
+// 114 glitches = 1,958,505,181 (EVEN)
+// 115 glitches = 1,975,685,051 (ODD) ✅
+// USE: 1,975,685,051 for 115 ODD glitches (more troops)
+set cp 1975685051
+echo "Catapults:    1,975,685,051 | 115 glitch ODD | ✅ +2.147B/hr"
+
+echo ""
+echo "=================================================="
+echo "PER CITY TOTALS"
+echo "=================================================="
+
+// Calculate totals
+set totalTroops {2000000000+2000000000+2000000000+715827884+715827884+1610612737+1670265066+1894838521+1288490191+1975684959+1932735286+1975685051}
+echo "Total Troops per City: 19,779,967,579 (~19.8B)"
+echo ""
+echo "Generating Types: 10 out of 12"
+echo "Food Generated: 10 × 2,147,483,647 = 21,474,836,470/hr"
+echo "That's 21.47B food/hr per city!"
+echo ""
+
+echo "=================================================="
+echo "10 CITY TOTALS"
+echo "=================================================="
+echo ""
+echo "Total Troops (10 cities): 197,799,675,790 (~197.8B)"
+echo "Total Food/hr (10 cities): 214,748,364,700 (~214.7B/hr)"
+echo ""
+echo "Food per day: 214.7B × 24 = 5.15 TRILLION food/day!"
+echo ""
+
+// =====================================================
+// SCRIPT ARRAYS FOR AUTOMATION
+// =====================================================
+
+echo "=================================================="
+echo "COPY THESE FOR YOUR SCRIPTS:"
+echo "=================================================="
+echo ""
+echo "setarr troopTypes \"wo w s p sw a c cata t b r cp\""
+echo ""
+echo "setarr optimalCounts \"2000000000 2000000000 2000000000 715827884 715827884 1610612737 1670265066 1894838521 1288490191 1975684959 1932735286 1975685051\""
+echo ""
+
+// =====================================================
+// DEPLOYMENT SCRIPT FOR ALL 10 CITIES
+// =====================================================
+
+setarr troopTypes "wo w s p sw a c cata t b r cp"
+setarr optimalCounts "2000000000 2000000000 2000000000 715827884 715827884 1610612737 1670265066 1894838521 1288490191 1975684959 1932735286 1975685051"
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+
+// Loop through all cities
+set cityIndex 0
+set totalCities $c.allCities.length$
+
+label cityLoop
+if {%cityIndex%>=%totalCities%} goto allDone
+
+echo "--- Processing City %cityIndex% ---"
+switchcity %cityIndex%
+sleep 1
+
+// Check each troop type
+set i 0
+label troopLoop
+set current $c.castle.troop.%troopNames[{%i%}]%$
+set optimal %optimalCounts[{%i%}]%
+set diff {%optimal%-%current%}
+
+if {%diff%>0} echo "  %troopTypes[{%i%}]%: Need +%diff%"
+if {%diff%<0} echo "  %troopTypes[{%i%}]%: Remove %diff% (send to valley)"
+if {%diff%==0} echo "  %troopTypes[{%i%}]%: ✅ OPTIMAL"
+
+set i {%i%+1}
+if {%i%<12} goto troopLoop
+
+set cityIndex {%cityIndex%+1}
+goto cityLoop
+
+label allDone
+echo ""
+echo "=================================================="
+echo "ALL 10 CITIES CHECKED"
+echo "=================================================="
+echo "Run troop movement scripts to reach optimal counts"
+echo "Once all cities optimized:"
+echo "  - 197.8B total troops"
+echo "  - 214.7B food/hr generation"
+echo "  - 5.15T food/day!"
+echo "=================================================="

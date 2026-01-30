@@ -1,0 +1,362 @@
+// =====================================================
+// COMPLETE GLITCH AUTOMATION - ALL-IN-ONE
+// =====================================================
+// 
+// FULL AUTOMATION:
+// 1. Scan all cities
+// 2. Use items if low resources (food, troop packs)
+// 3. Untrain excess troops if needed
+// 4. Calculate optimal distribution
+// 5. Balance troops across cities
+// 6. Use Fleet Feet for speed
+// 7. Verify glitch status
+//
+// RUN ORDER:
+// 1. item-helper-glitch-setup.txt (prepare resources)
+// 2. multi-city-glitch-optimizer.txt (scan & plan)
+// 3. troop-balancer-fleet-feet.txt (execute moves)
+// 4. This script (all-in-one alternative)
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "COMPLETE GLITCH AUTOMATION v1.0"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// CONFIGURATION
+// =====================================================
+
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+setarr troopAbbr "wo w s p sw a c cata t b r cp"
+setarr foodPerTroop "1 1 2 3 3 4 9 17 5 25 50 125"
+setarr glitchThreshold "2147483648 2147483648 1073741824 715827883 715827883 536870912 238609295 126322568 429496730 85899346 42949673 17179870"
+setarr optimalCounts "2000000000 2000000000 2000000000 715827884 715827884 1610612737 1670265066 1894838521 1288490191 1975684959 1932735286 1975685051"
+
+set minFood 100000000
+set glitchNumber 2147483647
+
+// =====================================================
+// PHASE 1: SCAN ALL CITIES & RESOURCES
+// =====================================================
+
+echo "=== PHASE 1: SCANNING ==="
+echo ""
+
+set numCities $c.allCities.length$
+echo "Account has %numCities% cities"
+
+// Initialize totals
+set i 0
+label initTotals
+if {%i%>=12} goto initDone
+set total_%troopAbbr[{%i%}]% 0
+set i {%i%+1}
+goto initTotals
+label initDone
+
+// Scan each city
+set cityIdx 0
+label scanCity
+
+if {%cityIdx%>=%numCities%} goto scanDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+set city%cityIdx%_coord $c.castle.x$,$c.castle.y$
+set city%cityIdx%_food $c.castle.resource.food.amount$
+
+echo "City %cityIdx% (%city%cityIdx%_coord%):"
+echo "  Food: %city%cityIdx%_food%"
+
+// Get troop counts
+set j 0
+label scanTroops
+if {%j%>=12} goto scanTroopsDone
+
+set count $c.castle.troop.%troopNames[{%j%}]%$
+set city%cityIdx%_%troopAbbr[{%j%}]% %count%
+
+// Add to totals
+set oldTotal %total_%troopAbbr[{%j%}]%%
+set total_%troopAbbr[{%j%}]% {%oldTotal%+%count%}
+
+set j {%j%+1}
+goto scanTroops
+
+label scanTroopsDone
+
+set cityIdx {%cityIdx%+1}
+goto scanCity
+
+label scanDone
+
+echo ""
+echo "Account Totals:"
+echo "  Scouts: %total_s%"
+echo "  Archers: %total_a%"
+echo "  Cavalry: %total_c%"
+echo "  Cataphracts: %total_cata%"
+echo ""
+
+// =====================================================
+// PHASE 2: USE ITEMS IF NEEDED
+// =====================================================
+
+echo "=== PHASE 2: ITEMS CHECK ==="
+echo ""
+
+set cityIdx 0
+label itemCity
+
+if {%cityIdx%>=%numCities%} goto itemsDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+set cityFood $c.castle.resource.food.amount$
+
+if {%cityFood%>=%minFood%} goto cityHasFood
+
+echo "City %cityIdx% low food (%cityFood%) - using items..."
+
+// Use food items
+set item1b $c.getItemCount("player.resource.food.1b")$
+if {%item1b%>0} set r $c.af.getShopCommands().useItem("player.resource.food.1b",%item1b%)$
+if {%item1b%>0} echo "  Used %item1b% x 1B food"
+
+set item100m $c.getItemCount("player.resource.food.100m")$
+if {%item100m%>0} set r $c.af.getShopCommands().useItem("player.resource.food.100m",%item100m%)$
+if {%item100m%>0} echo "  Used %item100m% x 100M food"
+
+set item10m $c.getItemCount("player.resource.food.10m")$
+if {%item10m%>0} set r $c.af.getShopCommands().useItem("player.resource.food.10m",%item10m%)$
+if {%item10m%>0} echo "  Used %item10m% x 10M food"
+
+label cityHasFood
+set cityIdx {%cityIdx%+1}
+goto itemCity
+
+label itemsDone
+echo ""
+
+// =====================================================
+// PHASE 3: USE TROOP PACKS
+// =====================================================
+
+echo "=== PHASE 3: TROOP PACKS ==="
+echo ""
+
+set cityIdx 0
+label packCity
+
+if {%cityIdx%>=%numCities%} goto packsDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+echo "City %cityIdx% troop packs:"
+
+// Check for each troop type
+set j 2
+label checkPacks
+if {%j%>=12} goto packCityDone
+
+set type %troopAbbr[{%j%}]%
+set packCode player.troop.%type%.1m
+set packCount $c.getItemCount("%packCode%")$
+
+if {%packCount%>0} echo "  %type%: %packCount% x 1M packs available"
+
+set j {%j%+1}
+goto checkPacks
+
+label packCityDone
+set cityIdx {%cityIdx%+1}
+goto packCity
+
+label packsDone
+echo ""
+
+// =====================================================
+// PHASE 4: CALCULATE OPTIMAL MOVES
+// =====================================================
+
+echo "=== PHASE 4: OPTIMIZATION ==="
+echo ""
+
+// For each troop type, calculate distribution
+set j 2
+label calcOpt
+if {%j%>=12} goto calcDone
+
+set type %troopAbbr[{%j%}]%
+set total %total_%type%%
+set optimal %optimalCounts[{%j%}]%
+
+set citiesCanFill {{%total%/%optimal%}\\1}
+set remainder {{%total%|%optimal%}}
+
+echo "%type%: Total %total%, can fill %citiesCanFill% cities"
+
+set j {%j%+1}
+goto calcOpt
+
+label calcDone
+echo ""
+
+// =====================================================
+// PHASE 5: EXECUTE BALANCING
+// =====================================================
+
+echo "=== PHASE 5: BALANCING ==="
+echo ""
+
+// Find source and target cities for each type
+// Move from excess to deficit
+
+set moveCount 0
+
+set j 2
+label balanceType
+if {%j%>=12} goto balanceDone
+
+set type %troopAbbr[{%j%}]%
+set optimal %optimalCounts[{%j%}]%
+
+echo "Balancing %type%..."
+
+// Find city with most excess
+set srcCity -1
+set maxExcess 0
+set i 0
+
+label findSrc
+if {%i%>=%numCities%} goto foundSrc
+
+set cityCount %city%i%_%type%%
+set excess {%cityCount%-%optimal%}
+
+if {%excess%>%maxExcess%} set maxExcess %excess%
+if {%excess%>%maxExcess%} set srcCity %i%
+
+set i {%i%+1}
+goto findSrc
+
+label foundSrc
+
+if {%srcCity%==-1} goto noMove
+if {%maxExcess%<100000000} goto noMove
+
+// Find city that needs troops
+set tgtCity -1
+set maxNeed 0
+set i 0
+
+label findTgt
+if {%i%>=%numCities%} goto foundTgt
+
+set cityCount %city%i%_%type%%
+set need {%optimal%-%cityCount%}
+
+if {%need%>%maxNeed%} set maxNeed %need%
+if {%need%>%maxNeed%} set tgtCity %i%
+
+set i {%i%+1}
+goto findTgt
+
+label foundTgt
+
+if {%tgtCity%==-1} goto noMove
+if {%maxNeed%<100000000} goto noMove
+
+// Execute move
+set moveAmt %maxExcess%
+if {%maxNeed%<%moveAmt%} set moveAmt %maxNeed%
+
+echo "  Moving %moveAmt% from City %srcCity% to City %tgtCity%"
+
+switchcity %srcCity%
+sleep 0.3
+
+set tgtCoord %city%tgtCity%_coord%
+transport %tgtCoord% t:100000,%type%:%moveAmt%
+
+echo "  Sent! (Use Fleet Feet for speed)"
+set moveCount {%moveCount%+1}
+
+label noMove
+set j {%j%+1}
+goto balanceType
+
+label balanceDone
+
+echo ""
+echo "Total moves executed: %moveCount%"
+echo ""
+
+// =====================================================
+// PHASE 6: VERIFY GLITCH STATUS
+// =====================================================
+
+echo "=== PHASE 6: VERIFICATION ==="
+echo ""
+
+set totalFoodGen 0
+
+set cityIdx 0
+label verifyCity
+
+if {%cityIdx%>=%numCities%} goto verifyDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+echo "City %cityIdx% Glitch Status:"
+
+set cityGen 0
+
+// Check each glitch type (skip wo, w - can't reach threshold under 2B)
+set j 2
+label verifyType
+if {%j%>=12} goto verifyCityDone
+
+set type %troopAbbr[{%j%}]%
+set threshold %glitchThreshold[{%j%}]%
+set count $c.castle.troop.%troopNames[{%j%}]%$
+
+set glitches {{%count%/%threshold%}\\1}
+set isOdd {{%glitches%|2}==1}
+
+if {%isOdd%} echo "  %type%: %glitches% glitch ODD ✅"
+if {%isOdd%} set cityGen {%cityGen%+%glitchNumber|}
+
+if {!%isOdd%} if {%glitches%>0} echo "  %type%: %glitches% glitch EVEN ❌"
+
+set j {%j%+1}
+goto verifyType
+
+label verifyCityDone
+
+echo "  City Gen: %cityGen%/hr"
+set totalFoodGen {%totalFoodGen%+%cityGen%}
+
+set cityIdx {%cityIdx%+1}
+goto verifyCity
+
+label verifyDone
+
+echo ""
+echo "=================================================="
+echo "COMPLETE!"
+echo "=================================================="
+echo ""
+echo "Total Food Generation: %totalFoodGen%/hr"
+echo ""
+echo "Run again until all cities optimized!"
+echo "Target: 21.47B/hr per city = 214.7B/hr for 10 cities"
+echo "=================================================="

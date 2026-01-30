@@ -1,0 +1,249 @@
+// =====================================================
+// TROOP BALANCER WITH FLEET FEET
+// Actual execution script for moving troops between cities
+// =====================================================
+//
+// USAGE: Run after multi-city-glitch-optimizer.txt
+// This script executes the actual troop movements
+//
+// FLEET FEET CODES:
+// - player.buff.speedup.march (march speed buff)
+// - 8hr Fleet Feet: item code varies by version
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "TROOP BALANCER - FLEET FEET EDITION"
+echo "=================================================="
+
+// =====================================================
+// STEP 1: GET ALL CITY COORDINATES
+// =====================================================
+
+set numCities $c.allCities.length$
+echo "Account has %numCities% cities"
+echo ""
+
+// Store all city coordinates
+set i 0
+label getCoordsLoop
+if {%i%>=%numCities%} goto gotCoords
+
+switchcity %i%
+sleep 0.3
+set city%i%_coord $c.castle.position$
+set city%i%_x $c.castle.x$
+set city%i%_y $c.castle.y$
+echo "City %i%: %city%i%_coord% (%city%i%_x%,%city%i%_y%)"
+
+set i {%i%+1}
+goto getCoordsLoop
+
+label gotCoords
+echo ""
+
+// =====================================================
+// STEP 2: SCAN CURRENT TROOP DISTRIBUTION
+// =====================================================
+
+echo "--- Scanning troop distribution ---"
+
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+setarr troopAbbr "wo w s p sw a c cata t b r cp"
+
+// Optimal targets per city for ODD glitch
+setarr targets "2000000000 2000000000 2000000000 715827884 715827884 1610612737 1670265066 1894838521 1288490191 1975684959 1932735286 1975685051"
+
+set i 0
+label scanLoop
+if {%i%>=%numCities%} goto scanDone
+
+switchcity %i%
+sleep 0.3
+
+echo "City %i% troops:"
+set j 0
+label scanTroopLoop
+if {%j%>=12} goto scanTroopDone
+
+set count $c.castle.troop.%troopNames[{%j%}]%$
+set target %targets[{%j%}]%
+set diff {%target%-%count%}
+
+// Store for balancing
+set city%i%_%troopAbbr[{%j%}]% %count%
+set city%i%_%troopAbbr[{%j%}]%_diff %diff%
+
+if {%diff%>100000000} echo "  %troopAbbr[{%j%}]%: %count% (NEED +%diff%)"
+if {%diff%<-100000000} echo "  %troopAbbr[{%j%}]%: %count% (EXCESS %diff%)"
+
+set j {%j%+1}
+goto scanTroopLoop
+
+label scanTroopDone
+set i {%i%+1}
+goto scanLoop
+
+label scanDone
+echo ""
+
+// =====================================================
+// STEP 3: EXECUTE BALANCING MOVEMENTS
+// =====================================================
+
+echo "--- Executing troop movements ---"
+echo ""
+
+// Strategy: For each troop type
+// 1. Find cities with EXCESS (diff < -100M)
+// 2. Find cities that NEED (diff > 100M)
+// 3. Transport from excess to need
+// 4. Use max rally limit per transport
+
+set rallyLimit $c.cm.getRallyDispatchPerArmyLimit(true)$
+echo "Rally limit per army: %rallyLimit%"
+echo ""
+
+// Process each troop type
+set troopIdx 0
+label balanceTroopLoop
+if {%troopIdx%>=12} goto balanceDone
+
+set troopType %troopAbbr[{%troopIdx%}]%
+set troopName %troopNames[{%troopIdx%}]%
+set targetCount %targets[{%troopIdx%}]%
+
+echo "Balancing %troopType%..."
+
+// Find source city (most excess)
+set sourceCity -1
+set maxExcess 0
+set i 0
+
+label findSourceLoop
+if {%i%>=%numCities%} goto foundSource
+
+set diff %city%i%_%troopType%_diff%
+// Negative diff = excess troops
+if {%diff%<-100000000} goto checkExcess
+goto nextSource
+
+label checkExcess
+set absExcess {0-%diff%}
+if {%absExcess%>%maxExcess%} set maxExcess %absExcess%
+if {%absExcess%>%maxExcess%} set sourceCity %i%
+
+label nextSource
+set i {%i%+1}
+goto findSourceLoop
+
+label foundSource
+
+if {%sourceCity%==-1} goto noSourceFound
+
+// Find target city (most needed)
+set targetCity -1
+set maxNeed 0
+set i 0
+
+label findTargetLoop
+if {%i%>=%numCities%} goto foundTarget
+
+set diff %city%i%_%troopType%_diff%
+// Positive diff = needs troops
+if {%diff%>100000000} goto checkNeed
+goto nextTarget
+
+label checkNeed
+if {%diff%>%maxNeed%} set maxNeed %diff%
+if {%diff%>%maxNeed%} set targetCity %i%
+
+label nextTarget
+set i {%i%+1}
+goto findTargetLoop
+
+label foundTarget
+
+if {%targetCity%==-1} goto noTargetFound
+
+// Execute transport from source to target
+echo "  Moving %troopType%: City %sourceCity% -> City %targetCity%"
+
+// Calculate amount to move (minimum of excess and need)
+set sourceExcess {0-%city%sourceCity%_%troopType%_diff%}
+set targetNeed %city%targetCity%_%troopType%_diff%
+set moveAmount %sourceExcess%
+if {%targetNeed%<%moveAmount%} set moveAmount %targetNeed%
+
+// Cap at rally limit
+if {%moveAmount%>%rallyLimit%} set moveAmount %rallyLimit%
+
+echo "  Amount: %moveAmount%"
+
+// Switch to source city
+switchcity %sourceCity%
+sleep 0.5
+
+// Get target coordinates
+set targetCoord %city%targetCity%_x%,%city%targetCity%_y%
+
+// Execute transport with transporters for speed
+// Using 100k transporters for carrying capacity
+echo "  Command: transport %targetCoord% t:100000,%troopType%:%moveAmount%"
+transport %targetCoord% t:100000,%troopType%:%moveAmount%
+
+// Use Fleet Feet if available
+// Uncomment the line below if you have Fleet Feet items
+// set result $c.af.getShopCommands().useSpeedUp(c.castle.fieldId, "all")$
+
+echo "  Sent! Use Fleet Feet manually if needed."
+echo ""
+
+// Update tracking (subtract from source, add to target)
+set city%sourceCity%_%troopType% {%city%sourceCity%_%troopType%%-%moveAmount%}
+set city%targetCity%_%troopType% {%city%targetCity%_%troopType%%+%moveAmount%}
+set city%sourceCity%_%troopType%_diff {%city%sourceCity%_%troopType%_diff%+%moveAmount%}
+set city%targetCity%_%troopType%_diff {%city%targetCity%_%troopType%_diff%-%moveAmount%}
+
+goto balanceNextTroop
+
+label noSourceFound
+echo "  No excess found for %troopType%"
+goto balanceNextTroop
+
+label noTargetFound
+echo "  All cities have enough %troopType%"
+goto balanceNextTroop
+
+label balanceNextTroop
+set troopIdx {%troopIdx%+1}
+goto balanceTroopLoop
+
+label balanceDone
+
+echo ""
+echo "=================================================="
+echo "BALANCING ROUND COMPLETE"
+echo "=================================================="
+echo ""
+echo "Run this script multiple times until all cities"
+echo "reach optimal troop counts for max food glitch!"
+echo ""
+echo "Optimal counts per city:"
+echo "  wo:   2,000,000,000 (0 glitch)"
+echo "  w:    2,000,000,000 (0 glitch)"
+echo "  s:    2,000,000,000 (1 glitch ODD)"
+echo "  p:      715,827,884 (1 glitch ODD)"
+echo "  sw:     715,827,884 (1 glitch ODD)"
+echo "  a:    1,610,612,737 (3 glitch ODD)"
+echo "  c:    1,670,265,066 (7 glitch ODD)"
+echo "  cata: 1,894,838,521 (15 glitch ODD)"
+echo "  t:    1,288,490,191 (3 glitch ODD)"
+echo "  b:    1,975,684,959 (23 glitch ODD)"
+echo "  r:    1,932,735,286 (45 glitch ODD)"
+echo "  cp:   1,975,685,051 (115 glitch ODD)"
+echo ""
+echo "Total per city: ~19.8B troops"
+echo "Food generation: 21.47B/hr per city"
+echo "=================================================="

@@ -1,0 +1,244 @@
+// =====================================================
+// ITEM HELPER - GLITCH SETUP ASSISTANT
+// Use items, untrain troops, use packs when low resources
+// =====================================================
+//
+// FEATURES:
+// 1. Use food items when food is low
+// 2. Untrain troops to generate food/resources
+// 3. Use troop packs to add troops directly
+// 4. Check and use all available items
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "ITEM HELPER - GLITCH SETUP ASSISTANT"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// ITEM CODES REFERENCE
+// =====================================================
+// 
+// FOOD ITEMS:
+// - player.resource.food.1k     (1,000 food)
+// - player.resource.food.10k    (10,000 food)
+// - player.resource.food.100k   (100,000 food)
+// - player.resource.food.1m     (1,000,000 food)
+// - player.resource.food.10m    (10,000,000 food)
+// - player.resource.food.100m   (100,000,000 food)
+// - player.resource.food.1b     (1,000,000,000 food)
+//
+// TROOP PACKS:
+// - player.troop.wo.1k, 10k, 100k, 1m
+// - player.troop.w.1k, 10k, 100k, 1m
+// - player.troop.s.1k, 10k, 100k, 1m
+// - player.troop.p.1k, 10k, 100k, 1m
+// - player.troop.sw.1k, 10k, 100k, 1m
+// - player.troop.a.1k, 10k, 100k, 1m
+// - player.troop.c.1k, 10k, 100k, 1m
+// - player.troop.cata.1k, 10k, 100k, 1m
+// - player.troop.t.1k, 10k, 100k, 1m
+// - player.troop.b.1k, 10k, 100k, 1m
+// - player.troop.r.1k, 10k, 100k, 1m
+// - player.troop.cp.1k, 10k, 100k, 1m
+//
+// SPEED ITEMS:
+// - player.buff.speedup.march   (Fleet Feet)
+// - player.buff.speedup.train   (Training speed)
+//
+// =====================================================
+
+// =====================================================
+// STEP 1: CHECK CURRENT RESOURCES
+// =====================================================
+
+echo "--- STEP 1: Checking Resources ---"
+echo ""
+
+set currentFood $c.castle.resource.food.amount$
+set currentGold $c.castle.resource.gold.amount$
+set currentWood $c.castle.resource.wood.amount$
+set currentStone $c.castle.resource.stone.amount$
+set currentIron $c.castle.resource.iron.amount$
+
+echo "Current Resources:"
+echo "  Food:  %currentFood%"
+echo "  Gold:  %currentGold%"
+echo "  Wood:  %currentWood%"
+echo "  Stone: %currentStone%"
+echo "  Iron:  %currentIron%"
+echo ""
+
+// Minimum food needed for troop movement (transporters eat food)
+set minFoodForMovement 100000000
+
+if {%currentFood%<%minFoodForMovement%} echo "⚠️ LOW FOOD - Need items or untrain troops!"
+if {%currentFood%>=%minFoodForMovement%} echo "✅ Food OK for troop movement"
+echo ""
+
+// =====================================================
+// STEP 2: USE FOOD ITEMS IF NEEDED
+// =====================================================
+
+echo "--- STEP 2: Using Food Items ---"
+echo ""
+
+if {%currentFood%>=%minFoodForMovement%} goto skipFoodItems
+
+echo "Using available food items..."
+
+// Use food items from largest to smallest
+// Check item count first, then use
+
+// 1B food items
+set itemCount $c.getItemCount("player.resource.food.1b")$
+if {%itemCount%>0} echo "Found %itemCount% x 1B food items"
+if {%itemCount%>0} set result $c.af.getShopCommands().useItem("player.resource.food.1b", %itemCount%)$
+if {%itemCount%>0} echo "  Used %itemCount% x 1B food"
+
+// 100M food items
+set itemCount $c.getItemCount("player.resource.food.100m")$
+if {%itemCount%>0} echo "Found %itemCount% x 100M food items"
+if {%itemCount%>0} set result $c.af.getShopCommands().useItem("player.resource.food.100m", %itemCount%)$
+if {%itemCount%>0} echo "  Used %itemCount% x 100M food"
+
+// 10M food items
+set itemCount $c.getItemCount("player.resource.food.10m")$
+if {%itemCount%>0} echo "Found %itemCount% x 10M food items"
+if {%itemCount%>0} set result $c.af.getShopCommands().useItem("player.resource.food.10m", %itemCount%)$
+if {%itemCount%>0} echo "  Used %itemCount% x 10M food"
+
+// 1M food items
+set itemCount $c.getItemCount("player.resource.food.1m")$
+if {%itemCount%>0} echo "Found %itemCount% x 1M food items"
+if {%itemCount%>0} set result $c.af.getShopCommands().useItem("player.resource.food.1m", %itemCount%)$
+if {%itemCount%>0} echo "  Used %itemCount% x 1M food"
+
+// Recheck food
+set currentFood $c.castle.resource.food.amount$
+echo ""
+echo "Food after items: %currentFood%"
+
+label skipFoodItems
+echo ""
+
+// =====================================================
+// STEP 3: UNTRAIN TROOPS IF STILL LOW FOOD
+// =====================================================
+
+echo "--- STEP 3: Untrain Troops if Needed ---"
+echo ""
+
+set currentFood $c.castle.resource.food.amount$
+
+if {%currentFood%>=%minFoodForMovement%} goto skipUntrain
+
+echo "Still low food - untraining excess workers for resources..."
+
+// Untrain workers (they're not needed for glitch)
+// Each worker returns some resources when untrained
+
+set workersToUntrain 10000000
+set currentWorkers $c.castle.troop.peasants$
+
+if {%currentWorkers%>%workersToUntrain%} echo "Untraining %workersToUntrain% workers..."
+if {%currentWorkers%>%workersToUntrain%} set result $c.af.getCastleCommands().deleteTroop(c.castle.id, "peasants", %workersToUntrain%)$
+if {%currentWorkers%>%workersToUntrain%} echo "  Untrained! Resources recovered."
+
+// Can also untrain warriors if needed
+set warriorsToUntrain 10000000
+set currentWarriors $c.castle.troop.militia$
+
+if {%currentWarriors%>%warriorsToUntrain%} echo "Untraining %warriorsToUntrain% warriors..."
+if {%currentWarriors%>%warriorsToUntrain%} set result $c.af.getCastleCommands().deleteTroop(c.castle.id, "militia", %warriorsToUntrain%)$
+if {%currentWarriors%>%warriorsToUntrain%} echo "  Untrained! Resources recovered."
+
+label skipUntrain
+echo ""
+
+// =====================================================
+// STEP 4: USE TROOP PACKS TO ADD TROOPS
+// =====================================================
+
+echo "--- STEP 4: Using Troop Packs ---"
+echo ""
+
+// Check for troop packs and use them to reach glitch targets
+// This adds troops directly without training!
+
+setarr troopAbbr "wo w s p sw a c cata t b r cp"
+setarr targets "2000000000 2000000000 2000000000 715827884 715827884 1610612737 1670265066 1894838521 1288490191 1975684959 1932735286 1975685051"
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+
+set i 0
+label troopPackLoop
+if {%i%>=12} goto troopPackDone
+
+set type %troopAbbr[{%i%}]%
+set target %targets[{%i%}]%
+set current $c.castle.troop.%troopNames[{%i%}]%$
+set needed {%target%-%current%}
+
+if {%needed%<=0} goto nextTroopPack
+
+echo "Need %needed% more %type% to reach target"
+
+// Check for 1M packs
+set packCode player.troop.%type%.1m
+set packCount $c.getItemCount("%packCode%")$
+if {%packCount%>0} echo "  Found %packCount% x 1M %type% packs"
+
+// Calculate how many packs to use
+set packsToUse {{%needed%/1000000}+1}
+if {%packsToUse%>%packCount%} set packsToUse %packCount%
+
+if {%packsToUse%>0} set result $c.af.getShopCommands().useItem("%packCode%", %packsToUse%)$
+if {%packsToUse%>0} echo "  Used %packsToUse% packs (+%packsToUse%M troops)"
+
+// Check for 100k packs
+set packCode player.troop.%type%.100k
+set packCount $c.getItemCount("%packCode%")$
+if {%packCount%>0} echo "  Found %packCount% x 100k %type% packs"
+
+label nextTroopPack
+set i {%i%+1}
+goto troopPackLoop
+
+label troopPackDone
+echo ""
+
+// =====================================================
+// STEP 5: USE FLEET FEET FOR FAST MOVEMENT
+// =====================================================
+
+echo "--- STEP 5: Fleet Feet Status ---"
+echo ""
+
+// Check Fleet Feet inventory
+set fleetFeetCount $c.getItemCount("player.buff.speedup.march")$
+echo "Fleet Feet items available: %fleetFeetCount%"
+
+if {%fleetFeetCount%>0} echo "✅ Can use Fleet Feet for instant troop movement"
+if {%fleetFeetCount%==0} echo "⚠️ No Fleet Feet - troop movement will be slow"
+echo ""
+
+// =====================================================
+// STEP 6: SUMMARY & NEXT STEPS
+// =====================================================
+
+echo "=================================================="
+echo "ITEM HELPER COMPLETE"
+echo "=================================================="
+echo ""
+
+set finalFood $c.castle.resource.food.amount$
+echo "Final food: %finalFood%"
+
+if {%finalFood%>=%minFoodForMovement%} echo "✅ Ready for troop balancing!"
+if {%finalFood%<%minFoodForMovement%} echo "⚠️ Still low food - need more items or wait for glitch"
+echo ""
+echo "Next: Run troop-balancer-fleet-feet.txt"
+echo "=================================================="

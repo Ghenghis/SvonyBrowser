@@ -1,0 +1,226 @@
+// =====================================================
+// VALLEY DOUBLE FOOD GLITCH
+// Move glitched troops to valley for 2X FOOD GENERATION
+// =====================================================
+//
+// HOW IT WORKS:
+// - City glitch threshold = X
+// - Valley glitch threshold = X/2 (HALF!)
+// - Move GLITCH NUMBER troops to valley
+// - Get glitch in BOTH city AND valley
+// - Result: 2X FOOD GENERATION
+//
+// EXAMPLE (Archers):
+// - City threshold: 536,870,912
+// - Valley threshold: 268,435,456 (half)
+// - Put 536M archers in city = 1 glitch
+// - Put 268M archers in valley = 1 glitch
+// - Total: 2 glitches = 2x food gen!
+//
+// ⚠️ RISK: Valley has NO defense - troops can be stolen
+// ⚠️ Most people avoid this because of the risk
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "VALLEY DOUBLE FOOD GLITCH"
+echo "2X FOOD GENERATION"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// GLITCH THRESHOLDS - CITY vs VALLEY
+// =====================================================
+//
+// Type        | City Threshold   | Valley Threshold (half)
+// ------------|------------------|------------------------
+// Workers     | 2,147,483,648    | 1,073,741,824
+// Warriors    | 2,147,483,648    | 1,073,741,824
+// Scouts      | 1,073,741,824    | 536,870,912
+// Pikemen     | 715,827,883      | 357,913,942
+// Swordsmen   | 715,827,883      | 357,913,942
+// Archers     | 536,870,912      | 268,435,456
+// Cavalry     | 238,609,295      | 119,304,648
+// Cataphracts | 126,322,568      | 63,161,284
+// Transporters| 429,496,730      | 214,748,365
+// Ballista    | 85,899,346       | 42,949,673
+// Battering R | 42,949,673       | 21,474,837
+// Catapults   | 17,179,870       | 8,589,935
+//
+// =====================================================
+
+// Configuration
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+setarr troopAbbr "wo w s p sw a c cata t b r cp"
+
+// CITY glitch thresholds
+setarr cityThreshold "2147483648 2147483648 1073741824 715827883 715827883 536870912 238609295 126322568 429496730 85899346 42949673 17179870"
+
+// VALLEY glitch thresholds (HALF of city)
+setarr valleyThreshold "1073741824 1073741824 536870912 357913942 357913942 268435456 119304648 63161284 214748365 42949673 21474837 8589935"
+
+set glitchNumber 2147483647
+
+// Valley coordinates (MUST OWN THIS VALLEY!)
+set valleyCoord 300,700
+
+echo "Valley target: %valleyCoord%"
+echo ""
+
+// =====================================================
+// STEP 1: SCAN CURRENT CITY + VALLEY TROOPS
+// =====================================================
+
+echo "--- Step 1: Scanning troops ---"
+echo ""
+
+// Get city troops
+echo "CITY troops:"
+set j 0
+label scanCity
+if {%j%>=12} goto scanCityDone
+
+set cityCount $c.castle.troop.%troopNames[{%j%}]%$
+set city_%troopAbbr[{%j%}]% %cityCount%
+
+set threshold %cityThreshold[{%j%}]%
+set cityGlitch {{%cityCount%/%threshold%}\\1}
+
+if {%cityCount%>1000000} echo "  %troopAbbr[{%j%}]%: %cityCount% (%cityGlitch% glitch)"
+
+set j {%j%+1}
+goto scanCity
+
+label scanCityDone
+echo ""
+
+// =====================================================
+// STEP 2: CALCULATE OPTIMAL VALLEY DISTRIBUTION
+// =====================================================
+
+echo "--- Step 2: Calculating valley distribution ---"
+echo ""
+echo "To DOUBLE food glitch, move these to valley:"
+echo ""
+
+// For each troop type, calculate how many to send to valley
+// Goal: Get 1 ODD glitch in valley for each type that has city glitch
+
+set j 2
+label calcValley
+if {%j%>=12} goto calcValleyDone
+
+set type %troopAbbr[{%j%}]%
+set cityCount %city_%type%%
+set cThresh %cityThreshold[{%j%}]%
+set vThresh %valleyThreshold[{%j%}]%
+
+// Check if city has glitch
+set cityGlitch {{%cityCount%/%cThresh%}\\1}
+
+if {%cityGlitch%==0} goto skipValleyCalc
+
+// Calculate how many to send to valley for 1 ODD glitch
+// Need: valleyThreshold + 1
+set sendToValley {%vThresh%+1}
+
+// Check if we have enough
+if {%cityCount%<%sendToValley%} echo "  %type%: Not enough troops for valley glitch"
+if {%cityCount%<%sendToValley%} goto skipValleyCalc
+
+echo "  %type%: Send %sendToValley% to valley for +1 glitch"
+echo "       City: %cityCount% -> {%cityCount%-%sendToValley%}"
+echo "       Valley: 0 -> %sendToValley%"
+echo "       Result: DOUBLE food from this type!"
+echo ""
+
+set valley_%type%_send %sendToValley%
+
+label skipValleyCalc
+set j {%j%+1}
+goto calcValley
+
+label calcValleyDone
+
+// =====================================================
+// STEP 3: EXECUTE TROOP MOVEMENT TO VALLEY
+// =====================================================
+
+echo "--- Step 3: Moving troops to valley ---"
+echo "⚠️ WARNING: Valley has NO DEFENSE!"
+echo ""
+
+// Move each troop type that has valley target
+set j 2
+label moveToValley
+if {%j%>=12} goto moveDone
+
+set type %troopAbbr[{%j%}]%
+
+// Check if we calculated a send amount
+iferror %valley_%type%_send% goto skipMove
+
+set sendAmount %valley_%type%_send%
+if {%sendAmount%<=0} goto skipMove
+
+echo "Sending %sendAmount% %type% to valley %valleyCoord%"
+
+// Execute reinforce to valley
+reinforce %valleyCoord% none %type%:%sendAmount%
+
+echo "  Sent! (March in progress...)"
+sleep 1
+
+label skipMove
+set j {%j%+1}
+goto moveToValley
+
+label moveDone
+echo ""
+
+// =====================================================
+// STEP 4: VERIFY DOUBLE GLITCH
+// =====================================================
+
+echo "--- Step 4: Verifying double glitch ---"
+echo "(Wait for troops to arrive first!)"
+echo ""
+
+// After troops arrive, verify glitch status
+echo "Check glitch status with this command:"
+echo "  foodglitch"
+echo ""
+echo "Expected results:"
+echo "  - City glitches: X (from remaining troops)"
+echo "  - Valley glitches: Y (from sent troops)"
+echo "  - Total: X + Y = 2X food generation!"
+echo ""
+
+// =====================================================
+// FOOD GENERATION CALCULATION
+// =====================================================
+
+echo "=================================================="
+echo "DOUBLE FOOD GLITCH MATH"
+echo "=================================================="
+echo ""
+echo "Each ODD glitch = +2,147,483,647 food/hr"
+echo ""
+echo "WITHOUT valley:"
+echo "  10 types × 1 glitch = 21.47B food/hr"
+echo ""
+echo "WITH valley (doubled):"
+echo "  10 types × 2 glitches = 42.94B food/hr!"
+echo ""
+echo "10 cities WITH valley glitch:"
+echo "  42.94B × 10 = 429.4B food/hr!"
+echo "  = 10.3 TRILLION food/day!"
+echo ""
+echo "=================================================="
+echo ""
+echo "⚠️ REMEMBER: Valley troops have NO DEFENSE!"
+echo "⚠️ Keep bubble/peace shield active!"
+echo "⚠️ Or only use on alt accounts!"
+echo "=================================================="

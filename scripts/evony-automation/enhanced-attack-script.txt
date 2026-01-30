@@ -1,0 +1,382 @@
+// ============================================================
+// ENHANCED ATTACK SCRIPT v2.0
+// Original: User's script | Improvements: Cascade AI
+// ============================================================
+
+setsilence true
+
+// ---- CONFIGURATION ---- //
+set coords 0,0                    // Primary target
+set coords2 0,0                   // Secondary target (rotation)
+set coords3 0,0                   // Tertiary target (rotation)
+set useCoordRotation 0            // 1 = rotate targets
+
+set troops cp:100k
+set bannertroops cp:990k,a:10k
+set usebanners 0                  // 1 = use banners
+set queentofight 1                // 1 = include queen
+set kingfight 1                   // 1 = include king
+set UseEnergyItems 0              // 1 = use stamina items
+
+set speed 2                       // Waves per cycle
+set globalspeed 1                 // Seconds between sends
+
+// ---- NEW: ADVANCED CONFIG ---- //
+set maxHeroLevel 100              // Configurable level cap
+set minStaminaToFight 4           // Min stamina to send hero
+set fireHeroesUnderLevel 101      // Fire heroes under this level when stamina low
+set enableAttackTracking 1        // Track attack results
+set enableTroopSafetyCheck 1      // Check troops before send
+set minTroopsRequired 100000      // Minimum troops to attack
+
+// ---- NEW: SAFETY LIMITS (32-bit) ---- //
+set troopSafeLimit 700000000      // 700M per type - safe for glitch
+set troopMoveLimit 2100000000     // 2.1B max per move
+set goldMinimum 1000000           // Min gold to continue
+set foodMinimum 100000000         // Min food to continue
+
+// ---- NEW: STAMINA THRESHOLDS (configurable) ---- //
+set teaThreshold 50               // Use tea below this
+set wineThreshold 30              // Use wine below this
+set panaxThreshold 10             // Use panax below this
+
+# ---- don't change below this line ---- #
+
+import autoevony.gui.MainScreen;
+import com.evony.client.response.ResponseDispatcher;
+
+// ---- NEW: Attack Result Tracking ---- //
+function initTracking() {
+    if (getStatic("attackStats")==null) {
+        setStatic('attackStats', {
+            sent: 0,
+            returned: 0,
+            wins: 0,
+            losses: 0,
+            lastTarget: null,
+            coordIndex: 0
+        });
+    }
+}
+
+function trackAttackSent(heroName, target) {
+    if (enableAttackTracking!=1) return;
+    var stats = getStatic("attackStats");
+    stats.sent += 1;
+    stats.lastTarget = target;
+    c.cm.logMsg("[TRACK] Sent #" + stats.sent + " with " + heroName);
+}
+
+function getNextCoord() {
+    if (useCoordRotation!=1) return coords;
+    var stats = getStatic("attackStats");
+    var idx = stats.coordIndex % 3;
+    stats.coordIndex += 1;
+    if (idx==0) return coords;
+    if (idx==1) return coords2;
+    return coords3;
+}
+
+// ---- NEW: Troop Safety Check ---- //
+function checkTroopSafety() {
+    if (enableTroopSafetyCheck!=1) return true;
+    
+    // Check if we have minimum troops
+    var totalTroops = 0;
+    for (var t in c.cm.troops) {
+        totalTroops += c.cm.troops[t];
+    }
+    
+    if (totalTroops < minTroopsRequired) {
+        c.cm.logMsg("[SAFETY] Not enough troops: " + totalTroops);
+        return false;
+    }
+    
+    // Check for overflow risk (700M limit per type)
+    for (var t in c.cm.troops) {
+        if (c.cm.troops[t] > troopSafeLimit) {
+            c.cm.logMsg("[SAFETY] WARNING: " + t + " exceeds safe limit!");
+        }
+    }
+    
+    return true;
+}
+
+// ---- IMPROVED: Award Heroes with configurable thresholds ---- //
+function awardheroes() {
+    for (var i=0; i<c.cm.heroes.length; i+=1) {
+        if (c.cm.heroes[i].status!=0) continue;
+        
+        c.af.getHeroCommand().awardGold(c.castle.id, c.cm.heroes[i].id);
+        
+        if (UseEnergyItems==1 || c.cm.heroes[i].isHero!=0) {
+            var stam = c.cm.heroes[i].stamina;
+            
+            if (stam < panaxThreshold && c.getItem("hero.item.Panax_ginseng").count > 0) {
+                c.af.getHeroCommand().useItem(c.castle.id, c.cm.heroes[i].id, "hero.item.Panax_ginseng");
+            }
+            else if (stam < wineThreshold && c.getItem("hero.item.Lugui_Wine").count > 0) {
+                c.af.getHeroCommand().useItem(c.castle.id, c.cm.heroes[i].id, "hero.item.Lugui_Wine");
+            }
+            else if (stam < teaThreshold && c.getItem("hero.item.Tea").count > 0) {
+                c.af.getHeroCommand().useItem(c.castle.id, c.cm.heroes[i].id, "hero.item.Tea");
+            }
+        }
+    }
+}
+
+function armyevents(x) {
+    if (x.hero.status!=0) {
+        delete getStatic("armydata")[x.hero.id];
+        
+        // Track return
+        if (enableAttackTracking==1) {
+            var stats = getStatic("attackStats");
+            stats.returned += 1;
+        }
+    }
+}
+
+function addarmyupdate() {
+    if (getStatic("armydata")==null) {
+        setStatic('armydata', {});
+    }
+    if (getCallback("armyevents")==null) {
+        ResponseDispatcher.getInstance().addEventListener(ResponseDispatcher.SERVER_HERO_UPDATE, setCallback(armyevents));
+    }
+}
+
+set nv $m_dyn.initTracking()$
+set nv $m_dyn.addarmyupdate()$
+
+function dorefresh() {
+    if (c.lag>30) {
+        if (getStatic("lastrefreshtime")!=null && getStatic("lastrefreshtime")>((new Date().getTime())-360000)) return;
+        setStatic("lastrefreshtime", new Date().getTime());
+        MainScreen.getInstance().refresh();
+    }
+}
+
+// ---- IMPROVED: Fire heroes with configurable level ---- //
+function fireheros() {
+    for (var i=0; i<c.cm.heroes.length; i+=1) {
+        if (c.cm.heroes[i].isHero == 0 && 
+            c.cm.heroes[i].stamina < minStaminaToFight && 
+            c.cm.heroes[i].status == 0 && 
+            c.cm.heroes[i].level < fireHeroesUnderLevel) {
+            c.af.getHeroCommand().fireHero(c.castle.id, c.cm.heroes[i].id);
+        }
+    }
+}
+
+// ---- IMPROVED: Level up with configurable cap ---- //
+function herolevelup() {
+    var actions = 0;
+    for (var i=0; i<c.cm.heroes.length; i+=1) {
+        if (c.cm.heroes[i].status!=0) continue;
+        c.af.getEquipmentCommands().WearAllEquipmenttech(c.cm.heroes[i].id, 2);
+        
+        var l = c.cm.heroes[i].level;
+        var exp = c.cm.heroes[i].experience;
+        
+        while (exp > c.cm.heroes[i].upgradeExp && l < maxHeroLevel) {
+            c.af.getHeroCommand().levelUp(c.castle.id, c.cm.heroes[i].id);
+            c.af.getHeroCommand().addPoint2(c.castle.id, c.cm.heroes[i].id, 0, 1, 0);
+            actions += 1;
+            exp -= c.cm.heroes[i].upgradeExp;
+            l += 1;
+        }
+    }
+    return int(actions * 0.3);
+}
+
+// ---- NEW: Sort heroes by attack power ---- //
+function getHerosByPower() {
+    var heroes = [];
+    for (var i=0; i<c.cm.heroes.length; i+=1) {
+        if (c.cm.heroes[i].status!=0) continue;
+        if (c.cm.heroes[i].stamina < minStaminaToFight) continue;
+        if (c.cm.heroes[i].name=="Queen" && queentofight!=1) continue;
+        if (c.cm.heroes[i].name=="King" && kingfight!=1) continue;
+        heroes.push(c.cm.heroes[i]);
+    }
+    // Sort by power descending
+    heroes.sort(function(a,b) { return b.power - a.power; });
+    return heroes;
+}
+
+// ---- IMPROVED: Send attacks with priority & tracking ---- //
+function sendattacks(i) {
+    if (c.cm.localArmies.length >= c.cm.getMaxRallySlots()) return i;
+    
+    // Troop safety check
+    if (!checkTroopSafety()) return c.cm.heroes.length;
+    
+    if (getStatic("lastarmysendtime")!=null && 
+        getStatic("lastarmysendtime") > ((new Date().getTime()) - Number(globalspeed)*1000)) {
+        c.cm.logMsg("Rate limited, waiting");
+        return i;
+    }
+    
+    i = int(i);
+    var jj = 0;
+    var ss = getStatic("armydata");
+    var kk = new Date().getTime();
+    
+    // Get sorted heroes by power
+    var sortedHeroes = getHerosByPower();
+    
+    for (var idx=i; idx<sortedHeroes.length; idx+=1) {
+        var hero = sortedHeroes[idx];
+        
+        if (ss[hero.id]==null) {
+            ss[hero.id] = kk + 10000;
+        }
+        else if (ss[hero.id] > kk) {
+            c.cm.logMsg("Retrying too fast with same hero");
+            continue;
+        }
+        else {
+            ss[hero.id] = ss[hero.id] + 20000;
+        }
+        
+        var targetCoord = getNextCoord();
+        var m;
+        
+        if (usebanners==1 && c.getItem("player.item.stygandrsbannerofthehorde").count > 0) {
+            m = c.getArmy("attack", c.getValue("Coordinate", targetCoord), hero.name, c.getValue("Troop", bannertroops));
+            m.useItem = true;
+        }
+        else {
+            m = c.getArmy("attack", c.getValue("Coordinate", targetCoord), hero.name, c.getValue("Troop", troops));
+        }
+        
+        m.heroId = hero.id;
+        c.af.getArmyCommands().newArmy(c.castle.id, m);
+        
+        c.cm.logMsg("Sending with " + hero.name + " (Power: " + hero.power + ")");
+        trackAttackSent(hero.name, targetCoord);
+        
+        setStatic("lastarmysendtime", new Date().getTime());
+        jj += 1;
+        
+        if (jj >= speed) break;
+    }
+    
+    return i + jj + 1;
+}
+
+function fixstuckheroes() {
+    var m = c.getRawTime();
+    var s = false;
+    for (var i=0; i<c.cm.localArmies.length; i+=1) {
+        if (c.cm.localArmies[i].reachTime + 2000 < m) {
+            c.af.getHeroCommand().callBackHero(c.castle.id, c.cm.localArmies[i].heroid);
+            s = true;
+        }
+    }
+    return s;
+}
+
+// ---- IMPROVED: Hire best hero by attack, not just power ---- //
+function hirebesthero() {
+    var bestAtk = 0;
+    var heroname = null;
+    
+    for (var i=0; i<c.cm.innHeroes.length; i+=1) {
+        // Prioritize attack stat for combat heroes
+        var score = c.cm.innHeroes[i].power + (c.cm.innHeroes[i].attack * 2);
+        if (score > bestAtk) {
+            bestAtk = score;
+            heroname = c.cm.innHeroes[i].name;
+        }
+    }
+    
+    if (heroname != null) {
+        c.af.getHeroCommand().hireHero(c.castle.id, heroname);
+        c.cm.logMsg("[INN] Hired: " + heroname + " (score: " + bestAtk + ")");
+    }
+    return heroname;
+}
+
+function isherospotsfull() {
+    var max = c.cm.getBuildingLevel(c.buildingTypes.fh);
+    for (var i=0; i<c.cm.heroes.length; i+=1) {
+        if ((c.cm.heroes[i].name=="Queen" || c.cm.heroes[i].name=="King") && c.cm.heroes[i].isHero!=0) {
+            max += 1;
+            break;
+        }
+    }
+    if (c.cm.heroes.length >= max) return true;
+    return false;
+}
+
+function getlag() {
+    if (c.lag > 10) {
+        c.cm.logMsg("Lag " + c.lag);
+        var mk = int(c.lag / 2);
+        if (mk > 15) mk = 15;
+        return mk;
+    }
+    return 0;
+}
+
+// ---- NEW: Print stats ---- //
+function printStats() {
+    if (enableAttackTracking!=1) return;
+    var stats = getStatic("attackStats");
+    c.cm.logMsg("[STATS] Sent: " + stats.sent + " | Returned: " + stats.returned);
+}
+
+autoheal true
+
+label start
+set n $m_dyn.getlag()$
+if (n>0) sleep %n%
+set nv $m_dyn.dorefresh()$
+set nv $m_dyn.printStats()$
+
+if (c.cm.resource.gold < goldMinimum) goto no_gold_error
+if (c.cm.resource.food.amount < foodMinimum) goto no_food_err
+
+if (fixstuckheroes()) sleep 2
+set n $m_dyn.herolevelup()$
+if (n>0) sleep n
+set nv $m_dyn.fireheros()$
+set nv $m_dyn.awardheroes()$
+
+set j 0
+label attack
+set j $m_dyn.sendattacks(j)$
+if (j>=c.cm.heroes.length || c.cm.localArmies.length>=c.cm.getMaxRallySlots()) goto endattack
+sleep 1
+goto attack
+
+label endattack
+sleep 1
+if (c.cm.heroes.length>2 && c.cm.localArmies.length == 0) goto no_wave_err
+if (isherospotsfull()) goto start
+
+label refreshInn
+set nv $c.cm.updateInn()$
+sleep 1
+set nv $m_dyn.hirebesthero()$
+sleep 1
+if (isherospotsfull()) goto start
+goto refreshInn
+
+label no_gold_error
+echo "No gold error - need at least " + goldMinimum
+sleep 1
+goto start
+
+label no_food_err
+echo "No food error - need at least " + foodMinimum
+sleep 1
+goto start
+
+label no_wave_err
+echo "No waves sent - check troops, target, or hero availability"
+set nv $m_dyn.printStats()$
+sleep 5
+goto start

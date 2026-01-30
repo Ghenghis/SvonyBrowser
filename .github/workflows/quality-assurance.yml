@@ -1,0 +1,165 @@
+name: 🔍 Code Quality Assurance
+
+on:
+  push:
+    branches: [ main, develop, release/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  powershell-validation:
+    name: 📜 PowerShell Script Validation
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup PowerShell
+      uses: azure/powershell@v1
+      with:
+        inlineScript: |
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+        azPSVersion: "latest"
+        
+    - name: 🔍 Run PSScriptAnalyzer
+      run: |
+        $scripts = Get-ChildItem -Path './scripts' -Filter '*.ps1' -Recurse
+        $totalIssues = 0
+        $results = @()
+        
+        foreach ($script in $scripts) {
+          $result = Invoke-ScriptAnalyzer -Path $script.FullName -Severity Warning,Error
+          if ($result) {
+            $totalIssues += $result.Count
+            $results += "❌ $($script.Name): $($result.Count) issues"
+            $result | ForEach-Object { 
+              $results += "  - $($_.RuleName): $($_.Message) (Line $($_.Line))" 
+            }
+          } else {
+            $results += "✅ $($script.Name): Clean"
+          }
+        }
+        
+        Write-Host "=== POWERSHELL SCRIPT VALIDATION REPORT ==="
+        $results | ForEach-Object { Write-Host $_ }
+        Write-Host ""
+        Write-Host "Total Scripts: $($scripts.Count)"
+        Write-Host "Total Issues: $totalIssues"
+        
+        if ($totalIssues -gt 0) {
+          Write-Host "❌ PowerShell validation failed!" -ForegroundColor Red
+          exit 1
+        } else {
+          Write-Host "✅ All PowerShell scripts are compliant!" -ForegroundColor Green
+        }
+
+  javascript-validation:
+    name: 📦 JavaScript/TypeScript Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📦 Install Dependencies
+      run: npm ci
+      
+    - name: 🔍 ESLint Validation
+      run: npm run lint
+      
+    - name: 🎨 Prettier Format Check
+      run: npm run format:check
+      
+    - name: 🔧 TypeScript Type Check
+      run: npm run type-check
+      
+    - name: 🧪 Run Tests
+      run: npm run test:coverage
+      
+    - name: 🔒 Security Audit
+      run: npm audit --audit-level=moderate
+
+  build-validation:
+    name: 🏗️ Build Validation
+    runs-on: windows-latest
+    needs: [powershell-validation, javascript-validation]
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📦 Install Dependencies
+      run: npm ci
+      
+    - name: 🏗️ Build Application
+      run: npm run build
+      
+    - name: 📋 Validate Build Artifacts
+      run: |
+        if (Test-Path "dist") {
+          Write-Host "✅ Build artifacts created successfully"
+          Get-ChildItem "dist" -Recurse | ForEach-Object { 
+            Write-Host "  📁 $($_.Name) ($($_.Length) bytes)"
+          }
+        } else {
+          Write-Host "❌ Build artifacts not found!"
+          exit 1
+        }
+
+  release-validation:
+    name: 🚀 Release Validation
+    runs-on: windows-latest
+    needs: [build-validation]
+    if: startsWith(github.ref, 'refs/heads/release/') || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Version Check
+      run: |
+        $packageJson = Get-Content "package.json" | ConvertFrom-Json
+        $currentVersion = $packageJson.version
+        Write-Host "Current Version: $currentVersion"
+        
+        # Validate version format (semantic versioning)
+        if ($currentVersion -match '^\d+\.\d+\.\d+$') {
+          Write-Host "✅ Version format is valid"
+        } else {
+          Write-Host "❌ Invalid version format: $currentVersion"
+          exit 1
+        }
+        
+    - name: 📋 Changelog Validation
+      run: |
+        if (Test-Path "CHANGELOG.md") {
+          $changelog = Get-Content "CHANGELOG.md" -Raw
+          if ($changelog -match "## \[$($packageJson.version)\]") {
+            Write-Host "✅ Changelog entry found for current version"
+          } else {
+            Write-Host "⚠️ No changelog entry found for current version"
+          }
+        } else {
+          Write-Host "⚠️ CHANGELOG.md not found"
+        }
+        
+    - name: 🔍 Release Readiness Check
+      run: |
+        Write-Host "=== RELEASE READINESS REPORT ==="
+        Write-Host "✅ All quality checks passed"
+        Write-Host "✅ Build validation successful"
+        Write-Host "✅ Version format validated"
+        Write-Host "🚀 Ready for release!"

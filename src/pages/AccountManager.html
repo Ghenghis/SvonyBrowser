@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Manager - SvonyBrowser</title>
+  <style>
+    :root {
+      --evony-primary: #e94560;
+      --evony-secondary: #16213e;
+      --evony-accent: #ffd700;
+      --evony-background: #1a1a2e;
+      --evony-surface: rgba(0, 0, 0, 0.3);
+      --evony-text: #eeeeee;
+      --evony-text-muted: #888888;
+      --evony-border: #333333;
+      --evony-success: #4CAF50;
+      --evony-warning: #ff9800;
+      --evony-error: #f44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: var(--evony-text);
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #16213e 0%, #1a1a2e 50%, #16213e 100%);
+      border-bottom: 2px solid var(--evony-primary);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      color: var(--evony-accent);
+      font-size: 24px;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-badge {
+      background: var(--evony-surface);
+      padding: 8px 15px;
+      border-radius: 5px;
+      border: 1px solid var(--evony-border);
+    }
+
+    .stat-value {
+      color: var(--evony-accent);
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: var(--evony-surface);
+      border: 1px solid var(--evony-border);
+      border-radius: 5px;
+      cursor: pointer;
+      color: var(--evony-text-muted);
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      border-color: var(--evony-primary);
+    }
+
+    .tab.active {
+      background: var(--evony-primary);
+      border-color: var(--evony-primary);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section {
+      background: var(--evony-surface);
+      border-radius: 10px;
+      border: 1px solid var(--evony-border);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      color: var(--evony-primary);
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--evony-border);
+    }
+
+    .account-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 15px;
+    }
+
+    .account-card {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid var(--evony-border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .account-card:hover {
+      border-color: var(--evony-primary);
+      transform: translateY(-2px);
+    }
+
+    .account-card.selected {
+      border-color: var(--evony-accent);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+
+    .account-name {
+      color: var(--evony-accent);
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .account-meta {
+      color: var(--evony-text-muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .account-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .mini-stat {
+      text-align: center;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+    }
+
+    .mini-stat-value {
+      color: var(--evony-accent);
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .mini-stat-label {
+      color: var(--evony-text-muted);
+      font-size: 10px;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #e94560 0%, #c73e54 100%);
+      color: white;
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, #4CAF50 0%, #3d8b40 100%);
+      color: white;
+    }
+
+    .btn-info {
+      background: linear-gradient(180deg, #2196F3 0%, #1976D2 100%);
+      color: white;
+    }
+
+    .btn-warning {
+      background: linear-gradient(180deg, #ff9800 0%, #f57c00 100%);
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .detail-panel {
+      background: var(--evony-surface);
+      border-radius: 10px;
+      border: 1px solid var(--evony-border);
+      padding: 20px;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .player-name {
+      font-size: 24px;
+      color: var(--evony-accent);
+      font-weight: bold;
+    }
+
+    .player-stats {
+      display: flex;
+      gap: 15px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 15px;
+      background: rgba(233, 69, 96, 0.15);
+      border-radius: 5px;
+      border: 1px solid rgba(233, 69, 96, 0.3);
+    }
+
+    .stat-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .troop-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .troop-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+    }
+
+    .troop-icon {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 5px;
+    }
+
+    .troop-count {
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .troop-name {
+      color: var(--evony-text-muted);
+      font-size: 10px;
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+    }
+
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+    }
+
+    .resource-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .resource-value {
+      color: white;
+      font-weight: bold;
+    }
+
+    .castle-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .castle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      margin-bottom: 8px;
+      border: 1px solid var(--evony-border);
+    }
+
+    .castle-name {
+      color: var(--evony-accent);
+      font-weight: bold;
+    }
+
+    .castle-coords {
+      color: var(--evony-text-muted);
+      font-size: 12px;
+    }
+
+    .castle-troops {
+      color: var(--evony-text);
+    }
+
+    .import-area {
+      border: 2px dashed var(--evony-border);
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .import-area:hover {
+      border-color: var(--evony-primary);
+      background: rgba(233, 69, 96, 0.1);
+    }
+
+    .import-area.dragover {
+      border-color: var(--evony-accent);
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    .export-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .export-option {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      border: 1px solid var(--evony-border);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-option:hover {
+      border-color: var(--evony-primary);
+    }
+
+    .export-format {
+      font-size: 24px;
+      color: var(--evony-accent);
+      margin-bottom: 10px;
+    }
+
+    .no-accounts {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--evony-text-muted);
+    }
+
+    .no-accounts h3 {
+      color: var(--evony-text);
+      margin-bottom: 10px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--evony-border);
+      border-radius: 5px;
+      color: var(--evony-text);
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .search-bar:focus {
+      border-color: var(--evony-primary);
+      outline: none;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--evony-text-muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>⚔️ Account Manager</h1>
+    <div class="header-stats">
+      <div class="stat-badge">
+        <span class="stat-value" id="accountCount">0</span> Accounts
+      </div>
+      <div class="stat-badge">
+        <span class="stat-value" id="totalStorage">0 KB</span> Storage
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="accounts">📋 Accounts</div>
+      <div class="tab" data-tab="details">📊 Details</div>
+      <div class="tab" data-tab="export">📤 Export</div>
+      <div class="tab" data-tab="import">📥 Import</div>
+    </div>
+
+    <!-- Accounts Tab -->
+    <div id="accounts" class="tab-content active">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="refreshAccounts()">🔄 Refresh</button>
+        <button class="btn btn-warning" onclick="clearAllAccounts()">🗑️ Clear All</button>
+      </div>
+
+      <input type="text" class="search-bar" placeholder="Search accounts by name, email, or server..." id="searchInput"
+        oninput="filterAccounts()">
+
+      <div class="section">
+        <div class="section-title">Saved Accounts</div>
+        <div class="account-grid" id="accountGrid">
+          <div class="no-accounts">
+            <h3>No Accounts Saved</h3>
+            <p>Extract account data from logged-in sessions or import existing account files.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Tab -->
+    <div id="details" class="tab-content">
+      <div class="detail-panel" id="detailPanel">
+        <div class="no-accounts">
+          <h3>No Account Selected</h3>
+          <p>Select an account from the Accounts tab to view details.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Tab -->
+    <div id="export" class="tab-content">
+      <div class="section">
+        <div class="section-title">Export Account Data</div>
+        <div class="export-options">
+          <div class="export-option" onclick="exportJSON()">
+            <div class="export-format">📄 JSON</div>
+            <p>Complete account data with full structure</p>
+            <small>Best for backup & import</small>
+          </div>
+          <div class="export-option" onclick="exportCSV()">
+            <div class="export-format">📊 CSV</div>
+            <p>Spreadsheet-compatible format</p>
+            <small>Best for Excel/Sheets</small>
+          </div>
+          <div class="export-option" onclick="exportTroopsCSV()">
+            <div class="export-format">⚔️ Troops</div>
+            <p>Troops per city breakdown</p>
+            <small>Detailed troop counts</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Export All Accounts</div>
+        <button class="btn btn-success" onclick="exportAllAccounts()">📦 Export All Accounts (JSON)</button>
+      </div>
+    </div>
+
+    <!-- Import Tab -->
+    <div id="import" class="tab-content">
+      <div class="section">
+        <div class="section-title">Import Account Data</div>
+        <div class="import-area" id="importArea" onclick="document.getElementById('fileInput').click()">
+          <h3>📁 Click or Drag & Drop</h3>
+          <p>Import JSON account files</p>
+          <small>Supports: .json, .svony</small>
+        </div>
+        <input type="file" id="fileInput" accept=".json,.svony" onchange="handleFileImport(event)">
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    SvonyBrowser Account Manager v1.0 | Evony Account Data Extraction Tool
+  </div>
+
+  <script>
+    let accounts = [];
+    let selectedAccount = null;
+
+    function init() {
+      loadAccounts();
+      setupTabs();
+      setupDragDrop();
+      updateStats();
+    }
+
+    function loadAccounts() {
+      try {
+        const data = localStorage.getItem('svony_accounts');
+        accounts = data ? JSON.parse(data) : [];
+        renderAccounts();
+      } catch (e) {
+        accounts = [];
+      }
+    }
+
+    function saveAccounts() {
+      localStorage.setItem('svony_accounts', JSON.stringify(accounts));
+      updateStats();
+    }
+
+    function renderAccounts() {
+      const grid = document.getElementById('accountGrid');
+
+      if (accounts.length === 0) {
+        grid.innerHTML = `
+                    <div class="no-accounts">
+                        <h3>No Accounts Saved</h3>
+                        <p>Extract account data from logged-in sessions or import existing account files.</p>
+                    </div>
+                `;
+        return;
+      }
+
+      grid.innerHTML = accounts.map((acc, index) => {
+        const data = acc.data;
+        const totalTroops = calculateTotalTroops(data.totals.troops);
+
+        return `
+                    <div class="account-card ${selectedAccount === index ? 'selected' : ''}" onclick="selectAccount(${index})">
+                        <div class="account-name">${data.player.name}</div>
+                        <div class="account-meta">
+                            ${acc.email} | ${acc.server} | ${acc.fileSize}
+                        </div>
+                        <div class="account-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">${formatNumber(data.player.prestige)}</div>
+                                <div class="mini-stat-label">Prestige</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">${data.totals.castleCount}</div>
+                                <div class="mini-stat-label">Castles</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">${formatNumber(totalTroops)}</div>
+                                <div class="mini-stat-label">Troops</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+      }).join('');
+    }
+
+    function selectAccount(index) {
+      selectedAccount = index;
+      renderAccounts();
+      renderDetails();
+      switchTab('details');
+    }
+
+    function renderDetails() {
+      const panel = document.getElementById('detailPanel');
+
+      if (selectedAccount === null || !accounts[selectedAccount]) {
+        panel.innerHTML = `
+                    <div class="no-accounts">
+                        <h3>No Account Selected</h3>
+                        <p>Select an account from the Accounts tab to view details.</p>
+                    </div>
+                `;
+        return;
+      }
+
+      const acc = accounts[selectedAccount].data;
+      const t = acc.totals.troops;
+      const r = acc.totals.resources;
+
+      panel.innerHTML = `
+                <div class="detail-header">
+                    <div>
+                        <div class="player-name">${acc.player.name}</div>
+                        <div style="color: var(--evony-text-muted)">
+                            ${acc.player.email} | Server: ${acc.metadata.server}
+                        </div>
+                    </div>
+                    <div class="player-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${formatNumber(acc.player.prestige)}</span>
+                            <span style="color: var(--evony-text-muted)">Prestige</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${formatNumber(acc.player.honor)}</span>
+                            <span style="color: var(--evony-text-muted)">Honor</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">#${acc.player.rank}</span>
+                            <span style="color: var(--evony-text-muted)">Rank</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Total Troops (${formatNumber(calculateTotalTroops(t))})</div>
+                    <div class="troop-grid">
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.worker)}</div>
+                            <div class="troop-name">Worker</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.warrior)}</div>
+                            <div class="troop-name">Warrior</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.scout)}</div>
+                            <div class="troop-name">Scout</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.pikeman)}</div>
+                            <div class="troop-name">Pikeman</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.swordsman)}</div>
+                            <div class="troop-name">Swordsman</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.archer)}</div>
+                            <div class="troop-name">Archer</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.cavalry)}</div>
+                            <div class="troop-name">Cavalry</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.cataphract)}</div>
+                            <div class="troop-name">Cataphract</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.transporter)}</div>
+                            <div class="troop-name">Transport</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.ballista)}</div>
+                            <div class="troop-name">Ballista</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.batteringRam)}</div>
+                            <div class="troop-name">Ram</div>
+                        </div>
+                        <div class="troop-item">
+                            <div class="troop-count">${formatNumber(t.catapult)}</div>
+                            <div class="troop-name">Catapult</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Total Resources</div>
+                    <div class="resource-grid">
+                        <div class="resource-item">
+                            <div class="resource-value">${formatNumber(r.food)}</div>
+                            <div style="color: var(--evony-text-muted)">Food</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">${formatNumber(r.lumber)}</div>
+                            <div style="color: var(--evony-text-muted)">Lumber</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">${formatNumber(r.stone)}</div>
+                            <div style="color: var(--evony-text-muted)">Stone</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">${formatNumber(r.iron)}</div>
+                            <div style="color: var(--evony-text-muted)">Iron</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">${formatNumber(r.gold)}</div>
+                            <div style="color: var(--evony-text-muted)">Gold</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Castles (${acc.castles.length})</div>
+                    <div class="castle-list">
+                        ${acc.castles.map(castle => {
+        const castleTroops = calculateTotalTroops(castle.troops);
+        return `
+                                <div class="castle-item">
+                                    <div>
+                                        <div class="castle-name">${castle.name} (Lv.${castle.level})</div>
+                                        <div class="castle-coords">(${castle.coordX}, ${castle.coordY})</div>
+                                    </div>
+                                    <div class="castle-troops">${formatNumber(castleTroops)} troops</div>
+                                </div>
+                            `;
+      }).join('')}
+                    </div>
+                </div>
+
+                <div class="action-bar" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="exportJSON()">📄 Export JSON</button>
+                    <button class="btn btn-success" onclick="exportCSV()">📊 Export CSV</button>
+                    <button class="btn btn-info" onclick="exportTroopsCSV()">⚔️ Export Troops</button>
+                    <button class="btn btn-warning" onclick="deleteAccount(${selectedAccount})">🗑️ Delete</button>
+                </div>
+            `;
+    }
+
+    function calculateTotalTroops(troops) {
+      return (troops.worker || 0) + (troops.warrior || 0) + (troops.scout || 0) +
+        (troops.pikeman || 0) + (troops.swordsman || 0) + (troops.archer || 0) +
+        (troops.cavalry || 0) + (troops.cataphract || 0) + (troops.transporter || 0) +
+        (troops.ballista || 0) + (troops.batteringRam || 0) + (troops.catapult || 0);
+    }
+
+    function formatNumber(num) {
+      if (!num) return '0';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toLocaleString();
+    }
+
+    function setupTabs() {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function setupDragDrop() {
+      const area = document.getElementById('importArea');
+
+      area.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        area.classList.add('dragover');
+      });
+
+      area.addEventListener('dragleave', () => {
+        area.classList.remove('dragover');
+      });
+
+      area.addEventListener('drop', (e) => {
+        e.preventDefault();
+        area.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          importFile(files[0]);
+        }
+      });
+    }
+
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (file) importFile(file);
+    }
+
+    function importFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+
+          if (data.format === 'svony-account-v1' && Array.isArray(data.accounts)) {
+            data.accounts.forEach(acc => {
+              const existing = accounts.findIndex(a => a.id === acc.id);
+              if (existing >= 0) {
+                accounts[existing] = acc;
+              } else {
+                accounts.unshift(acc);
+              }
+            });
+            alert(`Imported ${data.accounts.length} accounts!`);
+          } else if (data.player && data.metadata) {
+            const id = `${data.player.email.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${data.metadata.server.toLowerCase()}`;
+            const stored = {
+              id,
+              email: data.player.email,
+              server: data.metadata.server,
+              lastUpdated: new Date().toISOString(),
+              fileSize: calculateSize(JSON.stringify(data)),
+              data
+            };
+            const existing = accounts.findIndex(a => a.id === id);
+            if (existing >= 0) {
+              accounts[existing] = stored;
+            } else {
+              accounts.unshift(stored);
+            }
+            alert('Account imported successfully!');
+          } else {
+            throw new Error('Unrecognized format');
+          }
+
+          saveAccounts();
+          renderAccounts();
+          switchTab('accounts');
+        } catch (err) {
+          alert('Failed to import: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function calculateSize(json) {
+      const bytes = new Blob([json]).size;
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    function exportJSON() {
+      if (selectedAccount === null) {
+        alert('Please select an account first');
+        return;
+      }
+      const acc = accounts[selectedAccount].data;
+      downloadFile(JSON.stringify(acc, null, 2), `${acc.player.name}_${acc.metadata.server}.json`);
+    }
+
+    function exportCSV() {
+      if (selectedAccount === null) {
+        alert('Please select an account first');
+        return;
+      }
+      const acc = accounts[selectedAccount].data;
+      const csv = generateCSV(acc);
+      downloadFile(csv, `${acc.player.name}_${acc.metadata.server}.csv`, 'text/csv');
+    }
+
+    function exportTroopsCSV() {
+      if (selectedAccount === null) {
+        alert('Please select an account first');
+        return;
+      }
+      const acc = accounts[selectedAccount].data;
+      const csv = generateTroopsCSV(acc);
+      downloadFile(csv, `${acc.player.name}_troops.csv`, 'text/csv');
+    }
+
+    function generateCSV(acc) {
+      const lines = [];
+      lines.push('=== PLAYER INFO ===');
+      lines.push('Field,Value');
+      lines.push(`Name,${acc.player.name}`);
+      lines.push(`Email,${acc.player.email}`);
+      lines.push(`Server,${acc.metadata.server}`);
+      lines.push(`Prestige,${acc.player.prestige}`);
+      lines.push(`Honor,${acc.player.honor}`);
+      lines.push(`Rank,${acc.player.rank}`);
+      return lines.join('\n');
+    }
+
+    function generateTroopsCSV(acc) {
+      const lines = [];
+      lines.push('City,Worker,Warrior,Scout,Pikeman,Swordsman,Archer,Cavalry,Cataphract,Transport,Ballista,Ram,Catapult,Total');
+
+      acc.castles.forEach(castle => {
+        const t = castle.troops;
+        const total = calculateTotalTroops(t);
+        lines.push([
+          castle.name, t.worker, t.warrior, t.scout, t.pikeman, t.swordsman,
+          t.archer, t.cavalry, t.cataphract, t.transporter, t.ballista,
+          t.batteringRam, t.catapult, total
+        ].join(','));
+      });
+
+      const tt = acc.totals.troops;
+      const grandTotal = calculateTotalTroops(tt);
+      lines.push([
+        'TOTAL', tt.worker, tt.warrior, tt.scout, tt.pikeman, tt.swordsman,
+        tt.archer, tt.cavalry, tt.cataphract, tt.transporter, tt.ballista,
+        tt.batteringRam, tt.catapult, grandTotal
+      ].join(','));
+
+      return lines.join('\n');
+    }
+
+    function exportAllAccounts() {
+      const exportData = {
+        version: '1.0.0',
+        exportedAt: new Date().toISOString(),
+        format: 'svony-account-v1',
+        accounts
+      };
+      downloadFile(JSON.stringify(exportData, null, 2), `svony_all_accounts_${Date.now()}.json`);
+    }
+
+    function downloadFile(content, filename, mimeType = 'application/json') {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function deleteAccount(index) {
+      if (confirm('Are you sure you want to delete this account?')) {
+        accounts.splice(index, 1);
+        saveAccounts();
+        selectedAccount = null;
+        renderAccounts();
+        switchTab('accounts');
+      }
+    }
+
+    function clearAllAccounts() {
+      if (confirm('Are you sure you want to delete ALL accounts? This cannot be undone.')) {
+        accounts = [];
+        saveAccounts();
+        selectedAccount = null;
+        renderAccounts();
+      }
+    }
+
+    function refreshAccounts() {
+      loadAccounts();
+    }
+
+    function filterAccounts() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      document.querySelectorAll('.account-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(query) ? 'block' : 'none';
+      });
+    }
+
+    function updateStats() {
+      document.getElementById('accountCount').textContent = accounts.length;
+      const totalSize = calculateSize(JSON.stringify(accounts));
+      document.getElementById('totalStorage').textContent = totalSize;
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

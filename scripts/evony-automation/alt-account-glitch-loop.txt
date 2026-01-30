@@ -1,0 +1,267 @@
+// =====================================================
+// ALT/SPAM ACCOUNT GLITCH SCRIPT
+// Loops until food available - NO FLEET FEET
+// =====================================================
+//
+// FOR ALT ACCOUNTS ONLY - NOT MAIN ACCOUNTS
+// 
+// FEATURES:
+// 1. Loop until account has food
+// 2. Open ALL items automatically
+// 3. Spin wheel if has amulets
+// 4. Use food items, troop packs
+// 5. NO Fleet Feet (slow march is fine)
+// 6. Balance troops for glitch
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "ALT ACCOUNT GLITCH LOOP"
+echo "NO FLEET FEET - SLOW MARCH OK"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// CONFIGURATION
+// =====================================================
+
+set minFood 10000000
+set loopDelay 5
+set maxLoops 1000
+
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+setarr troopAbbr "wo w s p sw a c cata t b r cp"
+
+// =====================================================
+// MAIN LOOP - KEEP GOING UNTIL FOOD
+// =====================================================
+
+set loopCount 0
+
+label mainLoop
+
+set loopCount {%loopCount%+1}
+echo ""
+echo "=== LOOP %loopCount% ==="
+
+if {%loopCount%>%maxLoops%} goto maxLoopsReached
+
+// Check current food
+set currentFood $c.castle.resource.food.amount$
+echo "Current food: %currentFood%"
+
+// If enough food, proceed to troop movement
+if {%currentFood%>=%minFood%} goto hasFoodProceed
+
+// =====================================================
+// NO FOOD - TRY TO GET SOME
+// =====================================================
+
+echo "Low food - trying to get more..."
+
+// STEP 1: Open ALL food items
+echo "--- Opening food items ---"
+
+set item1b $c.getItemCount("player.resource.food.1b")$
+if {%item1b%>0} set r $c.af.getShopCommands().useItem("player.resource.food.1b",%item1b%)$
+if {%item1b%>0} echo "  Used %item1b% x 1B food"
+
+set item100m $c.getItemCount("player.resource.food.100m")$
+if {%item100m%>0} set r $c.af.getShopCommands().useItem("player.resource.food.100m",%item100m%)$
+if {%item100m%>0} echo "  Used %item100m% x 100M food"
+
+set item10m $c.getItemCount("player.resource.food.10m")$
+if {%item10m%>0} set r $c.af.getShopCommands().useItem("player.resource.food.10m",%item10m%)$
+if {%item10m%>0} echo "  Used %item10m% x 10M food"
+
+set item1m $c.getItemCount("player.resource.food.1m")$
+if {%item1m%>0} set r $c.af.getShopCommands().useItem("player.resource.food.1m",%item1m%)$
+if {%item1m%>0} echo "  Used %item1m% x 1M food"
+
+set item100k $c.getItemCount("player.resource.food.100k")$
+if {%item100k%>0} set r $c.af.getShopCommands().useItem("player.resource.food.100k",%item100k%)$
+if {%item100k%>0} echo "  Used %item100k% x 100k food"
+
+// STEP 2: Open ALL resource items (wood, stone, iron, gold)
+echo "--- Opening other resource items ---"
+
+// Gold items
+set goldItems $c.getItemCount("player.resource.gold.1m")$
+if {%goldItems%>0} set r $c.af.getShopCommands().useItem("player.resource.gold.1m",%goldItems%)$
+if {%goldItems%>0} echo "  Used %goldItems% x 1M gold"
+
+// Wood items
+set woodItems $c.getItemCount("player.resource.wood.1m")$
+if {%woodItems%>0} set r $c.af.getShopCommands().useItem("player.resource.wood.1m",%woodItems%)$
+if {%woodItems%>0} echo "  Used %woodItems% x 1M wood"
+
+// Stone items
+set stoneItems $c.getItemCount("player.resource.stone.1m")$
+if {%stoneItems%>0} set r $c.af.getShopCommands().useItem("player.resource.stone.1m",%stoneItems%)$
+if {%stoneItems%>0} echo "  Used %stoneItems% x 1M stone"
+
+// Iron items
+set ironItems $c.getItemCount("player.resource.iron.1m")$
+if {%ironItems%>0} set r $c.af.getShopCommands().useItem("player.resource.iron.1m",%ironItems%)$
+if {%ironItems%>0} echo "  Used %ironItems% x 1M iron"
+
+// STEP 3: Open troop packs
+echo "--- Opening troop packs ---"
+
+set j 0
+label openTroopPacks
+if {%j%>=12} goto troopPacksDone
+
+set type %troopAbbr[{%j%}]%
+
+// 1M packs
+set pack1m $c.getItemCount("player.troop.%type%.1m")$
+if {%pack1m%>0} set r $c.af.getShopCommands().useItem("player.troop.%type%.1m",%pack1m%)$
+if {%pack1m%>0} echo "  Used %pack1m% x 1M %type%"
+
+// 100k packs
+set pack100k $c.getItemCount("player.troop.%type%.100k")$
+if {%pack100k%>0} set r $c.af.getShopCommands().useItem("player.troop.%type%.100k",%pack100k%)$
+if {%pack100k%>0} echo "  Used %pack100k% x 100k %type%"
+
+// 10k packs
+set pack10k $c.getItemCount("player.troop.%type%.10k")$
+if {%pack10k%>0} set r $c.af.getShopCommands().useItem("player.troop.%type%.10k",%pack10k%)$
+if {%pack10k%>0} echo "  Used %pack10k% x 10k %type%"
+
+set j {%j%+1}
+goto openTroopPacks
+
+label troopPacksDone
+
+// =====================================================
+// STEP 4: SPIN WHEEL IF HAS AMULETS
+// =====================================================
+
+echo "--- Checking amulets for wheel spin ---"
+
+// Check for amulets (used for wheel spinning)
+// Common amulet item codes
+set amuletCount $c.getItemCount("player.wheel.amulet")$
+echo "Amulets available: %amuletCount%"
+
+if {%amuletCount%<=0} goto noAmulets
+
+echo "Spinning wheel with amulets..."
+
+label spinLoop
+set amuletCount $c.getItemCount("player.wheel.amulet")$
+if {%amuletCount%<=0} goto spinDone
+
+// Spin the wheel
+set spinResult $c.af.getShopCommands().spinWheel()$
+echo "  Spin! Amulets left: %amuletCount%"
+
+// Small delay between spins
+sleep 0.5
+
+goto spinLoop
+
+label spinDone
+echo "All amulets used!"
+goto afterAmulets
+
+label noAmulets
+echo "No amulets to spin"
+
+label afterAmulets
+
+// =====================================================
+// STEP 5: UNTRAIN EXCESS WORKERS/WARRIORS
+// =====================================================
+
+echo "--- Untraining excess troops for food ---"
+
+// Check if still low on food
+set currentFood $c.castle.resource.food.amount$
+if {%currentFood%>=%minFood%} goto skipUntrain
+
+// Untrain workers (they don't help with glitch anyway)
+set workers $c.castle.troop.peasants$
+set untrainWo {{%workers%/10}\\1}
+if {%untrainWo%>1000000} set r $c.af.getCastleCommands().deleteTroop(c.castle.id,"peasants",%untrainWo%)$
+if {%untrainWo%>1000000} echo "  Untrained %untrainWo% workers"
+
+// Untrain warriors
+set warriors $c.castle.troop.militia$
+set untrainW {{%warriors%/10}\\1}
+if {%untrainW%>1000000} set r $c.af.getCastleCommands().deleteTroop(c.castle.id,"militia",%untrainW%)$
+if {%untrainW%>1000000} echo "  Untrained %untrainW% warriors"
+
+label skipUntrain
+
+// =====================================================
+// CHECK FOOD AGAIN
+// =====================================================
+
+set currentFood $c.castle.resource.food.amount$
+echo ""
+echo "Food after items/spin/untrain: %currentFood%"
+
+if {%currentFood%>=%minFood%} goto hasFoodProceed
+
+// Still no food - wait and loop
+echo "Still low food - waiting %loopDelay% seconds..."
+sleep %loopDelay%
+goto mainLoop
+
+// =====================================================
+// HAS FOOD - PROCEED WITH TROOP BALANCE
+// =====================================================
+
+label hasFoodProceed
+
+echo ""
+echo "=== FOOD AVAILABLE - BALANCING TROOPS ==="
+echo ""
+
+// NO FLEET FEET - just regular transports (slow is OK for alts)
+
+// Scan all cities
+set numCities $c.allCities.length$
+echo "Account has %numCities% cities"
+
+// Quick scan of each city
+set cityIdx 0
+label quickScan
+if {%cityIdx%>=%numCities%} goto quickScanDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+set troops $c.cm.allTroop.total$
+set food $c.castle.resource.food.amount$
+echo "City %cityIdx%: %troops% troops, %food% food"
+
+set cityIdx {%cityIdx%+1}
+goto quickScan
+
+label quickScanDone
+
+echo ""
+echo "Troop balancing for alts uses SLOW marches"
+echo "No Fleet Feet wasted on alt accounts!"
+echo ""
+
+// Continue looping to keep items used
+echo "Waiting 60 seconds before next loop..."
+sleep 60
+goto mainLoop
+
+// =====================================================
+// MAX LOOPS REACHED
+// =====================================================
+
+label maxLoopsReached
+echo ""
+echo "=================================================="
+echo "MAX LOOPS REACHED (%maxLoops%)"
+echo "Script stopping - restart if needed"
+echo "=================================================="

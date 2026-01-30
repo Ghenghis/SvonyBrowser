@@ -1,0 +1,272 @@
+// =====================================================
+// AUTO-RECALL VALLEY DEFENSE
+// Monitors for attacks - recalls valley troops instantly
+// =====================================================
+//
+// KEEPS VALLEY TROOPS SAFE!
+// - Runs continuously in script window
+// - Monitors incoming attacks (reports/war window)
+// - Auto-recalls troops from valleys when attack detected
+// - Uses recall items for instant return
+//
+// ATTACH TO: Reports window or War window
+// RUN: Keep running while valley troops are deployed
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "AUTO-RECALL VALLEY DEFENSE"
+echo "Protecting valley troops from attacks"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// CONFIGURATION
+// =====================================================
+
+// Check interval (seconds)
+set checkInterval 2
+
+// Your valleys with troops (add all your valley coords)
+setarr valleyList "300,700 301,700 300,701"
+
+// Recall item code
+set recallItem player.trick.qlbx
+
+// Alert on attack?
+set alertSound true
+
+echo "Monitoring valleys: %valleyList%"
+echo "Check interval: %checkInterval% seconds"
+echo ""
+echo "Press STOP to end monitoring"
+echo ""
+
+// =====================================================
+// MAIN MONITORING LOOP
+// =====================================================
+
+label monitorLoop
+
+// =====================================================
+// METHOD 1: Check incoming armies (enemyArmies)
+// =====================================================
+
+set incomingCount $c.cm.enemyArmies.length$
+
+if {%incomingCount%>0} goto attackDetected
+
+// =====================================================
+// METHOD 2: Check war reports for new attacks
+// =====================================================
+
+// Check if new attack report received
+set lastReport $c.reports.warReports[0]$
+iferror %lastReport% goto noNewReport
+
+// Check if report is recent (within last 60 seconds)
+set reportTime $c.reports.warReports[0].createTime$
+set currentTime $c.getRawTime()$
+set reportAge {{%currentTime%-%reportTime%}/1000}
+
+if {%reportAge%<60} goto checkReportType
+
+label noNewReport
+goto noAttack
+
+label checkReportType
+
+// Check if it's an incoming attack report
+set reportType $c.reports.warReports[0].reportType$
+
+// Report types: 1=scout, 2=attack, 3=reinforce, etc.
+if {%reportType%==2} goto attackDetected
+if {%reportType%==1} goto scoutDetected
+
+goto noAttack
+
+// =====================================================
+// SCOUT DETECTED - WARNING
+// =====================================================
+
+label scoutDetected
+echo "⚠️ SCOUT DETECTED! Attack may follow!"
+echo "Time: $c.getTime()$"
+// Don't recall yet, just warn
+goto noAttack
+
+// =====================================================
+// ATTACK DETECTED - RECALL NOW!
+// =====================================================
+
+label attackDetected
+
+echo ""
+echo "🚨🚨🚨 ATTACK DETECTED! 🚨🚨🚨"
+echo "Time: $c.getTime()$"
+echo "Incoming armies: %incomingCount%"
+echo ""
+
+// Play alert sound if enabled
+if {%alertSound%} echo "\a\a\a"
+
+// Get attack details
+set i 0
+label showAttacks
+if {%i%>=%incomingCount%} goto startRecall
+
+set attackerName $c.cm.enemyArmies[%i%].playerName$
+set targetCoord $c.cm.enemyArmies[%i%].targetCoord$
+set arrivalTime $c.cm.enemyArmies[%i%].reachTime$
+set currentTime $c.getRawTime()$
+set timeLeft {{{%arrivalTime%-%currentTime%}/1000}}
+
+echo "Attack #%i%:"
+echo "  From: %attackerName%"
+echo "  Target: %targetCoord%"
+echo "  Arrives in: %timeLeft% seconds"
+
+set i {%i%+1}
+goto showAttacks
+
+// =====================================================
+// RECALL ALL VALLEY TROOPS
+// =====================================================
+
+label startRecall
+
+echo ""
+echo "=== RECALLING ALL VALLEY TROOPS ==="
+echo ""
+
+// Loop through all valleys
+set vIdx 0
+label recallValleyLoop
+
+iferror %valleyList[{%vIdx%}]% goto recallDone
+
+set valleyCoord %valleyList[{%vIdx%}]%
+echo "Recalling from valley: %valleyCoord%"
+
+// Switch to valley
+set valleyCity $c.getCityFromCoord("%valleyCoord%")$
+if {%valleyCity%==null} goto nextValley
+
+// Check if valley has troops
+switchcity %valleyCoord%
+sleep 0.3
+
+set valleyTroops $c.cm.allTroop.total$
+echo "  Troops in valley: %valleyTroops%"
+
+if {%valleyTroops%<=0} goto nextValley
+
+// Find main city to recall to
+switchcity 0
+sleep 0.3
+
+set mainCityCoord $c.castle.x$,$c.castle.y$
+
+// Recall troops from valley to main city
+echo "  Recalling to city: %mainCityCoord%"
+
+// Send all troops back
+// Using reinforce from valley to city
+set troopStr ""
+
+// Build troop string for all types
+set wo $c.getCityFromCoord("%valleyCoord%").troop.peasants$
+set w $c.getCityFromCoord("%valleyCoord%").troop.militia$
+set s $c.getCityFromCoord("%valleyCoord%").troop.scouter$
+set p $c.getCityFromCoord("%valleyCoord%").troop.pikemen$
+set sw $c.getCityFromCoord("%valleyCoord%").troop.swordsmen$
+set a $c.getCityFromCoord("%valleyCoord%").troop.archer$
+set cav $c.getCityFromCoord("%valleyCoord%").troop.lightCavalry$
+set cata $c.getCityFromCoord("%valleyCoord%").troop.heavyCavalry$
+set t $c.getCityFromCoord("%valleyCoord%").troop.carriage$
+set b $c.getCityFromCoord("%valleyCoord%").troop.ballista$
+set r $c.getCityFromCoord("%valleyCoord%").troop.batteringRam$
+set cp $c.getCityFromCoord("%valleyCoord%").troop.catapult$
+
+// Execute recall command
+echo "  Sending recall command..."
+
+// Method 1: Direct recall via reinforce
+reinforce %mainCityCoord% from:%valleyCoord% wo:%wo%,w:%w%,s:%s%,p:%p%,sw:%sw%,a:%a%,c:%cav%,cata:%cata%,t:%t%,b:%b%,r:%r%,cp:%cp%
+
+echo "  ✅ Recall initiated!"
+
+// Use recall item for instant return if available
+set recallItemCount $c.getItemCount("%recallItem%")$
+if {%recallItemCount%>0} echo "  Using recall item for instant return..."
+if {%recallItemCount%>0} set result $c.af.getShopCommands().useTrickItem(c.castle.fieldId,c.cm.localArmies[0].armyId,c.getVar("%recallItem%"))$
+
+label nextValley
+set vIdx {%vIdx%+1}
+goto recallValleyLoop
+
+label recallDone
+
+echo ""
+echo "=== ALL VALLEYS RECALLED ==="
+echo ""
+echo "Troops are returning to cities!"
+echo "Continuing to monitor..."
+echo ""
+
+// Wait a bit before resuming monitoring
+sleep 10
+
+// =====================================================
+// NO ATTACK - CONTINUE MONITORING
+// =====================================================
+
+label noAttack
+
+// Status update every 30 checks
+set checkCount {%checkCount%+1}
+if {{%checkCount%|30}==0} echo "Still monitoring... (%checkCount% checks)"
+
+// Wait before next check
+sleep %checkInterval%
+
+// Loop back to monitoring
+goto monitorLoop
+
+// =====================================================
+// ALTERNATIVE: EVENT-BASED MONITORING
+// =====================================================
+// 
+// If the above polling method is too slow, you can also
+// attach to the war report event listener:
+//
+// c.events.addEventListener("warReport", function(e) {
+//     if (e.reportType == 2) { // attack
+//         // Trigger recall
+//     }
+// });
+//
+// This requires modifying the client scripts directly.
+//
+// =====================================================
+
+// =====================================================
+// MANUAL RECALL COMMAND
+// =====================================================
+//
+// To manually recall all valley troops:
+//
+// label manualRecall
+// set vIdx 0
+// label manualLoop
+// iferror %valleyList[{%vIdx%}]% goto manualDone
+// set v %valleyList[{%vIdx%}]%
+// reinforce [your city coord] from:%v% all
+// set vIdx {%vIdx%+1}
+// goto manualLoop
+// label manualDone
+// echo "Manual recall complete!"
+//
+// =====================================================

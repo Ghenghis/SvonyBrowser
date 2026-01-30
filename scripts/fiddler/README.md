@@ -70,11 +70,13 @@ Access via Fiddler's **Rules** menu:
 ### Viewing Captured Traffic
 
 In Fiddler:
+
 - Evony sessions appear with gold highlighting
 - Bold text indicates captured sessions
 - Check the Log tab for bridge status
 
 In Svony Browser:
+
 - Open the Traffic Viewer tab
 - Packets appear in real-time
 - Use filters to find specific actions
@@ -86,6 +88,7 @@ In Svony Browser:
 **Cause**: Svony Browser is not running or FiddlerBridge service is not started.
 
 **Solution**:
+
 1. Start Svony Browser first
 2. Wait for "FiddlerBridge connected" in status bar
 3. Then start Fiddler
@@ -95,6 +98,7 @@ In Svony Browser:
 **Cause**: Fiddler is not set as system proxy.
 
 **Solution**:
+
 1. In Fiddler, go to **Tools** → **Options** → **Connections**
 2. Ensure "Act as system proxy on startup" is checked
 3. Restart Fiddler
@@ -104,6 +108,7 @@ In Svony Browser:
 **Cause**: Packet format not recognized.
 
 **Solution**:
+
 - This is normal for some packets
 - The full packet data is still captured
 - Svony Browser's decoder will attempt full parsing
@@ -113,6 +118,7 @@ In Svony Browser:
 **Cause**: Pipe connection was lost.
 
 **Solution**:
+
 1. Use **Rules** → **Svony Bridge: Reconnect**
 2. Or restart both Fiddler and Svony Browser
 

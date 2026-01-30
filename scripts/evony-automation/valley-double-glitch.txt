@@ -1,0 +1,196 @@
+// =====================================================
+// VALLEY DOUBLE GLITCH - 2X TROOPS
+// ⚠️ WARNING: NO DEFENSE - RISKY!
+// =====================================================
+//
+// HOW IT WORKS:
+// - Send troops to valley
+// - Use recall item at EXACT moment (0.5s before arrival)
+// - Troops arrive at valley AND return to city
+// - Result: DOUBLED troops
+//
+// WHY MOST DON'T USE IT:
+// - Valley has NO DEFENSE
+// - Anyone can attack and steal your troops
+// - Need to constantly watch valleys
+// - Only safe during peace time or bubble
+//
+// WHEN TO USE:
+// - Account has bubble/peace shield
+// - Quick double then recall back
+// - Alt accounts you don't care about
+// - During server maintenance/low activity
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "VALLEY DOUBLE GLITCH - 2X TROOPS"
+echo "⚠️ WARNING: VALLEYS HAVE NO DEFENSE!"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// CONFIGURATION
+// =====================================================
+
+// Target valley coordinates (must own the valley!)
+set valleyX 300
+set valleyY 700
+set valleyCoord %valleyX%,%valleyY%
+
+// Recall item code
+set recallItem player.trick.qlbx
+
+// Timing offset (seconds before arrival to use recall)
+set timingOffset 0.5
+
+// Troops to send (adjust as needed)
+set troopType a
+set troopAmount 100000000
+
+echo "Valley target: %valleyCoord%"
+echo "Troop type: %troopType%"
+echo "Amount: %troopAmount%"
+echo ""
+
+// =====================================================
+// SAFETY CHECK - DO YOU OWN THE VALLEY?
+// =====================================================
+
+echo "--- Checking valley ownership ---"
+
+set valleyInfo $c.getCityFromCoord("%valleyCoord%")$
+if {%valleyInfo%==null} echo "⚠️ Valley not owned! Capture it first."
+if {%valleyInfo%==null} goto scriptEnd
+
+echo "✅ Valley owned - proceeding"
+echo ""
+
+// =====================================================
+// STEP 1: SEND TROOPS TO VALLEY
+// =====================================================
+
+echo "--- Step 1: Sending troops to valley ---"
+
+// Send reinforcement to valley
+reinforce %valleyCoord% none %troopType%:%troopAmount%
+echo "Sent %troopAmount% %troopType% to %valleyCoord%"
+echo ""
+
+// =====================================================
+// STEP 2: WAIT FOR PRECISE TIMING
+// =====================================================
+
+echo "--- Step 2: Waiting for recall timing ---"
+
+label waitForArmy
+
+// Check if army is marching
+iferror $c.cm.localArmies[0]$ goto waitForArmy
+
+// Get arrival time
+set arrivalTime $c.cm.localArmies[0].reachTime$
+set currentTime $c.getRawTime()$
+set timeLeft {{{%arrivalTime%-%currentTime%}/1000}-%timingOffset%}
+
+echo "Time until recall: %timeLeft% seconds"
+
+// Wait until just before arrival
+sleep $c.math.max(0,%timeLeft%)$
+
+// =====================================================
+// STEP 3: RAPID-FIRE RECALL (THE GLITCH)
+// =====================================================
+
+echo "--- Step 3: EXECUTING RECALL GLITCH ---"
+
+// Fire multiple recall items rapidly
+// This is the timing-critical part!
+
+set armyId $c.cm.localArmies[0].armyId$
+set fieldId $c.castle.fieldId$
+
+echo "Firing recall items NOW!"
+
+set r1 $c.af.getShopCommands().useTrickItem(%fieldId%,%armyId%,c.getVar("%recallItem%"))$
+set r2 $c.af.getShopCommands().useTrickItem(%fieldId%,%armyId%,c.getVar("%recallItem%"))$
+set r3 $c.af.getShopCommands().useTrickItem(%fieldId%,%armyId%,c.getVar("%recallItem%"))$
+set r4 $c.af.getShopCommands().useTrickItem(%fieldId%,%armyId%,c.getVar("%recallItem%"))$
+set r5 $c.af.getShopCommands().useTrickItem(%fieldId%,%armyId%,c.getVar("%recallItem%"))$
+
+echo "Recall items fired!"
+echo ""
+
+// =====================================================
+// STEP 4: VERIFY RESULTS
+// =====================================================
+
+echo "--- Step 4: Checking results ---"
+
+// Wait for troops to settle
+sleep 3
+
+// Check troops in city
+set cityTroops $c.castle.troop.%troopType%$
+echo "Troops in city: %cityTroops%"
+
+// Check troops in valley
+switchcity %valleyCoord%
+sleep 1
+set valleyTroops $c.castle.troop.%troopType%$
+echo "Troops in valley: %valleyTroops%"
+
+set totalTroops {%cityTroops%+%valleyTroops%}
+echo ""
+echo "Total troops: %totalTroops%"
+
+// Check if doubled
+set originalAmount %troopAmount%
+set expectedDouble {%originalAmount%*2}
+
+if {%totalTroops%>=%expectedDouble%} echo "✅ SUCCESS! Troops doubled!"
+if {%totalTroops%<%expectedDouble%} echo "❌ Glitch may have failed - try again"
+
+echo ""
+
+// =====================================================
+// STEP 5: OPTIONAL - RECALL FROM VALLEY
+// =====================================================
+
+echo "--- Step 5: Recall troops from valley? ---"
+echo ""
+echo "⚠️ REMEMBER: Valley has NO DEFENSE!"
+echo "Anyone can attack and steal these troops!"
+echo ""
+echo "To recall troops back to city:"
+echo "  switchcity [your city index]"
+echo "  reinforce [city coord] from:%valleyCoord% %troopType%:%valleyTroops%"
+echo ""
+echo "Or keep them in valley for food glitch"
+echo "(Valley troops count toward glitch threshold)"
+echo ""
+
+// =====================================================
+// RISKS & WARNINGS
+// =====================================================
+
+echo "=================================================="
+echo "⚠️ VALLEY GLITCH RISKS ⚠️"
+echo "=================================================="
+echo ""
+echo "1. NO DEFENSE - Anyone can attack valley"
+echo "2. Troops can be STOLEN by attackers"
+echo "3. Need constant monitoring"
+echo "4. Only safe with bubble/peace shield"
+echo "5. Most players avoid this for good reason!"
+echo ""
+echo "SAFE ALTERNATIVES:"
+echo "- Keep troops in city (has walls/defense)"
+echo "- Use city glitch numbers instead"
+echo "- Valley only for temporary food boost"
+echo ""
+echo "=================================================="
+
+label scriptEnd

@@ -1,0 +1,203 @@
+// =====================================================
+// ALL ACCOUNTS SCAN LIST
+// 480+ accounts for troop scanning
+// =====================================================
+//
+// FORMAT: name | email | password | source
+// TARGET: Find accounts with 8B-20B troops
+//
+// =====================================================
+
+// === ACC.TXT ACCOUNTS (22 accounts) ===
+
+// 1. zee | yucon1966@yahoo.com | vermonter1
+// 2. RQ | jenspast1991@yahoo.com | redfox
+// 3. CoolArrow | Midnightemissary@gmail.com | Vidnight
+// 4. PAB | erich.schlegel@us.fujitsu.com | 4thebagel
+// 5. IamChoder | bill.prins@gmail.com | macoss
+// 6. GhostRaider | dustysoccer0@hotmail.com | soccer
+// 7. Chodebitch | chrischen421@gmail.com | macoss
+// 8. Saphire | saphires1@hotmail.com | GemsNJewels
+// 9. David960 | diamonddave960@yahoo.com | fran916
+// 10. Vorador | medri15@yahoo.com | macoss
+// 11. CrazyIvana | wally.nino@yahoo.com | 10molly10
+// 12. ladytara | celticchef2000@aol.com | evony123
+// 13. CrazyRill | terrillevony@yahoo.com | brendan11
+// 14. CrazyRoyal | hunygurl67@yahoo.com | guiness3
+// 15. Rigamortis | masterramrod@hotmail.co.uk | silentassassin
+// 16. fox | pllyankees@hotmail.com | guiness3
+// 17. KangWR | ykamhong@yahoo.com | 000000
+// 18. CRAZYMOFO | grosy@musc.edu | Catapult1
+// 19. Tard | gutter_maintenance@iinet.net.au | denagi71
+// 20. ant | ypgros@gmail.com | yardstickredneck98
+// 21. botkiller | iikissmygritsii@yahoo.com | Kbnj1657
+// 22. crazykiwi | [MAIN - USE CAREFULLY]
+
+// === ACCOUNTS-MASTER.JSON CONFLICT ACCOUNTS (71 with multiple passwords) ===
+
+// 23. 12antonius1972@gmail.com | $BGrB7u76 OR 55@nton
+// 24. antonspreckley@yahoo.co.uk | buckden810446 OR 25sydneystreet
+// 25. auto180@yahoo.com | yonkers265 OR cupcake
+// 26. azndrugz@yahoo.com | timeline1 OR chen1107
+// 27. baseball_junky3@yahoo.com | cookie OR besbol3
+// 28. bbb_ark1962@yahoo.com | BeatenbytheBalls42 OR Prince1
+// 29. bigger.2007@outlook.com | cedric26051990 OR 69arvida1967
+// 30. bobsfakeid2@yahoo.com | $BGrB7u76 OR MiaAnderson1996
+// 31. buckskinhorse@hotmail.com | pocojet1 OR pocojet
+// 32. catlinn@yahoo.com | april13 OR 2017-04-13
+// 33. chuckc417@yahoo.com | Shr140414 OR 8^Losangele
+// 34. dakota_taz@hotmail.com | april13 OR 2017-04-13
+// 35. dalefreeburg@yahoo.com | 7sPtEzAkURV9g7Ab OR One2$even9
+// 36. danman5625@yahoo.com | babycat9a7xcx9 OR dirtyboy6907
+// 37. ebraff@yahoo.com | Wombat091 OR Wombat
+// 38. elacetay12@yahoo.com | cookie OR beplaced66
+// 39. gozdev@hotmail.com | 20467480.0 OR 20467480
+// 40. hpu357@yahoo.com | 5656planes OR Viper7
+// 41. jasonj@generator.com | argo999 OR lion999
+// 42. jburkhardt0@gmail.com | cookie
+// 43. jenn1131@gmail.com | hNa3Hw8d#k#!GSZFy2%f OR moocat
+// 44. jhoopes01@yahoo.com | 85418541 OR 85418541.0
+// 45. jnsmu97@aol.com | yonkers265 OR brendan11
+// 46. kakarot1973@hotmail.com | 1qaz2wsxed OR 911922933
+// 47. katastrophe.2012@hotmail.com | 69arvida1967
+// 48. kistari@cox.net | Sunnyvale OR @r04BIS
+// 49. legacy-nj@juno.com | Crusader2z991773! OR V1kingFl00t
+// 50. lionclaw6@gmail.com | ragnarok9 OR valhalla9
+// 51. maltese_minx@hotmail.com | sgathach9 OR thelionrampant9
+// 52. martingerard07@aol.com | 196721 OR 196721.0
+// 53. martyevony5@yahoo.com | 0ne2$even10 OR 0ne2$even9
+// 54. mattzac@live.com | Viper7 OR Chefrey24
+// 55. mikehmike@yahoo.com | 7sPtEzAkURV9g7Ab OR 0ne2$even9
+// 56. minotavros78@yahoo.com | flik123
+// 57. mistersergio13@gmail.com | Smoofers777 OR steve123
+// 58. mrqbiii@yahoo.com | cheesehead OR curious1
+// 59. mymechanics@aol.com | $BGrB7u76 OR gt35turbo
+// 60. nelsonsantiago@verizon.net | heartless1 OR carbon
+// 61. nigel.abrown@blueyonder.co.uk | googlymooglypuddingandpie6 OR Shikai!
+// 62. peterbrannan@hotmail.com | theBUSHsmells123 OR stop123
+// 63. piendro@gmail.com | brendan11 OR tinkerbell1
+// 64. prince_medo_eg@hotmail.com | jojo1999 OR 0ne2$even9
+// 65. q_t_p_i_e99@yahoo.com | 102905 OR 102905.0
+// 66. ram2009alexander@gmail.com | 196721 OR 196721.0
+// 67. revell753@hotmail.com | vadar01 OR Vadar01
+// 68. richardblack1@comcast.net | Crusader2z991773! OR Loco464299
+// 69. rtharp02@gmail.com | G0dzilla OR DBobbyD
+// 70. santana2603@gmail.com | yugioh10 OR ogsec7
+// 71. satch.coffin@mail.com | argo999 OR sheldon111
+// 72. satch229@gmail.com | argo999 OR sheldon111
+// 73. satchman69@hotmail.com | sheldon111 OR argo999
+// 74. simoes134@hotmail.com | z991773Crusaderz2! OR Crusader2z991773!
+// 75. sleddog218@yahoo.com | Crusaderz991773! OR Outrage218
+// 76. tarasdbe@yahoo.com | bojangles5 OR brendan11
+// 77. toy64@live.co.uk | z991773Crusaderz2! OR Crusader2z991773!
+// 78. treacy@rollanet.org | goose321 OR thecakeisalie7
+// 79. varun123patel@yahoo.com | valhalla9 OR toygar78
+// 80. ykamhong@yahoo.com | 000000 OR 40tr
+// 81. zigzag@1904.dk | Bobbel1. OR Bobbell1
+// 82. zsk54321@gmail.com | viper7 OR ogsec7
+// 83. zsk54321@yahoo.com | Football234 OR cheezehead77
+// 84. zurt@mail.com | 20467480 OR 20467480.0
+
+// =====================================================
+// TOTAL: 480 accounts in database
+// =====================================================
+
+// =====================================================
+// SCAN SCRIPT - RUN ON EACH ACCOUNT
+// =====================================================
+
+setsilence true
+
+echo "┌────────────────────────────────────────────────────────"
+echo "│ ACCOUNT SCAN"
+echo "│ Name: $c.player.name$"
+echo "│ Email: $c.player.email$"
+echo "├────────────────────────────────────────────────────────"
+
+set numCities $c.allCities.length$
+set accountTotal 0
+set accountFood 0
+
+set i 0
+label cityLoop
+if {%i%>=%numCities%} goto done
+
+switchcity %i%
+sleep 0.3
+
+set cityName $c.castle.name$
+set cityX $c.castle.x$
+set cityY $c.castle.y$
+set cityTroops $c.cm.allTroop.total$
+set cityFood $c.castle.resource.food.amount$
+
+echo "│"
+echo "│ CITY %i%: %cityName% @ %cityX%,%cityY%"
+echo "│   Total: %cityTroops% troops | %cityFood% food"
+echo "│   ┌─────────────────────────────────────────"
+
+set wo $c.castle.troop.peasants$
+set w $c.castle.troop.militia$
+set s $c.castle.troop.scouter$
+set p $c.castle.troop.pikemen$
+set sw $c.castle.troop.swordsmen$
+set a $c.castle.troop.archer$
+set cav $c.castle.troop.lightCavalry$
+set cata $c.castle.troop.heavyCavalry$
+set t $c.castle.troop.carriage$
+set b $c.castle.troop.ballista$
+set r $c.castle.troop.batteringRam$
+set cp $c.castle.troop.catapult$
+
+echo "│   │ wo: %wo%"
+echo "│   │ w:  %w%"
+echo "│   │ s:  %s%"
+echo "│   │ p:  %p%"
+echo "│   │ sw: %sw%"
+echo "│   │ a:  %a%"
+echo "│   │ c:  %cav%"
+echo "│   │ cata: %cata%"
+echo "│   │ t:  %t%"
+echo "│   │ b:  %b%"
+echo "│   │ r:  %r%"
+echo "│   │ cp: %cp%"
+echo "│   └─────────────────────────────────────────"
+
+// Check for glitch potential
+set glitchList ""
+if {%s%>1073741824} set glitchList "%glitchList% s"
+if {%p%>715827883} set glitchList "%glitchList% p"
+if {%sw%>715827883} set glitchList "%glitchList% sw"
+if {%a%>536870912} set glitchList "%glitchList% a"
+if {%cav%>238609295} set glitchList "%glitchList% c"
+if {%cata%>126322568} set glitchList "%glitchList% cata"
+if {%b%>85899346} set glitchList "%glitchList% b"
+if {%r%>42949673} set glitchList "%glitchList% r"
+if {%cp%>17179870} set glitchList "%glitchList% cp"
+
+if {%glitchList%!=""} echo "│   🔥 GLITCH:%glitchList%"
+
+set accountTotal {%accountTotal%+%cityTroops%}
+set accountFood {%accountFood%+%cityFood%}
+
+set i {%i%+1}
+goto cityLoop
+
+label done
+
+echo "│"
+echo "├────────────────────────────────────────────────────────"
+echo "│ ACCOUNT TOTALS"
+echo "│   Total Troops: %accountTotal%"
+echo "│   Total Food: %accountFood%"
+echo "│   Cities: %numCities%"
+echo "├────────────────────────────────────────────────────────"
+
+// Determine status
+if {%accountTotal%<8000000000} echo "│ STATUS: ❌ TOO SMALL (under 8B)"
+if {%accountTotal%>=8000000000} if {%accountTotal%<=20000000000} echo "│ STATUS: ✅ IDEAL FOR TESTING (8B-20B)"
+if {%accountTotal%>20000000000} echo "│ STATUS: ⚠️ TOO LARGE (over 20B - be careful!)"
+
+echo "└────────────────────────────────────────────────────────"
+echo ""
+echo "Copy this output to track results!"

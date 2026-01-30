@@ -1,0 +1,202 @@
+.account-grid disply: gid;
+rd-template-columsrepeat(auto-fill, minmax(35px, 1fr)) ap2px magintp: 20p .sl-filesdiply: gd
+id-template-clmspeaauto-fillminmx(5pxfr)ap5px sol-fil b.4 1var(--evony-border) border-rus8 padng15p crroinr trsion
+all0.2s sol-file:ovr { borr-colo:var(--evony-gold);} .sol-file-name{var(--evony-gold)weghtbold }sol-file-siz { color:
+vr(--evony-txtser);ont-siz2 }export-posdisply: gdgrid-emplte-column:repeat(3, 1fr);1 p expor-crd4 var(--evony-border) 10
+padding20x;
+text-alg: cen urspointer expor-crd var(--evony-gold)rgba(25,215,,0.1) }
+.exptin { fnt-sizepx margin-bottom: 10px; } .exprt-fmat { font-size18px; font-eig: bold; color: var(--vony-gold)
+}expor-desc { color: vr(--evony-textseondary); f-siz: 12px; margi-top: 5px; }
+.sta-row flx jusify: spe-bewen; padng: 8x0 border-btom: 1px solrgba(255,255,255,0.1); } .stat-ow:shid {bodr-boom: nne; }
+.contaer { -width: 160;magin:0uto; adding }</style>
+</head><bodyclass="studio-page">
+  <div lass="sudioheer">
+    <h1 clss="studio-title">👤 Act Stuio</h1>
+    <divstyle="isplay: flx; gap0">
+      <uttn class="vonybtn evony-btn-pimry" onclck="extractAccont()">🔄Etract Current</button>
+        <buttn class="eony-btn vny-btn-blue" onclck="importAccout()">📥 Import</button>
+          <buto clas="evony-bn" click="exportAll()">📤Export A</button>
+  </div>
+  </div>
+  <div clss="in">
+    <div class="studi-stats-gi" styl="maginbttm2px">
+      <div cls="studi-scard">
+        <div clss="studio-stat-value" id="total-as">0</iv> <ivcass="studo-sttlbl">Total Accous</iv>
+            </v> <vcass="studio-stat-card">
+              <div clas="sud-sa-vlu" id="totalciis">0</div> <divclss="studosta-labl">TotalCiis</div>
+      </div> <divclss="studi-stacrd"> <divclass="studi-stavalu"id="total-troos">0
+    </div> <divclass="studi-stalabl">ToalTrops</iv>
+  </div> <divclss="studi-stacad"> <divclass="studio-stat-value"id="talheroe">0</dv> <divclss="studi-stalael">Total Heres
+        </iv>
+        </v>
+        </div> <divclass="tudio-bs">
+          <divclass="udotab aiv" data="accouns">👤 Accouts</div><divclass="studio-ta" atata="exracin">🔄Etractin</dv>
+              <divclass="tudio-ab" dat="so">📁 SOLFiles</div> <divlass="studi-tab" data-tab="expt">📤Export</div>
+                  <divclass="tudio-ab" datab="compr">📊Compare</div>
+                    </iv>
+                    <div id="accus" class="tabcontnactive">
+                      <div clss="agrid">
+                        <div lass="sud-card"> <vcass="studio-card-hader">
+                            <v>
+                              <div clss="studio-ad-title">Dem Accot</iv>
+                                <v style="fot-size2;color: var(--evony-tet-secondary)">Server: evony.com
+                              </div>
+                              </iv>
+                              <spa style="ft-siz: 24px">🏰</span> </div>
+                        <div class="studi-caboy">
+                          <div lass="stat-ow">
+                            <pan style="clovar(--evy-xt-seconday)">Cities</span> <span
+                                style="color: var(--evony-gold); ">5</span>
+                          </div>
+                          <div class="sat-ow">
+                            <sp yle="colrvr(--evony-text-econdary)">Power</span>
+                              <spn style="olov(--evonyol); fo-wiht:bold;">12,0</span>
+                          </div> <divass="stat-r">
+                            <spansyle="color: var(--evoy-text);">Troops</span>
+                              <spn style="olov(--evonyol); fo-wiht:bold;">.B</span>
+                        </div> <divass="stat-r">
+                          <spn style="olov(-voy-tex-seconary);">Heros</span>
+                            <spanstyle=" var(--evony-gold);font-eig: bold">42</span>
+                      </div>
+                      </di>
+                      <divsyle="displyfgap:10p; pding15;background:2">
+                        <buton lass="evony-bn evybtn-rimry" styl="fex:1;" onclick="viewAccount('demo')">View</button>
+                          <utton clss="evony-btn" style="flex:1;" onlic="efreshAcct('emo')">Refesh</utton>
+                          <uttn class="evony-btn evony-btn-ang" style="fle:1;" ncck="eleteAccount('demo')">
+                            Delete</button> </v>
+                            </v>
+                    </div>
+                    </div>
+                    <div id="" class="tabconen">
+                      <div cass="vony-panel">
+                        <div ass="evny-panel-heade"> <span class="evypanel-ttl">🔄Account Data Etraction</span>
+                          <sp class="evonycnfirm-icon" syle="widh32height:32px;"></span>
+                        </div>
+                        <div class="evnyanel-body">
+                          <div style="">
+                            <labelstyle="x; color: var(--evony-tet-secondary)">Extraction Source</label>
+                              <selectlass="studi-seect" id="extraction-suce">
+                                <optin value="current">Current Bowse Session</tion>
+                                  <opto value="sol">SOL File</oion>
+                                    <ptin vale="api">API Connection</otion>
+                                      </>
+                          </div> <divstyle="margn-botom5px">
+                            <labelstyle="dislay: block; mrg-bottomx; color: var(--evony-tet-secondary)">Data to
+                              Extract</label>
+                              <divstyle="disply: grid; id-template-clmsepet31fr);gap:1px">
+                                <lal><inputtye="checkbo"clas="evony-checkbx" checked> PayerInfo</label> <label>
+                                      <inputtype="checkx" class="vonycheckbox" checke> Ctie
+                                    </label> <label><input type="heckbx" cass="evny-checkbox" chckd> Troops</labl>
+                                      <label>
+                                        < type="checkbx" las="evony-checkbox" checked> Heroes
+                                      </label>
+                                      <lael><input type="checkbx" class="vonyheckbx" checked> Resuces
+                                    </label>
+                                    <abel>
+                                      <put typ="checkbox" class="evy-chckbox" checked> Items</label> <label>
+                                          <inut typ="checkbox" cla="evonycheckox" checked> Alliance
+                                        </label>
+                                        <labl>
+                                          <nputye="checkbo" class="evony-checkbox" checked> Buffs</label>
+                                            <lbel><input type="hecbx" class="evoy-checkbox" checke>Quests</lbel>
+                                            </v>
+                                            </iv>
+                                            <div class="studio-progress" style="">
+                                              <div class="studio-l" id="extraction-progress" stye="width:0%;"></div>
+                                              </dv> <divid="extrtin-stats"sty="color: v(--evony-textseconday);
+                                                mrg-botom: 15px;">Reaytoextract
+                                            </div> <buttonclass="evony-btnevony-bn-pimry evony-glow"
+                                              oclick="tartExtrac()" style=":10%">⚡ Start Extraction</button>
+                        </div>
+                      </div>
+                    </div> <divid="sol"clas="tab-cntent">
+                      <div cass="evony"><ivclas="evny-pane-heaer"> <spanclass="evny-panltitle">📁 Flsh SOL Fles</an>
+                            </v>
+                            <v clas="evony-ane-bod">
+                              <psyl="coor: vr(--evony-xtsendary); argi-bottom15x;">SOL fils contin sved AoEvony bt data
+                                ncuding account credentias andsettgs.</>
+                                <div clas="ss">
+                                  <div clas="s-fle" onclick="loadSolFile('autoevony.sol')">
+                                    <iv class="sol-filnme">atoevony.ol
+                                  </div> <vclass="sol-file-size">2.4 KB
+                                </div>
+                                </dv>
+                                <div cls="sol-fle" click="lodSoFie('accountsol')">
+                                  <div clas="s-name">accunts.sol</di>
+                                    <iv ass="sl-file-size">.2 KB
+                                  </div>
+                                </div>
+                                <div clas="s" oclick="lodSolFil('scripts.sol')">
+                                  <div class="slfil-name">scrps.s</iv>
+                                    <div clas="s">128.7KB</div>
+                                  </div>
+                                </div>
+                                <div style="margi-op: 20px; diplay: flx; gap0"> <buttonclass="vony-btn"
+                                    nclick="bowseSlFles()">📂 Brwe SOLFolder</button>
+                                    <buton css="evony-bn vony-btnprimary" onick="ipotSolFil)">📥Impot SOL File</button>
+                                </div>
+                                </dv>
+                      </div>
+                      </div>
+                      <divid="t" class="abontent"> <divclss="evny-pael">
+                          <divclass="evny-panel-hea">
+                            <sanclas="evny-pane-ttle">📤 Export Accounts</span>
+                              </iv>
+                              <iv class="vonypnel-boy"> <divstyle="mrg-bottom15">
+                                  <labelsyl="disply: bock; marg-bottom 5px;olor: var(--voy-tex-sconday)">Accounts to
+                                    Export</label> <selectlass="stdio-elect" id="expt-accounts" multile
+                                      style="hegh: 100px">
+                                      <opvue="al"elected>All Accounts</option> </select> </div>
+                                        <div class="ptions">
+                                          <iv class="xpotard" ncick="expts('json')">
+                                            <div class="">📄</div>
+                                            <div class="">JSON</div>
+                                            <div class="exprdsc">Full sructure,imprtabe
+                                          </iv>
+                                        </div>
+                                        <div class="car" onclick="xportA('sv')"><divcls="xpot-con">📊</div>
+                                        <v css="expot-format">CSV</iv>
+                              <iv css="xpt-dsc">Srdshee compble</dv>
+                                </div>
+                                <divclas="expor"onclick="exportAs('xlsx')"> <divclss="export-i">📗
+                              </iv>
+                              <iv class="xpotfomt">XLSX</v>
+                                <divclass="pordesc">Exceforma</div>
+                                  </div> </i>
+                              </iv>
+                              </iv>
+                              </div>
+                              <divid="ompe" cass="t-contnt"> <divlass="evny-pane"> <divclass="evny-paelheadr">
+                                    <spanclass="evony-peltile">📊 CmareAccounts</san>
+                                      </div> <divclass="evny-anelboy">
+                                        <divstyle=" 1fr1f; gap: 20x;">
+                                          <div>
+                                            <labl syle="dspay: bock;arg-botto: 5px; color: vr--evony-tet-seconday">
+                                              Account 1</label>
+                                              <selec class="studiselet" id="compe-account-1">
+                                                <option vlue="">Selet acct...</option>
+                                                </select> </v>
+                                                <v>
+                                                  <labl
+                                                    sye="dsplay: block; mari-bottom5px; olor: var(--voy-xt-seconday)">
+                                                    Account 2</label>
+                                                    <selec class="studi-select" id="cmareacut-2">
+                                                      <pon valu="">Selectaccount...</otion> </select>
+                                          </div>
+                                          </div>
+                                          <butt class="evony-bn evonybtn-prmary" onclick="comparAccounts()"
+                                            style="width00%; margin-top: 5">📊 Compare</button>
+                                            <div id="mpare-resuts" style="magin-top20px"></div>
+                                            </div>
+                                            </div>
+                                            </dv>
+                                            </div>
+
+                                            <sipt> uncti supTabs(){ document.querySelectorAll('tab').forEach( =>
+                                              tab.adEventLtener('cick', () =>{ s abId
+                                              =t.datast.abdcument.queySelctoAll('.studiota').frEach(=>t.classLit.remve('actve'))
+                                              -contentc cve('active'));
+                                              tab.classList.add('actie');
+                                              document.getElemntById(tabId).classList.add);
+                                              };
+                                              } } } } } } } ''++'%'; } } } } } }

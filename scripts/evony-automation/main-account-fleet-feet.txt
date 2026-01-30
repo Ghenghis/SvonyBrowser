@@ -1,0 +1,254 @@
+// =====================================================
+// MAIN ACCOUNT GLITCH SCRIPT - WITH FLEET FEET
+// FOR ACCOUNTS WITH BILLIONS OF TROOPS ONLY
+// =====================================================
+//
+// USE THIS ON: crazykiwi, main accounts with B+ troops
+// DO NOT USE ON: alt/spam accounts
+//
+// FEATURES:
+// 1. Uses Fleet Feet for instant troop movement
+// 2. Optimized for accounts with billions of troops
+// 3. Careful resource management
+// 4. Full glitch optimization
+//
+// =====================================================
+
+setsilence true
+
+echo "=================================================="
+echo "MAIN ACCOUNT GLITCH - FLEET FEET ENABLED"
+echo "FOR ACCOUNTS WITH BILLIONS OF TROOPS"
+echo "=================================================="
+echo ""
+
+// =====================================================
+// SAFETY CHECK - VERIFY THIS IS A MAIN ACCOUNT
+// =====================================================
+
+set totalTroops $c.cm.allTroop.total$
+set minTroopsForFleetFeet 1000000000
+
+echo "Total troops in account: %totalTroops%"
+
+if {%totalTroops%<%minTroopsForFleetFeet%} goto notMainAccount
+
+echo "✅ Account has 1B+ troops - Fleet Feet enabled"
+echo ""
+goto proceedWithFleetFeet
+
+label notMainAccount
+echo "⚠️ Account has less than 1B troops"
+echo "This looks like an ALT account!"
+echo "Use alt-account-glitch-loop.txt instead"
+echo "Script stopping to prevent Fleet Feet waste."
+goto scriptEnd
+
+// =====================================================
+// MAIN ACCOUNT PROCESSING
+// =====================================================
+
+label proceedWithFleetFeet
+
+// Configuration
+setarray troopNames ["peasants", "militia", "scouter", "pikemen", "swordsmen", "archer", "lightCavalry", "heavyCavalry", "carriage", "ballista", "batteringRam", "catapult"]
+setarr troopAbbr "wo w s p sw a c cata t b r cp"
+setarr optimalCounts "2000000000 2000000000 2000000000 715827884 715827884 1610612737 1670265066 1894838521 1288490191 1975684959 1932735286 1975685051"
+setarr glitchThreshold "2147483648 2147483648 1073741824 715827883 715827883 536870912 238609295 126322568 429496730 85899346 42949673 17179870"
+
+set glitchNumber 2147483647
+
+// =====================================================
+// STEP 1: CHECK FLEET FEET INVENTORY
+// =====================================================
+
+echo "--- Checking Fleet Feet inventory ---"
+
+set fleetFeet $c.getItemCount("player.buff.speedup.march")$
+echo "Fleet Feet available: %fleetFeet%"
+
+if {%fleetFeet%>0} echo "✅ Fleet Feet ready for instant marches"
+if {%fleetFeet%==0} echo "⚠️ No Fleet Feet - will use regular speed"
+echo ""
+
+// =====================================================
+// STEP 2: SCAN ALL CITIES
+// =====================================================
+
+echo "--- Scanning cities ---"
+
+set numCities $c.allCities.length$
+echo "Account has %numCities% cities"
+echo ""
+
+set cityIdx 0
+label scanMainCity
+
+if {%cityIdx%>=%numCities%} goto scanMainDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+set city%cityIdx%_x $c.castle.x$
+set city%cityIdx%_y $c.castle.y$
+set city%cityIdx%_food $c.castle.resource.food.amount$
+set city%cityIdx%_troops $c.cm.allTroop.total$
+
+echo "City %cityIdx% (%city%cityIdx%_x%,%city%cityIdx%_y%): %city%cityIdx%_troops% troops"
+
+// Store individual troop counts
+set j 0
+label storeTroops
+if {%j%>=12} goto storeTroopsDone
+
+set count $c.castle.troop.%troopNames[{%j%}]%$
+set city%cityIdx%_%troopAbbr[{%j%}]% %count%
+
+set j {%j%+1}
+goto storeTroops
+
+label storeTroopsDone
+
+set cityIdx {%cityIdx%+1}
+goto scanMainCity
+
+label scanMainDone
+echo ""
+
+// =====================================================
+// STEP 3: CALCULATE OPTIMAL MOVES
+// =====================================================
+
+echo "--- Calculating optimal distribution ---"
+echo ""
+
+// For each troop type that matters for glitch (skip wo, w)
+set j 2
+label calcMain
+if {%j%>=12} goto calcMainDone
+
+set type %troopAbbr[{%j%}]%
+set optimal %optimalCounts[{%j%}]%
+set threshold %glitchThreshold[{%j%}]%
+
+// Find city with excess and city that needs
+set srcCity -1
+set tgtCity -1
+set maxExcess 0
+set maxNeed 0
+
+set i 0
+label findMainSrcTgt
+if {%i%>=%numCities%} goto foundMainSrcTgt
+
+set count %city%i%_%type%%
+set excess {%count%-%optimal%}
+set need {%optimal%-%count%}
+
+if {%excess%>%maxExcess%} set maxExcess %excess%
+if {%excess%>%maxExcess%} set srcCity %i%
+
+if {%need%>%maxNeed%} set maxNeed %need%
+if {%need%>%maxNeed%} set tgtCity %i%
+
+set i {%i%+1}
+goto findMainSrcTgt
+
+label foundMainSrcTgt
+
+// Only move if significant difference
+if {%maxExcess%<100000000} goto skipMainMove
+if {%maxNeed%<100000000} goto skipMainMove
+if {%srcCity%==-1} goto skipMainMove
+if {%tgtCity%==-1} goto skipMainMove
+
+echo "%type%: Moving from City %srcCity% to City %tgtCity%"
+
+// Calculate amount
+set moveAmt %maxExcess%
+if {%maxNeed%<%moveAmt%} set moveAmt %maxNeed%
+
+// Execute with Fleet Feet
+switchcity %srcCity%
+sleep 0.3
+
+set tgtCoord %city%tgtCity%_x%,%city%tgtCity%_y%
+
+// Send troops
+echo "  Sending %moveAmt% %type% to %tgtCoord%"
+transport %tgtCoord% t:100000,%type%:%moveAmt%
+
+// USE FLEET FEET for instant arrival
+set fleetFeet $c.getItemCount("player.buff.speedup.march")$
+if {%fleetFeet%>0} echo "  Using Fleet Feet..."
+if {%fleetFeet%>0} set r $c.af.getShopCommands().useSpeedUp(c.castle.fieldId,"all")$
+if {%fleetFeet%>0} echo "  ✅ Instant arrival!"
+
+sleep 1
+
+label skipMainMove
+set j {%j%+1}
+goto calcMain
+
+label calcMainDone
+echo ""
+
+// =====================================================
+// STEP 4: VERIFY GLITCH STATUS
+// =====================================================
+
+echo "--- Verifying glitch status ---"
+echo ""
+
+set totalFoodGen 0
+
+set cityIdx 0
+label verifyMain
+
+if {%cityIdx%>=%numCities%} goto verifyMainDone
+
+switchcity %cityIdx%
+sleep 0.3
+
+echo "City %cityIdx%:"
+set cityGen 0
+
+set j 2
+label verifyMainType
+if {%j%>=12} goto verifyMainTypeDone
+
+set type %troopAbbr[{%j%}]%
+set threshold %glitchThreshold[{%j%}]%
+set count $c.castle.troop.%troopNames[{%j%}]%$
+
+set glitches {{%count%/%threshold%}\\1}
+set isOdd {{%glitches%|2}==1}
+
+if {%glitches%>0} if {%isOdd%} echo "  %type%: %glitches% ODD ✅"
+if {%glitches%>0} if {%isOdd%} set cityGen {%cityGen%+%glitchNumber%}
+if {%glitches%>0} if {!%isOdd%} echo "  %type%: %glitches% EVEN ❌"
+
+set j {%j%+1}
+goto verifyMainType
+
+label verifyMainTypeDone
+
+echo "  City Gen: %cityGen%/hr"
+set totalFoodGen {%totalFoodGen%+%cityGen%}
+
+set cityIdx {%cityIdx%+1}
+goto verifyMain
+
+label verifyMainDone
+
+echo ""
+echo "=================================================="
+echo "MAIN ACCOUNT OPTIMIZATION COMPLETE"
+echo "=================================================="
+echo ""
+echo "Total Food Generation: %totalFoodGen%/hr"
+echo ""
+echo "Run multiple times until all cities optimized!"
+echo "=================================================="
+
+label scriptEnd
